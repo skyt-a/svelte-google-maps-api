@@ -1,58 +1,36 @@
-# create-svelte
+#　svelte-google-maps-api
 
-Everything you need to build a Svelte library, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+## GoogleMap.svelte
 
-Read more about creating a library [in the docs](https://kit.svelte.dev/docs/packaging).
+`GoogleMap.svelte` is a Svelte component used to embed a Google Map into your application. This component provides a wrapper for Google Maps JavaScript API and exposes a wide range of event handlers for interacting with the map.
 
-## Creating a project
+### Properties
 
-If you're seeing this, you've probably already done this step. Congrats!
+The following properties can be passed to the GoogleMap component:
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+- `id`: Unique identifier for the map DOM element.
+- `options`: Google Map options.
+- `onDblClick`, `onDragEnd`, `onDragStart`, `onMouseDown`, `onMouseMove`, `onMouseOut`, `onMouseOver`, `onMouseUp`, `onRightClick`, `onClick`, `onDrag`, `onCenterChanged`: Event handlers for respective map events.
+- `onLoad`: A callback that is invoked when the map is fully loaded.
+- `onUnmount`: A callback that is invoked when the map is unmounted.
+- `mapContainerStyle`: A string to apply custom styles to the map container.
+- `mapContainerClassName`: A class to apply to the map container.
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+The component also manages its own local state variables such as `element`, `map`, and event listeners.
 
-## Developing
+## LoadScript.svelte
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+`LoadScript.svelte` is a Svelte component that handles the loading of Google Maps JavaScript API script. It waits for the script to load and then notifies that it's ready to be used.
 
-```bash
-npm run dev
+### Properties
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+The following properties can be passed to the LoadScript component:
 
-Everything inside `src/lib` is part of your library, everything inside `src/routes` can be used as a showcase or preview app.
+- `apiKey`: Your Google Maps API key.
+- `libraries`: An array of Google Map libraries to be loaded with the script.
 
-## Building
+The component uses the `onMount` lifecycle hook to create a script element and attach it to the document head. Once the script is loaded, it sets the `isReady` store value to `true` to signal that Google Maps API is ready to be used. The `svelteGoogleMapInit` function is attached to the `window` object to serve as a callback once the script is loaded.
 
-To build your library:
+The Google Maps API is loaded asynchronously, and the `apiKey` and `libraries` properties determine the URL used to fetch the API.
 
-```bash
-npm run package
-```
-
-To create a production version of your showcase app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
-
-## Publishing
-
-Go into the `package.json` and give your package the desired name through the `"name"` option. Also consider adding a `"license"` field and point it to a `LICENSE` file which you can create from a template (one popular option is the [MIT license](https://opensource.org/license/mit/)).
-
-To publish your library to [npm](https://www.npmjs.com):
-
-```bash
-npm publish
-```
+**Note:** The two components `GoogleMap.svelte` and `LoadScript.svelte` work together, `LoadScript.svelte` loads the Google Maps JavaScript API, and `GoogleMap.svelte` uses it to display and interact with the map. They are designed to be used together in a parent component, with `GoogleMap.svelte` being a child of `LoadScript.svelte`. This way, the map only attempts to load after the API script is ready.

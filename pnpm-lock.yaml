@@ -1,5 +1,10 @@
 lockfileVersion: '6.0'
 
+dependencies:
+  esm-env:
+    specifier: ^1.0.0
+    version: 1.0.0
+
 devDependencies:
   '@sveltejs/adapter-auto':
     specifier: ^2.0.0
@@ -43,6 +48,9 @@ devDependencies:
   svelte-check:
     specifier: ^3.4.3
     version: 3.4.6(postcss@8.4.26)(svelte@4.1.0)
+  svelte2tsx:
+    specifier: ^0.6.19
+    version: 0.6.19(svelte@4.1.0)(typescript@5.1.6)
   tslib:
     specifier: ^2.4.1
     version: 2.6.0
@@ -1122,7 +1130,6 @@ packages:
 
   /esm-env@1.0.0:
     resolution: {integrity: sha512-Cf6VksWPsTuW01vU9Mk/3vRue91Zevka5SjyNf3nEpokFRuqt/KjUQoGAwq9qMmhpLTHmXzSIrFRw8zxWzmFBA==}
-    dev: true
 
   /espree@9.6.1:
     resolution: {integrity: sha512-oruZaFkjorTpF32kDSI5/75ViwGeZginGGy2NoOSg3Q9bnwlnmDm4HLnkl0RE3n+njDXR037aY1+x58Z/zFdwQ==}

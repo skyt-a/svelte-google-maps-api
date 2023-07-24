@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { isReady } from '$lib/store.js';
 	import { onDestroy } from 'svelte';
-	import { browser } from '$app/environment';
+	import { BROWSER as browser } from 'esm-env';
 
 	export let id: string;
 	export let options: google.maps.MapOptions = {};

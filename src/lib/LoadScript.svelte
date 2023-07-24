@@ -6,8 +6,6 @@
 	export let apiKey = '';
 	export let libraries: Library[] = ['places'];
 
-	const dispatch = createEventDispatcher();
-
 	onMount(() => {
 		// @ts-ignore global custom event for google maps script callback
 		window.svelteGoogleMapInit = () => {
