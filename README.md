@@ -1,5 +1,7 @@
 #　svelte-google-maps-api
 
+#　warning:　This repository is under development
+
 ## GoogleMap.svelte
 
 `GoogleMap.svelte` is a Svelte component used to embed a Google Map into your application. This component provides a wrapper for Google Maps JavaScript API and exposes a wide range of event handlers for interacting with the map.
