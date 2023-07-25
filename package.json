@@ -1,6 +1,6 @@
 {
 	"name": "svelte-google-maps-api",
-	"version": "0.0.1",
+	"version": "0.0.7",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build && npm run package",
@@ -13,10 +13,28 @@
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
 		"format": "prettier --plugin-search-dir . --write ."
 	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/skyt-a/svelte-google-maps-api.git"
+	},
 	"exports": {
-		".": {
-			"types": "./dist/index.d.ts",
-			"svelte": "./dist/index.js"
+		"./LoadScript.svelte": {
+			"types": "./dist/LoadScript.svelte.d.ts",
+			"svelte": "./dist/LoadScript.svelte"
+		},
+		"./GoogleMap.svelte": {
+			"types": "./dist/GoogleMap.svelte.d.ts",
+			"svelte": "./dist/GoogleMap.svelte"
+		}
+	},
+	"typesVersions": {
+		">4.0": {
+			"LoadScript.svelte": [
+				"./dist/LoadScript.svelte.d.ts"
+			],
+			"GoogleMap.svelte": [
+				"./dist/GoogleMap.svelte.d.ts"
+			]
 		}
 	},
 	"files": [
@@ -49,10 +67,24 @@
 		"vite": "^4.4.2",
 		"vitest": "^0.32.2"
 	},
-	"svelte": "./dist/index.js",
-	"types": "./dist/index.d.ts",
 	"type": "module",
 	"dependencies": {
 		"esm-env": "^1.0.0"
-	}
+	},
+	"keywords": [
+		"Svelte",
+		"SvelteKit",
+		"Google",
+		"Google Maps",
+		"google maps",
+		"google-maps",
+		"@google-maps",
+		"google-maps-api",
+		"@google-maps-api",
+		"Map",
+		"Maps",
+		"API",
+		"GoogleMap",
+		"Typescript"
+	]
 }

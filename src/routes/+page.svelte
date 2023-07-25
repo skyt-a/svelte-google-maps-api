@@ -7,8 +7,10 @@
 <input type="text" placeholder="api key" bind:value={apiKey} />
 <LoadScript {apiKey} />
 <GoogleMap
-	center={{ lat: 24.2867, lng: 153.9807 }}
-	zoom={12}
+	options={{
+		center: { lat: 0, lng: 0 },
+		zoom: 8
+	}}
 	mapContainerStyle="width:100vw;height:100vh"
 	onClick={() => console.log('click')}
 	onLoad={(map) => console.log('map loaded', map)}

@@ -1,18 +1,20 @@
 <script lang="ts">
 	import { isReady } from '$lib/store.js';
-	import { onMount, createEventDispatcher } from 'svelte';
 	import type { Library } from '$lib/types/googleMap.js';
+	import { BROWSER as browser } from 'esm-env';
 
 	export let apiKey = '';
 	export let libraries: Library[] = ['places'];
 
-	onMount(() => {
-		// @ts-ignore global custom event for google maps script callback
+	const initialize = (key: string) => {
+		if (!key || key === '') {
+			return;
+		}
+		// @ts-ignore
 		window.svelteGoogleMapInit = () => {
-			isReady.update(() => true);
+			isReady.set(true);
 		};
-
-		const url = `//maps.googleapis.com/maps/api/js?${apiKey ? `key=${apiKey}&` : ''}${
+		const url = `//maps.googleapis.com/maps/api/js?${key ? `key=${key}&` : ''}${
 			libraries.length > 0 ? `libraries=${libraries.sort().join(',')}&` : ''
 		}callback=svelteGoogleMapInit`;
 		const script = document.createElement('script');
@@ -20,7 +22,10 @@
 		script.src = url;
 		script.async = true;
 		document.head.appendChild(script);
-	});
+	};
+	$: if (browser) {
+		initialize(apiKey);
+	}
 </script>
 
 <slot />
