@@ -10,7 +10,7 @@
 ## Install
 
 ```shell
-npm install console-play
+npm install svelte-google-maps-api
 ```
 
 ## Components
