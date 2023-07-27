@@ -1,10 +1,13 @@
 <script lang="ts">
-	import { isReady } from '$lib/store.js';
 	import type { Library } from '$lib/types/googleMap.js';
 	import { BROWSER as browser } from 'esm-env';
+	import { setContext } from 'svelte';
 
 	export let apiKey = '';
 	export let libraries: Library[] = ['places'];
+
+	let loaded = false;
+	let isReady = false;
 
 	const initialize = (key: string) => {
 		if (!key || key === '') {
@@ -12,7 +15,7 @@
 		}
 		// @ts-ignore
 		window.svelteGoogleMapInit = () => {
-			isReady.set(true);
+			loaded = true;
 		};
 		const url = `//maps.googleapis.com/maps/api/js?${key ? `key=${key}&` : ''}${
 			libraries.length > 0 ? `libraries=${libraries.sort().join(',')}&` : ''
@@ -26,6 +29,14 @@
 	$: if (browser) {
 		initialize(apiKey);
 	}
+	$: if (loaded) {
+		setContext('googleMap', {
+			isReady: true
+		});
+		isReady = true;
+	}
 </script>
 
-<slot />
+{#if isReady}
+	<slot />
+{/if}

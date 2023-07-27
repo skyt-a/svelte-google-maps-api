@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { isReady } from '$lib/store.js';
-	import { onDestroy } from 'svelte';
+	import { getContext, onDestroy } from 'svelte';
 	import { BROWSER as browser } from 'esm-env';
+	import { setContext } from 'svelte';
 
 	export let id: string;
 	export let options: google.maps.MapOptions = {};
@@ -151,6 +151,7 @@
 		dragListener = onDrag && google.maps.event.addListener(map, 'drag', onDrag);
 
 		onLoad?.(map);
+		setContext('map', { getMap: () => map });
 	};
 	onDestroy(() => {
 		if (map !== null && browser) {
@@ -162,11 +163,9 @@
 		}
 	});
 
-	isReady.subscribe((value) => {
-		if (value) {
-			initialize();
-		}
-	});
+	$: if (getContext('googleMap')?.isReady && element) {
+		initialize();
+	}
 </script>
 
 <div bind:this={element} {id} style={mapContainerStyle} class={mapContainerClassName}>
