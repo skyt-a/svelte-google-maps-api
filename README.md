@@ -1,19 +1,9 @@
-# svelte-google-maps-api
+## svelte-google-maps-api
 
 **warning:　This repository is under development**
 
-## Feature
-
 ・Google Map JavaScript API Wrapper for Svelte<br>
 ・Svelte 4 Supported
-
-## Install
-
-```shell
-npm install svelte-google-maps-api
-```
-
-## Components
 
 ### LoadScript
 
@@ -34,24 +24,24 @@ npm install svelte-google-maps-api
 
 | Prop                    | Type     | Description |
 |-------------------------|----------|-------------|
-| `id`                    | `string` | An identifier for the map container. |
-| `options`               | `google.maps.MapOptions` | Google Map options object. Default is `{}`. |
-| `onClick`               | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the map is clicked. |
-| `onDblClick`            | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the map is double clicked. |
-| `onDragEnd`             | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the drag ends. |
-| `onDragStart`           | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the drag starts. |
-| `onMouseDown`           | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the mouse button is pressed. |
-| `onMouseMove`           | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the mouse pointer moves. |
-| `onMouseOut`            | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the mouse pointer moves out of the map. |
-| `onMouseOver`           | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the mouse pointer moves over the map. |
-| `onMouseUp`             | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the mouse button is released. |
-| `onRightClick`          | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the map is right clicked. |
-| `onDrag`                | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the map is dragged. |
-| `onCenterChanged`       | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the center of the map changes. |
-| `onLoad`                | `(map: google.maps.Map) => void`| Callback function that is called when the map is loaded. |
-| `onUnmount`             | `(map: google.maps.Map) => void`| Callback function that is called when the map unmounts. |
-| `mapContainerStyle`     | `string`  | Style for the map container. Default is 'width:100%;height:100%'. |
-| `mapContainerClassName` | `string`  | Class name for the map container. |
+| id                    | `string` | An identifier for the map container. |
+| options               | `google.maps.MapOptions` | Google Map options object. |
+| onClick               | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the map is clicked. |
+| onDblClick            | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the map is double clicked. |
+| onDragEnd             | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the drag ends. |
+| onDragStart           | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the drag starts. |
+| onMouseDown           | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the mouse button is pressed. |
+| onMouseMove           | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the mouse pointer moves. |
+| onMouseOut            | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the mouse pointer moves out of the map. |
+| onMouseOver           | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the mouse pointer moves over the map. |
+| onMouseUp             | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the mouse button is released. |
+| onRightClick          | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the map is right clicked. |
+| onDrag                | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the map is dragged. |
+| onCenterChanged       | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the center of the map changes. |
+| onLoad                | `(map: google.maps.Map) => void`| Callback function that is called when the map is loaded. |
+| onUnmount             | `(map: google.maps.Map) => void`| Callback function that is called when the map unmounts. |
+| mapContainerStyle     | `string`  | Style for the map container. Default is 'width:100%;height:100%'. |
+| mapContainerClassName | `string`  | Class name for the map container. |
 
 ### Usage
 
