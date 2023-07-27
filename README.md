@@ -2,9 +2,17 @@
 
 **warning:　This repository is under development**
 
+## Feature
 ・Google Map JavaScript API Wrapper for Svelte<br>
 ・Svelte 4 Supported
 
+## Install
+
+```
+npm install svelte-google-maps-api
+```
+
+## Component
 ### LoadScript
 
 `LoadScript` is a Svelte component that handles the loading of Google Maps JavaScript API script.
