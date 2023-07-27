@@ -1,9 +1,19 @@
-## svelte-google-maps-api
+# svelte-google-maps-api
 
 **warning:　This repository is under development**
 
+## Feature
+
 ・Google Map JavaScript API Wrapper for Svelte<br>
 ・Svelte 4 Supported
+
+## Install
+
+```shell
+npm install console-play
+```
+
+## Components
 
 ### LoadScript
 
