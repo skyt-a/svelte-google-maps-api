@@ -66,7 +66,7 @@ The `GoogleMap` component can be used to render a Google Map:
 	};
 
 	const handleLoad = (map: google.maps.Map) => {
-		// do something with the loaded map
+		
 	};
 </script>
 

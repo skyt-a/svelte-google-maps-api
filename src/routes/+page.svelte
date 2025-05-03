@@ -1,41 +1,184 @@
-<script>
+<script lang="ts">
 	import GoogleMap from '$lib/GoogleMap.svelte';
-	import LoadScript from '$lib/LoadScript.svelte';
+	import APIProvider from '$lib/APIProvider.svelte';
 	import Marker from '$lib/Marker.svelte';
+	import AdvancedMarker from '$lib/AdvancedMarker.svelte';
+	import InfoWindow from '$lib/InfoWindow.svelte';
+	import Polyline from '$lib/Polyline.svelte';
+	import Polygon from '$lib/Polygon.svelte';
+	import Circle from '$lib/Circle.svelte';
+	import Rectangle from '$lib/Rectangle.svelte';
+	import HeatmapLayer from '$lib/HeatmapLayer.svelte';
+	import GroundOverlay from '$lib/GroundOverlay.svelte';
+	import DirectionsRenderer from '$lib/DirectionsRenderer.svelte';
+
 	let apiKey = '';
+
+	let showInfoWindow = false;
+	let advancedMarkerInstance: google.maps.marker.AdvancedMarkerElement | null = null;
+	let advMarkerComponent: AdvancedMarker;
+	let heatmapData = [
+		{ location: { lat: 35.685, lng: 139.76 }, weight: 3 },
+		{ location: { lat: 35.686, lng: 139.765 }, weight: 2 },
+		{ location: { lat: 35.687, lng: 139.77 }, weight: 5 },
+		{ location: { lat: 35.684, lng: 139.77 }, weight: 1 },
+		{ location: { lat: 35.683, lng: 139.765 }, weight: 4 }
+	];
+
+	const groundOverlayBounds = {
+		north: 35.695,
+		south: 35.69,
+		east: 139.765,
+		west: 139.76
+	};
+	const groundOverlayUrl =
+		'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png';
+
+	let directionsResult: google.maps.DirectionsResult | undefined = undefined;
+	let directionsStatus: string = 'Click button to fetch directions';
+
+	function handleMarkerClick() {
+		showInfoWindow = !showInfoWindow;
+	}
+
+	function handleInfoWindowClose() {
+		showInfoWindow = false;
+	}
+
+	function calculateRoute() {
+		if (
+			typeof window === 'undefined' ||
+			!window.google ||
+			!window.google.maps ||
+			!window.google.maps.DirectionsService
+		) {
+			directionsStatus = 'Google Maps API or Directions Service not ready';
+			console.error('[+page] Google Maps API or Directions Service not available on window');
+			return;
+		}
+
+		directionsStatus = 'Calculating...';
+		const directionsServiceInstance = new window.google.maps.DirectionsService();
+
+		const request: google.maps.DirectionsRequest = {
+			origin: { lat: 35.681, lng: 139.767 },
+			destination: { lat: 35.658, lng: 139.745 },
+			travelMode: google.maps.TravelMode.DRIVING
+		};
+
+		directionsServiceInstance.route(request, (result, status) => {
+			if (status === google.maps.DirectionsStatus.OK && result) {
+				directionsResult = result;
+				directionsStatus = 'Route calculated successfully';
+				console.log('[+page] Directions Result:', result);
+			} else {
+				directionsResult = undefined;
+				directionsStatus = `Error calculating directions: ${status}`;
+				console.error('[+page] Directions request failed due to ' + status);
+			}
+		});
+	}
 </script>
 
 <input type="text" placeholder="api key" bind:value={apiKey} />
-<LoadScript {apiKey}>
+<button on:click={calculateRoute}>Calculate Route</button>
+<span>{directionsStatus}</span>
+<APIProvider {apiKey} libraries={['marker', 'visualization', 'routes']}>
 	<GoogleMap
 		options={{
-			center: { lat: 0, lng: 0 },
-			zoom: 8
+			center: { lat: 35.681, lng: 139.767 },
+			zoom: 14,
+			mapId: 'e7e5672a39c9414b'
 		}}
 		mapContainerStyle="width:100vw;height:100vh"
-		onClick={() => console.log('click')}
 		onLoad={(map) => console.log('map loaded', map)}
-		onUnmount={(map) => console.log('map unmounted', map)}
-		onCenterChanged={(map) => console.log('map center changed', map)}
-		onDrag={(map) => console.log('map dragged', map)}
-		onDragEnd={(map) => console.log('map drag ended', map)}
-		onDblClick={(map) => console.log('map double clicked', map)}
-		onMouseUp={(map) => console.log('map mouse up', map)}
-		onMouseOver={(map) => console.log('map mouse over', map)}
-		onRightClick={(map) => console.log('map right clicked', map)}
-		onMouseOut={(map) => console.log('map mouse out', map)}
 	>
-		<Marker
-			position={{ lat: 0, lng: 0 }}
-			onClick={(m) => console.log('marker click', m)}
-			onDrag={(m) => console.log('marker drag', m)}
-			onDragEnd={(m) => console.log('marker drag end', m)}
-			onDragStart={(m) => console.log('marker drag start', m)}
-			onLoad={(m) => console.log('marker load', m)}
-			onRightClick={(m) => console.log('marker right click', m)}
-			onMouseOut={(m) => console.log('marker mouse out', m)}
-			onMouseOver={(m) => console.log('marker mouse over', m)}
-			onMouseUp={(m) => console.log('marker mouse up', m)}
+		<Marker position={{ lat: 35.681, lng: 139.767 }} onClick={handleMarkerClick} />
+
+		<AdvancedMarker
+			bind:this={advMarkerComponent}
+			position={{ lat: 35.683, lng: 139.768 }}
+			onClick={handleMarkerClick}
+			onLoad={(marker) => {
+				console.log('AdvancedMarker loaded:', marker);
+				advancedMarkerInstance = marker;
+			}}
+		>
+			<div style="background: blue; color: white; padding: 5px; border-radius: 5px;">ADV</div>
+		</AdvancedMarker>
+
+		{#if showInfoWindow && advMarkerComponent}
+			{@const markerInstance = advMarkerComponent.getMarkerInstance()}
+			{#if markerInstance}
+				<InfoWindow
+					anchor={markerInstance}
+					onCloseClick={handleInfoWindowClose}
+					bind:isOpen={showInfoWindow}
+				>
+					<p>Advanced Marker Info Window</p>
+					<p>Position: {JSON.stringify({ lat: 35.683, lng: 139.768 })}</p>
+				</InfoWindow>
+			{/if}
+		{/if}
+
+		<Polyline
+			path={[
+				{ lat: 35.68, lng: 139.76 },
+				{ lat: 35.682, lng: 139.765 },
+				{ lat: 35.68, lng: 139.77 }
+			]}
+			strokeColor="#FF0000"
+			strokeOpacity={0.8}
+			strokeWeight={2}
 		/>
+
+		<Polygon
+			paths={[
+				[
+					{ lat: 35.688, lng: 139.768 },
+					{ lat: 35.685, lng: 139.772 },
+					{ lat: 35.688, lng: 139.775 }
+				] as google.maps.LatLngLiteral[]
+			]}
+			strokeColor="#0000FF"
+			strokeOpacity={0.8}
+			strokeWeight={2}
+			fillColor="#0000FF"
+			fillOpacity={0.35}
+		/>
+
+		<Circle
+			center={{ lat: 35.678, lng: 139.775 }}
+			radius={200}
+			strokeColor="#00FF00"
+			strokeOpacity={0.8}
+			strokeWeight={2}
+			fillColor="#00FF00"
+			fillOpacity={0.35}
+		/>
+
+		<Rectangle
+			bounds={{
+				north: 35.678,
+				south: 35.675,
+				east: 139.765,
+				west: 139.76
+			}}
+			strokeColor="#FFFF00"
+			strokeOpacity={0.8}
+			strokeWeight={2}
+			fillColor="#FFFF00"
+			fillOpacity={0.35}
+		/>
+
+		{#if heatmapData.length > 0}
+			<HeatmapLayer data={heatmapData} options={{ radius: 20, opacity: 0.6 }} />
+		{/if}
+
+		<GroundOverlay url={groundOverlayUrl} bounds={groundOverlayBounds} options={{ opacity: 0.7 }} />
+
+		{#if directionsResult}
+			<DirectionsRenderer directions={directionsResult} />
+		{/if}
 	</GoogleMap>
-</LoadScript>
+</APIProvider>
