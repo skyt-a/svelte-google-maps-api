@@ -44,7 +44,7 @@
   let advMarkerComponent: AdvancedMarker;
 
   function getNativeInstance() {
-    const instance = advMarkerComponent?.getMarkerInstance();
+    instance = advMarkerComponent?.getMarkerInstance();
     console.log(instance);
   }
 &lt;/script&gt;
