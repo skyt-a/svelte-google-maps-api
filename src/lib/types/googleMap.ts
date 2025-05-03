@@ -5,4 +5,5 @@ export type Library =
 	| 'localContext'
 	| 'marker'
 	| 'places'
+	| 'routes'
 	| 'visualization';

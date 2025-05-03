@@ -18,9 +18,81 @@
 		"url": "https://github.com/skyt-a/svelte-google-maps-api.git"
 	},
 	"exports": {
-		"./LoadScript.svelte": {
-			"types": "./dist/LoadScript.svelte.d.ts",
-			"svelte": "./dist/LoadScript.svelte"
+		".": {
+			"types": "./dist/index.d.ts",
+			"svelte": "./dist/index.js"
+		},
+		"./APIProvider.svelte": {
+			"types": "./dist/APIProvider.svelte.d.ts",
+			"svelte": "./dist/APIProvider.svelte"
+		},
+		"./AdvancedMarker.svelte": {
+			"types": "./dist/AdvancedMarker.svelte.d.ts",
+			"svelte": "./dist/AdvancedMarker.svelte"
+		},
+		"./InfoWindow.svelte": {
+			"types": "./dist/InfoWindow.svelte.d.ts",
+			"svelte": "./dist/InfoWindow.svelte"
+		},
+		"./Polyline.svelte": {
+			"types": "./dist/Polyline.svelte.d.ts",
+			"svelte": "./dist/Polyline.svelte"
+		},
+		"./Polygon.svelte": {
+			"types": "./dist/Polygon.svelte.d.ts",
+			"svelte": "./dist/Polygon.svelte"
+		},
+		"./Circle.svelte": {
+			"types": "./dist/Circle.svelte.d.ts",
+			"svelte": "./dist/Circle.svelte"
+		},
+		"./Rectangle.svelte": {
+			"types": "./dist/Rectangle.svelte.d.ts",
+			"svelte": "./dist/Rectangle.svelte"
+		},
+		"./HeatmapLayer.svelte": {
+			"types": "./dist/HeatmapLayer.svelte.d.ts",
+			"svelte": "./dist/HeatmapLayer.svelte"
+		},
+		"./GroundOverlay.svelte": {
+			"types": "./dist/GroundOverlay.svelte.d.ts",
+			"svelte": "./dist/GroundOverlay.svelte"
+		},
+		"./DirectionsRenderer.svelte": {
+			"types": "./dist/DirectionsRenderer.svelte.d.ts",
+			"svelte": "./dist/DirectionsRenderer.svelte"
+		},
+		"./MapControl.svelte": {
+			"types": "./dist/controls/MapControl.svelte.d.ts",
+			"svelte": "./dist/controls/MapControl.svelte"
+		},
+		"./TrafficLayer.svelte": {
+			"types": "./dist/layers/TrafficLayer.svelte.d.ts",
+			"svelte": "./dist/layers/TrafficLayer.svelte"
+		},
+		"./TransitLayer.svelte": {
+			"types": "./dist/layers/TransitLayer.svelte.d.ts",
+			"svelte": "./dist/layers/TransitLayer.svelte"
+		},
+		"./BicyclingLayer.svelte": {
+			"types": "./dist/layers/BicyclingLayer.svelte.d.ts",
+			"svelte": "./dist/layers/BicyclingLayer.svelte"
+		},
+		"./KmlLayer.svelte": {
+			"types": "./dist/layers/KmlLayer.svelte.d.ts",
+			"svelte": "./dist/layers/KmlLayer.svelte"
+		},
+		"./Autocomplete.svelte": {
+			"types": "./dist/places/Autocomplete.svelte.d.ts",
+			"svelte": "./dist/places/Autocomplete.svelte"
+		},
+		"./OverlayView.svelte": {
+			"types": "./dist/overlay/OverlayView.svelte.d.ts",
+			"svelte": "./dist/overlay/OverlayView.svelte"
+		},
+		"./StreetViewPanorama.svelte": {
+			"types": "./dist/street-view/StreetViewPanorama.svelte.d.ts",
+			"svelte": "./dist/street-view/StreetViewPanorama.svelte"
 		},
 		"./GoogleMap.svelte": {
 			"types": "./dist/GoogleMap.svelte.d.ts",
@@ -50,15 +122,16 @@
 		"!dist/**/*.spec.*"
 	],
 	"peerDependencies": {
-		"svelte": "^4.0.0"
+		"svelte": "^5.0.0"
 	},
 	"license": "MIT",
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^6.0.0",
+		"@sveltejs/adapter-static": "^3.0.8",
 		"@sveltejs/kit": "^2.20.8",
 		"@sveltejs/package": "^2.3.11",
 		"@sveltejs/vite-plugin-svelte": "^4.0.4",
-		"@types/google.maps": "^3.53.5",
+		"@types/google.maps": "^3.58.1",
 		"@typescript-eslint/eslint-plugin": "^5.45.0",
 		"@typescript-eslint/parser": "^5.45.0",
 		"eslint": "^8.28.0",

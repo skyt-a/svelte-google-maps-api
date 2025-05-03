@@ -1,32 +1,35 @@
 <script lang="ts">
-	import { getContext, onDestroy } from 'svelte';
+	import { getContext, onDestroy, onMount } from 'svelte';
 	import { BROWSER as browser } from 'esm-env';
 	import { setContext } from 'svelte';
+	import type { APIProviderContext } from './APIProvider.svelte';
 
-	export let id: string;
+	export let id: string | undefined = undefined;
 	export let options: google.maps.MapOptions = {};
 
-	export let onDblClick: (e: google.maps.MapMouseEvent) => void;
-	export let onDragEnd: (e: google.maps.MapMouseEvent) => void;
-	export let onDragStart: (e: google.maps.MapMouseEvent) => void;
-	export let onMouseDown: (e: google.maps.MapMouseEvent) => void;
-	export let onMouseMove: (e: google.maps.MapMouseEvent) => void;
-	export let onMouseOut: (e: google.maps.MapMouseEvent) => void;
-	export let onMouseOver: (e: google.maps.MapMouseEvent) => void;
-	export let onMouseUp: (e: google.maps.MapMouseEvent) => void;
-	export let onRightClick: (e: google.maps.MapMouseEvent) => void;
-	export let onClick: (e: google.maps.MapMouseEvent) => void;
-	export let onDrag: (e: google.maps.MapMouseEvent) => void;
-	export let onCenterChanged: (e: google.maps.MapMouseEvent) => void;
+	export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onCenterChanged: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
 
-	export let onLoad: (map: google.maps.Map) => void;
-	export let onUnmount: (map: google.maps.Map) => void;
+	export let onLoad: ((map: google.maps.Map) => void) | undefined = undefined;
+	export let onUnmount: ((map: google.maps.Map) => void) | undefined = undefined;
 
 	export let mapContainerStyle: string = 'width:100%;height:100%';
-	export let mapContainerClassName: string;
+	export let mapContainerClassName: string = '';
 
 	let element: HTMLElement | null = null;
 	let map: google.maps.Map | null = null;
+
+	const { status, googleMapsApi } = getContext<APIProviderContext>('svelte-google-maps-api');
 
 	let dblclickListener: google.maps.MapsEventListener | null = null;
 	let dragendListener: google.maps.MapsEventListener | null = null;
@@ -41,135 +44,138 @@
 	let dragListener: google.maps.MapsEventListener | null = null;
 	let centerChangedListener: google.maps.MapsEventListener | null = null;
 
-	$: if (map && onDblClick && browser) {
+	$: if (map && onDblClick && googleMapsApi && browser) {
 		if (dblclickListener !== null) {
-			google.maps.event.removeListener(dblclickListener);
+			googleMapsApi.event.removeListener(dblclickListener);
 		}
-		dblclickListener = google.maps.event.addListener(map, 'dblclick', onDblClick);
+		dblclickListener = googleMapsApi.event.addListener(map, 'dblclick', onDblClick);
 	}
 
-	$: if (map && onDragEnd && browser) {
+	$: if (map && onDragEnd && googleMapsApi && browser) {
 		if (dragendListener !== null) {
-			google.maps.event.removeListener(dragendListener);
+			googleMapsApi.event.removeListener(dragendListener);
 		}
-		dragendListener = google.maps.event.addListener(map, 'dragend', onDragEnd);
+		dragendListener = googleMapsApi.event.addListener(map, 'dragend', onDragEnd);
 	}
 
-	$: if (map && onDragStart && browser) {
+	$: if (map && onDragStart && googleMapsApi && browser) {
 		if (dragstartListener !== null) {
-			google.maps.event.removeListener(dragstartListener);
+			googleMapsApi.event.removeListener(dragstartListener);
 		}
-		dragstartListener = google.maps.event.addListener(map, 'dragstart', onDragStart);
+		dragstartListener = googleMapsApi.event.addListener(map, 'dragstart', onDragStart);
 	}
 
-	$: if (map && onMouseDown && browser) {
+	$: if (map && onMouseDown && googleMapsApi && browser) {
 		if (mousedownListener !== null) {
-			google.maps.event.removeListener(mousedownListener);
+			googleMapsApi.event.removeListener(mousedownListener);
 		}
-		mousedownListener = google.maps.event.addListener(map, 'mousedown', onMouseDown);
+		mousedownListener = googleMapsApi.event.addListener(map, 'mousedown', onMouseDown);
 	}
 
-	$: if (map && onMouseMove && browser) {
+	$: if (map && onMouseMove && googleMapsApi && browser) {
 		if (mousemoveListener !== null) {
-			google.maps.event.removeListener(mousemoveListener);
+			googleMapsApi.event.removeListener(mousemoveListener);
 		}
-		mousemoveListener = google.maps.event.addListener(map, 'mousemove', onMouseMove);
+		mousemoveListener = googleMapsApi.event.addListener(map, 'mousemove', onMouseMove);
 	}
 
-	$: if (map && onMouseOut && browser) {
+	$: if (map && onMouseOut && googleMapsApi && browser) {
 		if (mouseoutListener !== null) {
-			google.maps.event.removeListener(mouseoutListener);
+			googleMapsApi.event.removeListener(mouseoutListener);
 		}
-		mouseoutListener = google.maps.event.addListener(map, 'mouseout', onMouseOut);
+		mouseoutListener = googleMapsApi.event.addListener(map, 'mouseout', onMouseOut);
 	}
 
-	$: if (map && onMouseOver && browser) {
+	$: if (map && onMouseOver && googleMapsApi && browser) {
 		if (mouseoverListener !== null) {
-			google.maps.event.removeListener(mouseoverListener);
+			googleMapsApi.event.removeListener(mouseoverListener);
 		}
-		mouseoverListener = google.maps.event.addListener(map, 'mouseover', onMouseOver);
+		mouseoverListener = googleMapsApi.event.addListener(map, 'mouseover', onMouseOver);
 	}
 
-	$: if (map && onMouseUp && browser) {
+	$: if (map && onMouseUp && googleMapsApi && browser) {
 		if (mouseupListener !== null) {
-			google.maps.event.removeListener(mouseupListener);
+			googleMapsApi.event.removeListener(mouseupListener);
 		}
-		mouseupListener = google.maps.event.addListener(map, 'mouseup', onMouseUp);
+		mouseupListener = googleMapsApi.event.addListener(map, 'mouseup', onMouseUp);
 	}
 
-	$: if (map && onRightClick && browser) {
+	$: if (map && onRightClick && googleMapsApi && browser) {
 		if (rightClickListener !== null) {
-			google.maps.event.removeListener(rightClickListener);
+			googleMapsApi.event.removeListener(rightClickListener);
 		}
-		rightClickListener = google.maps.event.addListener(map, 'rightclick', onRightClick);
+		rightClickListener = googleMapsApi.event.addListener(map, 'rightclick', onRightClick);
 	}
 
-	$: if (map && onClick && browser) {
+	$: if (map && onClick && googleMapsApi && browser) {
 		console.log('ddddd');
 		if (clickListener !== null) {
-			google.maps.event.removeListener(clickListener);
+			googleMapsApi.event.removeListener(clickListener);
 		}
-		clickListener = google.maps.event.addListener(map, 'click', onClick);
+		clickListener = googleMapsApi.event.addListener(map, 'click', onClick);
 	}
 
-	$: if (map && onDrag && browser) {
+	$: if (map && onDrag && googleMapsApi && browser) {
 		if (dragListener !== null) {
-			google.maps.event.removeListener(dragListener);
+			googleMapsApi.event.removeListener(dragListener);
 		}
-		dragListener = google.maps.event.addListener(map, 'drag', onDrag);
+		dragListener = googleMapsApi.event.addListener(map, 'drag', onDrag);
 	}
 
-	$: if (map && onCenterChanged && browser) {
+	$: if (map && onCenterChanged && googleMapsApi && browser) {
 		if (centerChangedListener !== null) {
-			google.maps.event.removeListener(centerChangedListener);
+			googleMapsApi.event.removeListener(centerChangedListener);
 		}
-		centerChangedListener = google.maps.event.addListener(map, 'center_changed', onCenterChanged);
+		centerChangedListener = googleMapsApi.event.addListener(map, 'center_changed', onCenterChanged);
 	}
 
-	const initialize = () => {
-		if (!browser) return;
-		if (!element) {
-			throw new Error('map element is not found');
-		}
-		const google = window.google;
-		map = new google.maps.Map(element, options);
+	const initialize = (gmaps: typeof google.maps) => {
+		if (!browser || !element) return;
 
-		// initialize event listeners
-		centerChangedListener =
-			onCenterChanged && google.maps.event.addListener(map, 'center_changed', onCenterChanged);
-		dblclickListener = onDblClick && google.maps.event.addListener(map, 'dblclick', onDblClick);
-		dragendListener = onDragEnd && google.maps.event.addListener(map, 'dragend', onDragEnd);
-		dragstartListener = onDragStart && google.maps.event.addListener(map, 'dragstart', onDragStart);
-		mousedownListener = onMouseDown && google.maps.event.addListener(map, 'mousedown', onMouseDown);
-		mousemoveListener = onMouseMove && google.maps.event.addListener(map, 'mousemove', onMouseMove);
-		mouseoutListener = onMouseOut && google.maps.event.addListener(map, 'mouseout', onMouseOut);
-		mouseoverListener = onMouseOver && google.maps.event.addListener(map, 'mouseover', onMouseOver);
-		mouseupListener = onMouseUp && google.maps.event.addListener(map, 'mouseup', onMouseUp);
-		rightClickListener =
-			onRightClick && google.maps.event.addListener(map, 'rightclick', onRightClick);
-		clickListener = onClick && google.maps.event.addListener(map, 'click', onClick);
-		dragListener = onDrag && google.maps.event.addListener(map, 'drag', onDrag);
+		map = new gmaps.Map(element, options);
+
+		if (onCenterChanged)
+			centerChangedListener = gmaps.event.addListener(map, 'center_changed', onCenterChanged);
+		if (onDblClick) dblclickListener = gmaps.event.addListener(map, 'dblclick', onDblClick);
+		if (onDragEnd) dragendListener = gmaps.event.addListener(map, 'dragend', onDragEnd);
+		if (onDragStart) dragstartListener = gmaps.event.addListener(map, 'dragstart', onDragStart);
+		if (onMouseDown) mousedownListener = gmaps.event.addListener(map, 'mousedown', onMouseDown);
+		if (onMouseMove) mousemoveListener = gmaps.event.addListener(map, 'mousemove', onMouseMove);
+		if (onMouseOut) mouseoutListener = gmaps.event.addListener(map, 'mouseout', onMouseOut);
+		if (onMouseOver) mouseoverListener = gmaps.event.addListener(map, 'mouseover', onMouseOver);
+		if (onMouseUp) mouseupListener = gmaps.event.addListener(map, 'mouseup', onMouseUp);
+		if (onRightClick) rightClickListener = gmaps.event.addListener(map, 'rightclick', onRightClick);
+		if (onClick) clickListener = gmaps.event.addListener(map, 'click', onClick);
+		if (onDrag) dragListener = gmaps.event.addListener(map, 'drag', onDrag);
 
 		onLoad?.(map);
-		setContext('map', { getMap: () => map });
+		setContext('map', map);
 	};
 	onDestroy(() => {
-		if (map !== null && browser) {
+		if (map !== null && googleMapsApi && browser) {
 			if (onUnmount) {
 				onUnmount(map);
 			}
-			const google = window.google;
-			google.maps.event.clearInstanceListeners(map);
+			googleMapsApi.event.clearInstanceListeners(map);
 		}
 	});
 
-	$: if (getContext('googleMap')?.isReady && element) {
-		initialize();
+	$: if ($status === 'loaded' && googleMapsApi && element && !map) {
+		initialize(googleMapsApi);
 	}
 </script>
 
 <div bind:this={element} {id} style={mapContainerStyle} class={mapContainerClassName}>
-	{#if map}
+	{#if $status === 'loading'}
+		<slot name="loading">
+			<!-- Optional: Display loading indicator -->
+		</slot>
+	{:else if $status === 'error'}
+		<slot name="error">
+			<!-- Optional: Display error message -->
+			<p style="color: red;">Error loading map.</p>
+		</slot>
+	{:else if map}
 		<slot />
 	{/if}
 </div>
