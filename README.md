@@ -4,7 +4,7 @@
 
 ## Feature
 ・Google Map JavaScript API Wrapper for Svelte<br>
-・Svelte 4 Supported
+・Svelte 5 Supported
 
 ## Install
 
