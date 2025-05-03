@@ -1,127 +1,120 @@
-## svelte-google-maps-api
+# Svelte Google Maps API
 
-**warning:　This repository is under development**
+[![npm version](https://badge.fury.io/js/svelte-google-maps-api.svg)](https://badge.fury.io/js/svelte-google-maps-api)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Feature
-・Google Map JavaScript API Wrapper for Svelte<br>
-・Svelte 5 Supported
+A declarative Svelte component library for the Google Maps JavaScript API, inspired by [`@vis.gl/react-google-maps`](https://visgl.github.io/react-google-maps/).
 
-## Install
+**Note:** This library is under active development. APIs might change.
 
-```
+## Features
+
+*   Declarative Svelte components for Google Maps elements (Map, Markers, InfoWindows, Shapes, Layers, etc.).
+*   TypeScript support.
+*   Context-based API loading and map instance sharing.
+*   Components for `AdvancedMarkerElement`, `MapControl`, `Autocomplete`, `OverlayView`, `StreetViewPanorama`, and more.
+
+## Installation
+
+```bash
+pnpm install svelte-google-maps-api
+# or
 npm install svelte-google-maps-api
+# or
+yarn add svelte-google-maps-api
 ```
 
-## Component
-### LoadScript
+## Basic Usage
 
-`LoadScript` is a Svelte component that handles the loading of Google Maps JavaScript API script.
-
-#### Properties
-
-| Prop       | Type     | Description |
-|------------|----------|-------------|
-| `apiKey`   | `string` | Google Maps API Key |
-| `libraries` | `string[]` | An array of Google Map libraries to be loaded with the script. |
-
-### GoogleMap
-
-`GoogleMap` is a component for rendering a Google Map.
-
-#### Properties
-
-| Prop                    | Type     | Description |
-|-------------------------|----------|-------------|
-| id                    | `string` | An identifier for the map container. |
-| options               | `google.maps.MapOptions` | Google Map options object. |
-| onClick               | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the map is clicked. |
-| onDblClick            | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the map is double clicked. |
-| onDragEnd             | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the drag ends. |
-| onDragStart           | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the drag starts. |
-| onMouseDown           | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the mouse button is pressed. |
-| onMouseMove           | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the mouse pointer moves. |
-| onMouseOut            | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the mouse pointer moves out of the map. |
-| onMouseOver           | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the mouse pointer moves over the map. |
-| onMouseUp             | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the mouse button is released. |
-| onRightClick          | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the map is right clicked. |
-| onDrag                | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the map is dragged. |
-| onCenterChanged       | `(e: google.maps.MapMouseEvent) => void`| Callback function that is called when the center of the map changes. |
-| onLoad                | `(map: google.maps.Map) => void`| Callback function that is called when the map is loaded. |
-| onUnmount             | `(map: google.maps.Map) => void`| Callback function that is called when the map unmounts. |
-| mapContainerStyle     | `string`  | Style for the map container. Default is 'width:100%;height:100%'. |
-| mapContainerClassName | `string`  | Class name for the map container. |
-
-### Usage
-
-The `GoogleMap` component can be used to render a Google Map:
+Get your Google Maps API Key. Make sure the "Maps JavaScript API" is enabled for your key in the Google Cloud Console. You might also need to enable specific libraries (like "marker", "places", "visualization") depending on the components you use.
 
 ```svelte
+<!-- src/routes/+page.svelte -->
 <script lang="ts">
-    	import LoadScript from 'svelte-google-maps-api/LoadScript.svelte';
-	import GoogleMap from 'svelte-google-maps-api//GoogleMap.svelte';
+  import {
+    APIProvider,
+    GoogleMap,
+    Marker
+  } from 'svelte-google-maps-api';
 
-	const options = {
-		zoom: 4,
-		center: {lat: -33, lng: 151},
-	};
+  let apiKey = 'YOUR_GOOGLE_MAPS_API_KEY'; // Replace with your actual API key
 
-	const handleLoad = (map: google.maps.Map) => {
-		
-	};
+  // Map options
+  const mapOptions = {
+    center: { lat: 35.681, lng: 139.767 }, // Tokyo Station
+    zoom: 14,
+    mapId: 'YOUR_MAP_ID' // Optional: Recommended for Advanced Markers & custom styling
+  };
+
+  // Marker position
+  const markerPosition = { lat: 35.681, lng: 139.767 };
+
 </script>
 
-<LoadScript apiKey={yourApiKey}>
-	<GoogleMap {options} onLoad={handleLoad} />
-</LoadScript>
+<div style="height: 100vh; width: 100%">
+  {#if apiKey}
+    <APIProvider {apiKey} libraries={['marker']}> {/* Load necessary libraries */}
+      <GoogleMap {...mapOptions} mapContainerStyle="width:100%; height:100%;">
+        <Marker position={markerPosition} title="Tokyo Station" />
+      </GoogleMap>
+    </APIProvider>
+  {:else}
+    <p>Please provide an API Key.</p>
+    <!-- Basic input example (replace with your actual key management) -->
+    <input type="text" placeholder="Enter API Key" bind:value={apiKey} />
+  {/if}
+</div>
 ```
 
-### Marker
+## Documentation
 
-#### Properties
+For detailed documentation, component references, and examples, please visit the **[Documentation Website](https://your-github-username.github.io/svelte-google-maps-api/)** (Replace with actual link after deployment).
 
-| Property            | Type                                                            | Description                                                                                                                                                                                                                                   |
-|---------------------|-----------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| position            | `google.maps.LatLng \| google.maps.LatLngLiteral`       | Specifies the position of the marker.                                                                                                                                                                                                         |
-| options             | `google.maps.MarkerOptions`                             | An object containing options for the marker, such as its icon, title, etc.                                                                                                                                                                    |
-| onClick             | `((e: google.maps.MapMouseEvent) => void)`              | Event handler for when the marker is clicked.                                                                                                                                                                                                 |
-| onClickableChanged  | `(() => void)`                                          | Event handler for when the marker's 'clickable' property is changed.                                                                                                                                                                          |
-| onCursorChanged     | `(() => void)`                                          | Event handler for when the marker's 'cursor' property is changed.                                                                                                                                                                             |
-| onAnimationChanged  | `(() => void)`                                          | Event handler for when the marker's 'animation' property is changed.                                                                                                                                                                          |
-| onDblClick          | `((e: google.maps.MapMouseEvent) => void)`              | Event handler for when the marker is double-clicked.                                                                                                                                                                                          |
-| onDrag              | `((e: google.maps.MapMouseEvent) => void)`              | Event handler for when the marker is dragged.                                                                                                                                                                                                 |
-| onDragEnd           | `((e: google.maps.MapMouseEvent) => void)`              | Event handler for when the dragging of the marker ends.                                                                                                                                                                                        |
-| onDraggableChanged  | `(() => void)`                                          | Event handler for when the marker's 'draggable' property is changed.                                                                                                                                                                          |
-| onDragStart         | `((e: google.maps.MapMouseEvent) => void)`              | Event handler for when the dragging of the marker starts.                                                                                                                                                                                      |
-| onFlatChanged       | `(() => void)`                                          | Event handler for when the marker's 'flat' property is changed.                                                                                                                                                                               |
-| onIconChanged       | `(() => void)`                                          | Event handler for when the marker's 'icon' property is changed.                                                                                                                                                                               |
-| onMouseDown         | `((e: google.maps.MapMouseEvent) => void)`              | Event handler for when the mouse button is pressed on the marker.                                                                                                                                                                             |
-| onMouseOut          | `((e: google.maps.MapMouseEvent) => void)`              | Event handler for when the mouse leaves the area of the marker.                                                                                                                                                                               |
-| onMouseOver         | `((e: google.maps.MapMouseEvent) => void)`              | Event handler for when the mouse enters the area of the marker.                                                                                                                                                                               |
-| onMouseUp           | `((e: google.maps.MapMouseEvent) => void)`              | Event handler for when the mouse button is released on the marker.                                                                                                                                                                            |
-| onPositionChanged   | `(() => void)`                                          | Event handler for when the marker's 'position' property is changed.                                                                                                                                                                           |
-| onRightClick        | `((e: google.maps.MapMouseEvent) => void)`              | Event handler for when the marker is right-clicked.                                                                                                                                                                                           |
-| onShapeChanged      | `(() => void)`                                          | Event handler for when the marker's 'shape' property is changed.                                                                                                                                                                              |
-| onTitleChanged      | `(() => void)`                                          | Event handler for when the marker's 'title' property is changed.                                                                                                                                                                              |
-| onVisibleChanged    | `(() => void)`                                          | Event handler for when the marker's 'visible' property is changed.                                                                                                                                                                            |
-| onZindexChanged     | `(() => void)`                                          | Event handler for when the marker's 'zIndex' property is changed.                                                                                                                                                                             |
-| onLoad              | `((marker: google.maps.Marker) => void)`                | Event handler for when the marker is added to the map. This event fires after the marker's position has been changed for the first time, but before the marker's `click` event and the map's `mousemove` and `idle` events.                    |
-| onUnmount           | `((marker: google.maps.Marker) => void)`                | Event handler for when the marker is removed from the map.                                                                                                                                                                                    |
+## Components
 
-### Usage
+This library provides the following components (and more):
 
-```svelte
-<script lang="ts">
-	import GoogleMap from 'svelte-google-maps-api//GoogleMap.svelte';
-	import Marker from 'svelte-google-maps-api//Marker.svelte';
+*   `APIProvider`: Loads the Google Maps API and provides context.
+*   `GoogleMap`: Renders the map container.
+*   `Marker`: The standard Google Maps marker.
+*   `AdvancedMarker`: The newer, customizable marker element.
+*   `InfoWindow`: Displays info windows, often anchored to markers.
+*   Drawing Components: `Polyline`, `Polygon`, `Rectangle`, `Circle`.
+*   Layer Components: `HeatmapLayer`, `KmlLayer`, `TrafficLayer`, `TransitLayer`, `BicyclingLayer`, `GroundOverlay`.
+*   Controls: `MapControl` (for custom controls). Standard controls are configured via `GoogleMap` options.
+*   Places: `Autocomplete`.
+*   Overlays: `OverlayView`.
+*   Street View: `StreetViewPanorama`.
 
-	const position = {lat: 37.7749, lng: -122.4194};
-	const options = {
-		draggable: true,
-		title: "Hello, World!"
-	};
-</script>
+## Contributing
 
-<GoogleMap>
-	<Marker {position} {options} />
-</GoogleMap>
+Contributions are welcome! Please feel free to open an issue or submit a pull request.
+
+## Building the Documentation
+
+To build the static documentation site (output to the `docs` directory):
+
+```bash
+pnpm run build
 ```
+
+This command typically runs `vite build`, which uses the `adapter-static` configured in `svelte.config.js`.
+
+## Deploying to GitHub Pages
+
+1.  **Build the site:** Run `pnpm run build` (or `npm run build`/`yarn build`). This will generate the static files in the `docs` directory.
+2.  **Commit the `docs` directory:** Add the `docs` directory to your git commit.
+3.  **Push to GitHub:** Push your changes to the `main` (or your default) branch.
+4.  **Configure GitHub Pages:**
+    *   Go to your repository settings on GitHub.
+    *   Navigate to the "Pages" section.
+    *   Under "Build and deployment", select "Deploy from a branch" as the source.
+    *   Choose the branch you pushed to (e.g., `main`) and select the `/docs` folder as the publishing source.
+    *   Save the changes.
+5.  **Access the site:** GitHub Pages will deploy your site. The URL will be something like `https://<your-username>.github.io/<repository-name>/docs/`. (Update the link in the main README accordingly).
+
+    *Alternatively, you can set up a GitHub Action to automate the build and deployment process to the `gh-pages` branch.* 
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

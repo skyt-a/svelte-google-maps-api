@@ -62,6 +62,38 @@
 			"types": "./dist/DirectionsRenderer.svelte.d.ts",
 			"svelte": "./dist/DirectionsRenderer.svelte"
 		},
+		"./MapControl.svelte": {
+			"types": "./dist/controls/MapControl.svelte.d.ts",
+			"svelte": "./dist/controls/MapControl.svelte"
+		},
+		"./TrafficLayer.svelte": {
+			"types": "./dist/layers/TrafficLayer.svelte.d.ts",
+			"svelte": "./dist/layers/TrafficLayer.svelte"
+		},
+		"./TransitLayer.svelte": {
+			"types": "./dist/layers/TransitLayer.svelte.d.ts",
+			"svelte": "./dist/layers/TransitLayer.svelte"
+		},
+		"./BicyclingLayer.svelte": {
+			"types": "./dist/layers/BicyclingLayer.svelte.d.ts",
+			"svelte": "./dist/layers/BicyclingLayer.svelte"
+		},
+		"./KmlLayer.svelte": {
+			"types": "./dist/layers/KmlLayer.svelte.d.ts",
+			"svelte": "./dist/layers/KmlLayer.svelte"
+		},
+		"./Autocomplete.svelte": {
+			"types": "./dist/places/Autocomplete.svelte.d.ts",
+			"svelte": "./dist/places/Autocomplete.svelte"
+		},
+		"./OverlayView.svelte": {
+			"types": "./dist/overlay/OverlayView.svelte.d.ts",
+			"svelte": "./dist/overlay/OverlayView.svelte"
+		},
+		"./StreetViewPanorama.svelte": {
+			"types": "./dist/street-view/StreetViewPanorama.svelte.d.ts",
+			"svelte": "./dist/street-view/StreetViewPanorama.svelte"
+		},
 		"./GoogleMap.svelte": {
 			"types": "./dist/GoogleMap.svelte.d.ts",
 			"svelte": "./dist/GoogleMap.svelte"
@@ -90,11 +122,12 @@
 		"!dist/**/*.spec.*"
 	],
 	"peerDependencies": {
-		"svelte": "^4.0.0"
+		"svelte": "^5.0.0"
 	},
 	"license": "MIT",
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^6.0.0",
+		"@sveltejs/adapter-static": "^3.0.8",
 		"@sveltejs/kit": "^2.20.8",
 		"@sveltejs/package": "^2.3.11",
 		"@sveltejs/vite-plugin-svelte": "^4.0.4",

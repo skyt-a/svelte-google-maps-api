@@ -228,6 +228,11 @@
 			onZindexChanged
 		);
 	}
+
+	// Function to get the marker instance
+	export function getMarkerInstance(): google.maps.Marker | null {
+		return marker;
+	}
 </script>
 
 <!-- Marker does not render anything itself, it just controls the Google Maps Marker object -->

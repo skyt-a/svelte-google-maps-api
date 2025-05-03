@@ -26,5 +26,24 @@ export {
 	DirectionsRenderer
 };
 
-// Export types as well
+// Export layers
+export * from './layers/TrafficLayer.svelte';
+export * from './layers/TransitLayer.svelte';
+export * from './layers/BicyclingLayer.svelte';
+export * from './layers/KmlLayer.svelte';
+export * from './HeatmapLayer.svelte';
+export * from './GroundOverlay.svelte';
+
+// Export places
+export * from './places/Autocomplete.svelte';
+
+// Export overlay
+export * from './overlay/OverlayView.svelte';
+
+// Export street view
+export * from './street-view/StreetViewPanorama.svelte';
+
+// Export controls
+export * from './controls/MapControl.svelte';
+
 export * from './types/googleMap.js';
