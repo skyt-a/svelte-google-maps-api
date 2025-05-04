@@ -3,7 +3,7 @@
 [![npm version](https://badge.fury.io/js/svelte-google-maps-api.svg)](https://badge.fury.io/js/svelte-google-maps-api)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A declarative Svelte component library for the Google Maps JavaScript API, inspired by [`@vis.gl/react-google-maps`](https://visgl.github.io/react-google-maps/).
+A declarative Svelte component library for the Google Maps JavaScript API.
 
 **Note:** This library is under active development. APIs might change.
 
