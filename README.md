@@ -68,7 +68,7 @@ Get your Google Maps API Key. Make sure the "Maps JavaScript API" is enabled for
 
 ## Documentation
 
-For detailed documentation, component references, and examples, please visit the **[Documentation Website](https://your-github-username.github.io/svelte-google-maps-api/)** (Replace with actual link after deployment).
+For detailed documentation, component references, and examples, please visit the **[Documentation Website](https://skyt-a.github.io/svelte-google-maps-api/docs)** (Replace with actual link after deployment).
 
 ## Components
 
@@ -89,31 +89,7 @@ This library provides the following components (and more):
 ## Contributing
 
 Contributions are welcome! Please feel free to open an issue or submit a pull request.
-
-## Building the Documentation
-
-To build the static documentation site (output to the `docs` directory):
-
-```bash
-pnpm run build
-```
-
-This command typically runs `vite build`, which uses the `adapter-static` configured in `svelte.config.js`.
-
-## Deploying to GitHub Pages
-
-1.  **Build the site:** Run `pnpm run build` (or `npm run build`/`yarn build`). This will generate the static files in the `docs` directory.
-2.  **Commit the `docs` directory:** Add the `docs` directory to your git commit.
-3.  **Push to GitHub:** Push your changes to the `main` (or your default) branch.
-4.  **Configure GitHub Pages:**
-    *   Go to your repository settings on GitHub.
-    *   Navigate to the "Pages" section.
-    *   Under "Build and deployment", select "Deploy from a branch" as the source.
-    *   Choose the branch you pushed to (e.g., `main`) and select the `/docs` folder as the publishing source.
-    *   Save the changes.
-5.  **Access the site:** GitHub Pages will deploy your site. The URL will be something like `https://<your-username>.github.io/<repository-name>/docs/`. (Update the link in the main README accordingly).
-
-    *Alternatively, you can set up a GitHub Action to automate the build and deployment process to the `gh-pages` branch.* 
+ 
 
 ## License
 
