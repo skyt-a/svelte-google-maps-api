@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="../favicon.png" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		
+		<link href="../_app/immutable/assets/2.2NCnmV4P.css" rel="stylesheet">
+		<link href="../_app/immutable/assets/5.DGyCL5W2.css" rel="stylesheet">
+		<link rel="modulepreload" href="../_app/immutable/entry/start.ODf7PBHQ.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/C5hsrE00.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/CxVNXqCc.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/0vHv7F0G.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/CdVlPdQB.js">
+		<link rel="modulepreload" href="../_app/immutable/entry/app.BYpm42X6.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/BB0Yao6Z.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/B9QI8j-U.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/Ymx3e2y9.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/Ci9-pv9u.js">
+		<link rel="modulepreload" href="../_app/immutable/nodes/0.DGTnoXPB.js">
+		<link rel="modulepreload" href="../_app/immutable/nodes/2.BnGdAZBh.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/hJ702ir1.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/DJhstR2y.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/CptybQpF.js">
+		<link rel="modulepreload" href="../_app/immutable/nodes/17.DcbBlygN.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/CWMV1YJF.js">
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div><!--[--><!--[--><!----><!--[--><!----><div class="docs-layout svelte-c4rnox"><nav class="sidebar svelte-c4rnox"><h2 class="svelte-c4rnox">Svelte Google Maps API</h2> <ul class="svelte-c4rnox"><li class="svelte-c4rnox"><a href="../docs" class="svelte-c4rnox">Getting Started</a></li> <li class="svelte-c4rnox"><a href="../docs/api-provider" class="svelte-c4rnox">APIProvider</a></li> <li class="svelte-c4rnox"><a href="../docs/google-map" class="svelte-c4rnox">GoogleMap</a></li> <li class="svelte-c4rnox"><a href="../docs/marker" class="svelte-c4rnox">Marker</a></li> <li class="svelte-c4rnox"><a href="../docs/advanced-marker" class="svelte-c4rnox">AdvancedMarker</a></li> <li class="svelte-c4rnox"><a href="../docs/info-window" class="svelte-c4rnox">InfoWindow</a></li> <li class="svelte-c4rnox"><a href="../docs/polyline" class="svelte-c4rnox">Polyline</a></li> <li class="svelte-c4rnox"><a href="../docs/polygon" class="svelte-c4rnox">Polygon</a></li> <li class="svelte-c4rnox"><a href="../docs/circle" class="svelte-c4rnox">Circle</a></li> <li class="svelte-c4rnox"><a href="../docs/rectangle" class="svelte-c4rnox">Rectangle</a></li> <li class="svelte-c4rnox"><a href="../docs/heatmap-layer" class="svelte-c4rnox">HeatmapLayer</a></li> <li class="svelte-c4rnox"><a href="../docs/ground-overlay" class="svelte-c4rnox">GroundOverlay</a></li> <li class="svelte-c4rnox"><a href="../docs/directions-renderer" class="svelte-c4rnox">DirectionsRenderer</a></li>  <li class="svelte-c4rnox"><a href="../docs/kml-layer" class="svelte-c4rnox">KmlLayer</a></li> <li class="svelte-c4rnox"><a href="../docs/map-control" class="svelte-c4rnox">MapControl</a></li> <li class="svelte-c4rnox"><a href="../docs/autocomplete" class="svelte-c4rnox">Autocomplete</a></li> <li class="svelte-c4rnox"><a href="../docs/overlay-view" class="svelte-c4rnox">OverlayView</a></li> <li class="svelte-c4rnox"><a href="../docs/street-view-panorama" class="svelte-c4rnox">StreetViewPanorama</a></li> <li class="svelte-c4rnox"><a href="../docs/hooks-context" class="svelte-c4rnox">Hooks / Context</a></li></ul></nav> <main class="main-content svelte-c4rnox"><!----><!----><h1>Marker</h1> <p>Renders a standard <a href="https://developers.google.com/maps/documentation/javascript/reference/marker#Marker" target="_blank" rel="noopener noreferrer"><code class="svelte-rgydg9">google.maps.Marker</code></a>.</p> <h2>Props</h2> <table class="svelte-rgydg9"><thead><tr><th class="svelte-rgydg9">Prop</th><th class="svelte-rgydg9">Type</th><th class="svelte-rgydg9">Description</th></tr></thead><tbody><tr><td class="svelte-rgydg9"><code class="svelte-rgydg9">position</code></td><td class="svelte-rgydg9"><code class="svelte-rgydg9">LatLng | LatLngLiteral</code></td><td class="svelte-rgydg9">Required. The marker's geographical location.</td></tr><tr><td class="svelte-rgydg9"><code class="svelte-rgydg9">options</code></td><td class="svelte-rgydg9"><code class="svelte-rgydg9">google.maps.MarkerOptions</code> (optional)</td><td class="svelte-rgydg9">Additional marker options (e.g., <code class="svelte-rgydg9">title</code>, <code class="svelte-rgydg9">icon</code>, <code class="svelte-rgydg9">draggable</code>, <code class="svelte-rgydg9">label</code>). See <a href="https://developers.google.com/maps/documentation/javascript/reference/marker#MarkerOptions" target="_blank" rel="noopener noreferrer">MarkerOptions docs</a>.</td></tr><tr><td class="svelte-rgydg9"><i>Marker Events</i></td><td class="svelte-rgydg9"><code class="svelte-rgydg9">(...) => void</code> (optional)</td><td class="svelte-rgydg9">All standard <a href="https://developers.google.com/maps/documentation/javascript/reference/marker#Marker-Events" target="_blank" rel="noopener noreferrer">google.maps.Marker events</a> are supported as props (e.g., <code class="svelte-rgydg9">onClick</code>, <code class="svelte-rgydg9">onDragEnd</code>, <code class="svelte-rgydg9">onPositionChanged</code>).</td></tr><tr><td class="svelte-rgydg9"><code class="svelte-rgydg9">onLoad</code></td><td class="svelte-rgydg9"><code class="svelte-rgydg9">(marker: Marker) => void</code> (optional)</td><td class="svelte-rgydg9">Callback fired when the marker instance is created.</td></tr><tr><td class="svelte-rgydg9"><code class="svelte-rgydg9">onUnmount</code></td><td class="svelte-rgydg9"><code class="svelte-rgydg9">(marker: Marker) => void</code> (optional)</td><td class="svelte-rgydg9">Callback fired before the marker is removed from the map.</td></tr></tbody></table> <h2>Example</h2> <pre class="svelte-rgydg9"><!---->
+&lt;GoogleMap {...mapOptions}&gt;
+  &lt;Marker
+    position={ { lat: 35.681, lng: 139.767 } }
+    title="Standard Marker"
+    options={ { icon: '...', draggable: true } }
+    onClick={ (e) => console.log('Marker clicked:', e) }
+    onDragEnd={ (e) => console.log('Marker drag ended:', e.latLng?.toJSON()) }
+  />
+&lt;/GoogleMap&gt;
+<!---->
+</pre><!----><!----></main></div><!----><!--]--><!----><!----><!--]--> <!--[!--><!--]--><!--]-->
+			
+			<script>
+				{
+					__sveltekit_1m5wfg8 = {
+						base: new URL("..", location).pathname.slice(0, -1),
+						assets: "/svelte-google-maps-api"
+					};
+
+					const element = document.currentScript.parentElement;
+
+					Promise.all([
+						import("../_app/immutable/entry/start.ODf7PBHQ.js"),
+						import("../_app/immutable/entry/app.BYpm42X6.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element, {
+							node_ids: [0, 2, 17],
+							data: [null,null,null],
+							form: null,
+							error: null
+						});
+					});
+				}
+			</script>
+		</div>
+	</body>
+</html>

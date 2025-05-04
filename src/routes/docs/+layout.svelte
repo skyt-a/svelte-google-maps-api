@@ -19,9 +19,9 @@
 			<li><a href="{base}/docs/heatmap-layer">HeatmapLayer</a></li>
 			<li><a href="{base}/docs/ground-overlay">GroundOverlay</a></li>
 			<li><a href="{base}/docs/directions-renderer">DirectionsRenderer</a></li>
-			<li><a href="{base}/docs/traffic-layer">TrafficLayer</a></li>
-			<li><a href="{base}/docs/transit-layer">TransitLayer</a></li>
-			<li><a href="{base}/docs/bicycling-layer">BicyclingLayer</a></li>
+			<!-- <li><a href="{base}/docs/traffic-layer">TrafficLayer</a></li> -->
+			<!-- <li><a href="{base}/docs/transit-layer">TransitLayer</a></li> -->
+			<!-- <li><a href="{base}/docs/bicycling-layer">BicyclingLayer</a></li> -->
 			<li><a href="{base}/docs/kml-layer">KmlLayer</a></li>
 			<li><a href="{base}/docs/map-control">MapControl</a></li>
 			<li><a href="{base}/docs/autocomplete">Autocomplete</a></li>

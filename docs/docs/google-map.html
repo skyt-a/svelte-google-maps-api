@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="../favicon.png" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		
+		<link href="../_app/immutable/assets/2.2NCnmV4P.css" rel="stylesheet">
+		<link href="../_app/immutable/assets/10.dRNLWIcr.css" rel="stylesheet">
+		<link rel="modulepreload" href="../_app/immutable/entry/start.ODf7PBHQ.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/C5hsrE00.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/CxVNXqCc.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/0vHv7F0G.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/CdVlPdQB.js">
+		<link rel="modulepreload" href="../_app/immutable/entry/app.BYpm42X6.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/BB0Yao6Z.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/B9QI8j-U.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/Ymx3e2y9.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/Ci9-pv9u.js">
+		<link rel="modulepreload" href="../_app/immutable/nodes/0.DGTnoXPB.js">
+		<link rel="modulepreload" href="../_app/immutable/nodes/2.BnGdAZBh.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/hJ702ir1.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/DJhstR2y.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/CptybQpF.js">
+		<link rel="modulepreload" href="../_app/immutable/nodes/10.BvuO1Qdy.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/CWMV1YJF.js">
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div><!--[--><!--[--><!----><!--[--><!----><div class="docs-layout svelte-c4rnox"><nav class="sidebar svelte-c4rnox"><h2 class="svelte-c4rnox">Svelte Google Maps API</h2> <ul class="svelte-c4rnox"><li class="svelte-c4rnox"><a href="../docs" class="svelte-c4rnox">Getting Started</a></li> <li class="svelte-c4rnox"><a href="../docs/api-provider" class="svelte-c4rnox">APIProvider</a></li> <li class="svelte-c4rnox"><a href="../docs/google-map" class="svelte-c4rnox">GoogleMap</a></li> <li class="svelte-c4rnox"><a href="../docs/marker" class="svelte-c4rnox">Marker</a></li> <li class="svelte-c4rnox"><a href="../docs/advanced-marker" class="svelte-c4rnox">AdvancedMarker</a></li> <li class="svelte-c4rnox"><a href="../docs/info-window" class="svelte-c4rnox">InfoWindow</a></li> <li class="svelte-c4rnox"><a href="../docs/polyline" class="svelte-c4rnox">Polyline</a></li> <li class="svelte-c4rnox"><a href="../docs/polygon" class="svelte-c4rnox">Polygon</a></li> <li class="svelte-c4rnox"><a href="../docs/circle" class="svelte-c4rnox">Circle</a></li> <li class="svelte-c4rnox"><a href="../docs/rectangle" class="svelte-c4rnox">Rectangle</a></li> <li class="svelte-c4rnox"><a href="../docs/heatmap-layer" class="svelte-c4rnox">HeatmapLayer</a></li> <li class="svelte-c4rnox"><a href="../docs/ground-overlay" class="svelte-c4rnox">GroundOverlay</a></li> <li class="svelte-c4rnox"><a href="../docs/directions-renderer" class="svelte-c4rnox">DirectionsRenderer</a></li>  <li class="svelte-c4rnox"><a href="../docs/kml-layer" class="svelte-c4rnox">KmlLayer</a></li> <li class="svelte-c4rnox"><a href="../docs/map-control" class="svelte-c4rnox">MapControl</a></li> <li class="svelte-c4rnox"><a href="../docs/autocomplete" class="svelte-c4rnox">Autocomplete</a></li> <li class="svelte-c4rnox"><a href="../docs/overlay-view" class="svelte-c4rnox">OverlayView</a></li> <li class="svelte-c4rnox"><a href="../docs/street-view-panorama" class="svelte-c4rnox">StreetViewPanorama</a></li> <li class="svelte-c4rnox"><a href="../docs/hooks-context" class="svelte-c4rnox">Hooks / Context</a></li></ul></nav> <main class="main-content svelte-c4rnox"><!----><!----><h1>GoogleMap</h1> <p>The `GoogleMap` component renders the map container div and initializes the `google.maps.Map`
+	instance. It must be placed inside an `APIProvider`.</p> <h2>Props</h2> <table class="svelte-gkwbav"><thead><tr><th class="svelte-gkwbav">Prop</th><th class="svelte-gkwbav">Type</th><th class="svelte-gkwbav">Description</th></tr></thead><tbody><tr><td class="svelte-gkwbav"><code class="svelte-gkwbav">options</code></td><td class="svelte-gkwbav"><code class="svelte-gkwbav">google.maps.MapOptions</code></td><td class="svelte-gkwbav">Map configuration options (e.g., <code class="svelte-gkwbav">center</code>, <code class="svelte-gkwbav">zoom</code>, <code class="svelte-gkwbav">mapId</code>, control options like <code class="svelte-gkwbav">fullscreenControl: false</code>, <code class="svelte-gkwbav">zoomControlOptions</code>, etc.). See <a href="https://developers.google.com/maps/documentation/javascript/reference/map#MapOptions" target="_blank" rel="noopener noreferrer">MapOptions documentation</a>.</td></tr><tr><td class="svelte-gkwbav"><code class="svelte-gkwbav">id</code></td><td class="svelte-gkwbav"><code class="svelte-gkwbav">string</code> (optional)</td><td class="svelte-gkwbav">Sets the ID attribute of the map container div.</td></tr><tr><td class="svelte-gkwbav"><code class="svelte-gkwbav">mapContainerStyle</code></td><td class="svelte-gkwbav"><code class="svelte-gkwbav">string</code> (optional)</td><td class="svelte-gkwbav">Inline styles for the map container div. Defaults to <code class="svelte-gkwbav">'width:100%;height:100%'</code>.
+				**Important:** Ensure the container has a defined height.</td></tr><tr><td class="svelte-gkwbav"><code class="svelte-gkwbav">mapContainerClassName</code></td><td class="svelte-gkwbav"><code class="svelte-gkwbav">string</code> (optional)</td><td class="svelte-gkwbav">CSS class name(s) for the map container div.</td></tr><tr><td class="svelte-gkwbav"><code class="svelte-gkwbav">onLoad</code></td><td class="svelte-gkwbav"><code class="svelte-gkwbav">((map: google.maps.Map) => void)</code> (optional)</td><td class="svelte-gkwbav">Callback fired when the map instance is initialized. Receives the map instance.</td></tr><tr><td class="svelte-gkwbav"><code class="svelte-gkwbav">onUnmount</code></td><td class="svelte-gkwbav"><code class="svelte-gkwbav">((map: google.maps.Map) => void)</code> (optional)</td><td class="svelte-gkwbav">Callback fired just before the map instance is destroyed.</td></tr><tr><td class="svelte-gkwbav"><i>Map Events</i></td><td class="svelte-gkwbav"><code class="svelte-gkwbav">(e: google.maps.MapMouseEvent | ...) => void</code> (optional)</td><td class="svelte-gkwbav">All standard <a href="https://developers.google.com/maps/documentation/javascript/reference/map#Map-Events" target="_blank" rel="noopener noreferrer">google.maps.Map events</a> are supported as props (e.g., <code class="svelte-gkwbav">onClick</code>, <code class="svelte-gkwbav">onBoundsChanged</code>, <code class="svelte-gkwbav">onZoomChanged</code>, <code class="svelte-gkwbav">onDragEnd</code>). The event names are camelCased (e.g.,
+				`bounds_changed` becomes `onBoundsChanged`).</td></tr></tbody></table> <h2>Context</h2> <p><code class="svelte-gkwbav">GoogleMap</code> provides a context named <code class="svelte-gkwbav">'map'</code> containing the initialized <code class="svelte-gkwbav">google.maps.Map</code> instance. Child components like `Marker`, `Polyline`, etc., use this context
+	automatically.</p> <h2>Example</h2> <pre class="svelte-gkwbav"><!---->
+&lt;script lang="ts"&gt;
+  import { APIProvider, GoogleMap } from 'svelte-google-maps-api';
+
+  const apiKey = 'YOUR_API_KEY';
+  const mapOptions = {
+    center: { lat: 40.7128, lng: -74.0060 }, // New York
+    zoom: 12,
+    mapTypeId: 'roadmap',
+    disableDefaultUI: true,
+    zoomControl: true
+  };
+
+  function handleMapLoad(map: google.maps.Map) {
+    console.log('Map Loaded!', map);
+  }
+
+  function handleMapClick(event: google.maps.MapMouseEvent) {
+    console.log('Map Clicked:', event.latLng?.toJSON());
+  }
+&lt;/script&gt;
+
+&lt;div style="height: 400px; width: 100%;"&gt;
+  &lt;APIProvider {apiKey}&gt;
+    &lt;GoogleMap
+      {...mapOptions}
+      onLoad={handleMapLoad}
+      onClick={handleMapClick}
+      mapContainerClassName="my-custom-map-class"
+    /&gt;
+    {/* Add Markers, Polylines etc. here */}
+  &lt;/APIProvider&gt;
+&lt;/div&gt;
+<!---->
+</pre><!----><!----></main></div><!----><!--]--><!----><!----><!--]--> <!--[!--><!--]--><!--]-->
+			
+			<script>
+				{
+					__sveltekit_1m5wfg8 = {
+						base: new URL("..", location).pathname.slice(0, -1),
+						assets: "/svelte-google-maps-api"
+					};
+
+					const element = document.currentScript.parentElement;
+
+					Promise.all([
+						import("../_app/immutable/entry/start.ODf7PBHQ.js"),
+						import("../_app/immutable/entry/app.BYpm42X6.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element, {
+							node_ids: [0, 2, 10],
+							data: [null,null,null],
+							form: null,
+							error: null
+						});
+					});
+				}
+			</script>
+		</div>
+	</body>
+</html>
