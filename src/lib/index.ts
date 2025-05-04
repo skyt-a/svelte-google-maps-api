@@ -10,6 +10,14 @@ import Rectangle from './Rectangle.svelte';
 import HeatmapLayer from './HeatmapLayer.svelte';
 import GroundOverlay from './GroundOverlay.svelte';
 import DirectionsRenderer from './DirectionsRenderer.svelte';
+import TrafficLayer from './layers/TrafficLayer.svelte';
+import TransitLayer from './layers/TransitLayer.svelte';
+import BicyclingLayer from './layers/BicyclingLayer.svelte';
+import KmlLayer from './layers/KmlLayer.svelte';
+import Autocomplete from './places/Autocomplete.svelte';
+import OverlayView from './overlay/OverlayView.svelte';
+import StreetViewPanorama from './street-view/StreetViewPanorama.svelte';
+import MapControl from './controls/MapControl.svelte';
 
 export {
 	APIProvider,
@@ -23,27 +31,15 @@ export {
 	Rectangle,
 	HeatmapLayer,
 	GroundOverlay,
-	DirectionsRenderer
+	DirectionsRenderer,
+	TrafficLayer,
+	TransitLayer,
+	BicyclingLayer,
+	KmlLayer,
+	Autocomplete,
+	OverlayView,
+	StreetViewPanorama,
+	MapControl
 };
-
-// Export layers
-export * from './layers/TrafficLayer.svelte';
-export * from './layers/TransitLayer.svelte';
-export * from './layers/BicyclingLayer.svelte';
-export * from './layers/KmlLayer.svelte';
-export * from './HeatmapLayer.svelte';
-export * from './GroundOverlay.svelte';
-
-// Export places
-export * from './places/Autocomplete.svelte';
-
-// Export overlay
-export * from './overlay/OverlayView.svelte';
-
-// Export street view
-export * from './street-view/StreetViewPanorama.svelte';
-
-// Export controls
-export * from './controls/MapControl.svelte';
 
 export * from './types/googleMap.js';
