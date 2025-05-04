@@ -29,7 +29,6 @@ yarn add svelte-google-maps-api
 Get your Google Maps API Key. Make sure the "Maps JavaScript API" is enabled for your key in the Google Cloud Console. You might also need to enable specific libraries (like "marker", "places", "visualization") depending on the components you use.
 
 ```svelte
-<!-- src/routes/+page.svelte -->
 <script lang="ts">
   import {
     APIProvider,
@@ -37,32 +36,23 @@ Get your Google Maps API Key. Make sure the "Maps JavaScript API" is enabled for
     Marker
   } from 'svelte-google-maps-api';
 
-  let apiKey = 'YOUR_GOOGLE_MAPS_API_KEY'; // Replace with your actual API key
+  let apiKey = 'YOUR_GOOGLE_MAPS_API_KEY'; 
 
-  // Map options
   const mapOptions = {
-    center: { lat: 35.681, lng: 139.767 }, // Tokyo Station
+    center: { lat: 35.681, lng: 139.767 }, 
     zoom: 14,
-    mapId: 'YOUR_MAP_ID' // Optional: Recommended for Advanced Markers & custom styling
+    mapId: 'YOUR_MAP_ID' 
   };
 
-  // Marker position
   const markerPosition = { lat: 35.681, lng: 139.767 };
-
 </script>
 
 <div style="height: 100vh; width: 100%">
-  {#if apiKey}
-    <APIProvider {apiKey} libraries={['marker']}> {/* Load necessary libraries */}
-      <GoogleMap {...mapOptions} mapContainerStyle="width:100%; height:100%;">
-        <Marker position={markerPosition} title="Tokyo Station" />
-      </GoogleMap>
-    </APIProvider>
-  {:else}
-    <p>Please provide an API Key.</p>
-    <!-- Basic input example (replace with your actual key management) -->
-    <input type="text" placeholder="Enter API Key" bind:value={apiKey} />
-  {/if}
+	<APIProvider {apiKey} libraries={['marker']}> {/* Load necessary libraries */}
+		<GoogleMap {...mapOptions} mapContainerStyle="width:100%; height:100%;">
+		<Marker position={markerPosition} title="Tokyo Station" />
+		</GoogleMap>
+	</APIProvider>
 </div>
 ```
 
