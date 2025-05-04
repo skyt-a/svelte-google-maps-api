@@ -30,27 +30,24 @@ Get your Google Maps API Key. Make sure the "Maps JavaScript API" is enabled for
 
 ```svelte
 <script lang="ts">
-  import {
-    APIProvider,
-    GoogleMap,
-    Marker
-  } from 'svelte-google-maps-api';
+	import { GoogleMap } from 'svelte-google-maps-api';
+	import { APIProvider } from 'svelte-google-maps-api';
+	import { Marker } from 'svelte-google-maps-api';
 
-  let apiKey = 'YOUR_GOOGLE_MAPS_API_KEY'; 
-
-  const mapOptions = {
-    center: { lat: 35.681, lng: 139.767 }, 
-    zoom: 14,
-    mapId: 'YOUR_MAP_ID' 
-  };
-
-  const markerPosition = { lat: 35.681, lng: 139.767 };
+	let apiKey = 'YOUR_MAP_KEY';
 </script>
 
-<div style="height: 100vh; width: 100%">
-	<APIProvider {apiKey} libraries={['marker']}> {/* Load necessary libraries */}
-		<GoogleMap {...mapOptions} mapContainerStyle="width:100%; height:100%;">
-		<Marker position={markerPosition} title="Tokyo Station" />
+<div style="width: 100%; height: 100vh;">
+	<APIProvider {apiKey} libraries={['marker']}>
+		<GoogleMap
+			options={{
+				center: { lat: 35.681, lng: 139.767 },
+				zoom: 14,
+				mapId: 'YOUR_MAP_ID'
+			}}
+			mapContainerStyle="width:100%;height:100%;"
+		>
+			<Marker position={{ lat: 35.681, lng: 139.767 }} />
 		</GoogleMap>
 	</APIProvider>
 </div>
