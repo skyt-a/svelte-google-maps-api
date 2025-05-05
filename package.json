@@ -8,7 +8,8 @@
 		"check": "turbo run check",
 		"test": "turbo run test",
 		"lint": "turbo run lint",
-		"format": "turbo run format"
+		"format": "turbo run format",
+		"publish": "publish --filter svelte-google-maps-api"
 	},
 	"repository": {
 		"type": "git",
