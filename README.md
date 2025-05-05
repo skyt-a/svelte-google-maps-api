@@ -57,7 +57,7 @@ Get your Google Maps API Key. Make sure the "Maps JavaScript API" is enabled for
 
 ## Documentation
 
-For detailed documentation, component references, and examples, please visit the **[Documentation Website]([https://skyt-a.github.io/svelte-google-maps-api/docs](https://skyt-a.github.io/svelte-google-maps-api-docs/))**
+For detailed documentation, component references, and examples, please visit the **[Documentation Website]([https://skyt-a.github.io/svelte-google-maps-api/](https://skyt-a.github.io/svelte-google-maps-api/))**
 
 ## Components
 
