@@ -3,7 +3,7 @@ import { sveltepress } from '@sveltepress/vite';
 import { defaultTheme } from '@sveltepress/theme-default';
 
 export default defineConfig({
-	base: '/svelte-google-maps-api-docs/',
+	base: '/svelte-google-maps-api/',
 	plugins: [
 		sveltepress({
 			theme: defaultTheme({
