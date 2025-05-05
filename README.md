@@ -29,6 +29,7 @@ yarn add svelte-google-maps-api
 Get your Google Maps API Key. Make sure the "Maps JavaScript API" is enabled for your key in the Google Cloud Console. You might also need to enable specific libraries (like "marker", "places", "visualization") depending on the components you use.
 
 ```svelte
+{% raw %}
 <script lang="ts">
 	import { GoogleMap } from 'svelte-google-maps-api';
 	import { APIProvider } from 'svelte-google-maps-api';
@@ -51,6 +52,7 @@ Get your Google Maps API Key. Make sure the "Maps JavaScript API" is enabled for
 		</GoogleMap>
 	</APIProvider>
 </div>
+{% endraw %}
 ```
 
 ## Documentation
