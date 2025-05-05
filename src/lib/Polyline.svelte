@@ -16,22 +16,22 @@
 	export let strokeWeight: number | undefined = undefined;
 	export let zIndex: number | undefined = undefined;
 
-	export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onPathChanged:
+	export let onclick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let ondblclick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let ondrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let ondragend: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let ondragstart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onmousedown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onmousemove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onmouseout: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onmouseover: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onmouseup: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onrightclick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onpathchanged:
 		| ((newPath: google.maps.MVCArray<google.maps.LatLng>) => void)
 		| undefined = undefined;
-	export let onLoad: ((polyline: google.maps.Polyline) => void) | undefined = undefined;
-	export let onUnmount: ((polyline: google.maps.Polyline) => void) | undefined = undefined;
+	export let onload: ((polyline: google.maps.Polyline) => void) | undefined = undefined;
+	export let onunmount: ((polyline: google.maps.Polyline) => void) | undefined = undefined;
 
 	let polylineInstance: google.maps.Polyline | null = null;
 	let listeners: google.maps.MapsEventListener[] = [];
@@ -64,7 +64,7 @@
 
 		try {
 			polylineInstance = new googleMapsApi.Polyline(polylineOptions);
-			onLoad?.(polylineInstance);
+			onload?.(polylineInstance);
 			setupListeners();
 		} catch (error) {
 			console.error('[Polyline] Error creating instance:', error);
@@ -95,17 +95,17 @@
 			pathUpdateListener = null;
 		}
 		const eventMap = {
-			onClick: 'click',
-			onDblClick: 'dblclick',
-			onDrag: 'drag',
-			onDragEnd: 'dragend',
-			onDragStart: 'dragstart',
-			onMouseDown: 'mousedown',
-			onMouseMove: 'mousemove',
-			onMouseOut: 'mouseout',
-			onMouseOver: 'mouseover',
-			onMouseUp: 'mouseup',
-			onRightClick: 'rightclick'
+			onclick: 'click',
+			ondblclick: 'dblclick',
+			ondrag: 'drag',
+			ondragend: 'dragend',
+			ondragstart: 'dragstart',
+			onmousedown: 'mousedown',
+			onmousemove: 'mousemove',
+			onmouseout: 'mouseout',
+			onmouseover: 'mouseover',
+			onmouseup: 'mouseup',
+			onrightclick: 'rightclick'
 		};
 
 		Object.entries(eventMap).forEach(([propName, eventName]) => {
@@ -115,10 +115,10 @@
 			}
 		});
 
-		if (onPathChanged) {
+		if (onpathchanged) {
 			const polylinePath = polylineInstance.getPath();
 			if (polylinePath) {
-				const updatePath = () => onPathChanged(polylinePath);
+				const updatePath = () => onpathchanged(polylinePath);
 				listeners.push(googleMapsApi.event.addListener(polylinePath, 'insert_at', updatePath));
 				listeners.push(googleMapsApi.event.addListener(polylinePath, 'set_at', updatePath));
 				if (draggable) {
@@ -134,7 +134,7 @@
 
 	onDestroy(() => {
 		if (polylineInstance) {
-			onUnmount?.(polylineInstance);
+			onunmount?.(polylineInstance);
 			listeners.forEach((listener) => googleMapsApi?.event.removeListener(listener));
 			if (pathUpdateListener && googleMapsApi) {
 				googleMapsApi.event.removeListener(pathUpdateListener);
