@@ -82,7 +82,6 @@ export default defineConfig({
 					]
 				},
 				github: 'https://github.com/skyt-a/svelte-google-maps-api',
-				// logo パスを修正
 				logo: '/images/svelte-google-maps-logo.png'
 			}),
 			siteConfig: {

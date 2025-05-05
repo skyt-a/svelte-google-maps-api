@@ -1,5 +1,11 @@
 # Svelte Google Maps API
 
+<p align="center">
+  <a href="https://skyt-a.github.io/svelte-google-maps-api/">
+    <img src="apps/docs/static/images/svelte-google-maps-logo.png" alt="Svelte Google Maps API Logo" width="300">
+  </a>
+</p>
+
 [![npm version](https://badge.fury.io/js/svelte-google-maps-api.svg)](https://badge.fury.io/js/svelte-google-maps-api)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
