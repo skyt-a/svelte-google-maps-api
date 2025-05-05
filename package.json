@@ -1,5 +1,5 @@
 {
-	"name": "svelte-google-maps-api",
+	"name": "svelte-google-maps-api-monorepo",
 	"version": "0.1.4",
 	"scripts": {
 		"build": "turbo run build",
