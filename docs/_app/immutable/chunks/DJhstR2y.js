@@ -1,0 +1,1 @@
+import{h as l,i as a}from"./CxVNXqCc.js";function o(i,t,e,n,r){var u;l&&a();var s=(u=t.$$slots)==null?void 0:u[e],f=!1;s===!0&&(s=t[e==="default"?"children":e],f=!0),s===void 0?r!==null&&r(i):s(i,f?()=>n:n)}function c(i){const t={};i.children&&(t.default=!0);for(const e in i.$$slots)t[e]=!0;return t}export{c as a,o as s};

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="../favicon.png" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		
+		<link href="../_app/immutable/assets/2.2NCnmV4P.css" rel="stylesheet">
+		<link href="../_app/immutable/assets/5.DGyCL5W2.css" rel="stylesheet">
+		<link rel="modulepreload" href="../_app/immutable/entry/start.ODf7PBHQ.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/C5hsrE00.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/CxVNXqCc.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/0vHv7F0G.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/CdVlPdQB.js">
+		<link rel="modulepreload" href="../_app/immutable/entry/app.BYpm42X6.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/BB0Yao6Z.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/B9QI8j-U.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/Ymx3e2y9.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/Ci9-pv9u.js">
+		<link rel="modulepreload" href="../_app/immutable/nodes/0.DGTnoXPB.js">
+		<link rel="modulepreload" href="../_app/immutable/nodes/2.BnGdAZBh.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/hJ702ir1.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/DJhstR2y.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/CptybQpF.js">
+		<link rel="modulepreload" href="../_app/immutable/nodes/14.CSlDo_pw.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/CWMV1YJF.js">
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div><!--[--><!--[--><!----><!--[--><!----><div class="docs-layout svelte-c4rnox"><nav class="sidebar svelte-c4rnox"><h2 class="svelte-c4rnox">Svelte Google Maps API</h2> <ul class="svelte-c4rnox"><li class="svelte-c4rnox"><a href="../docs" class="svelte-c4rnox">Getting Started</a></li> <li class="svelte-c4rnox"><a href="../docs/api-provider" class="svelte-c4rnox">APIProvider</a></li> <li class="svelte-c4rnox"><a href="../docs/google-map" class="svelte-c4rnox">GoogleMap</a></li> <li class="svelte-c4rnox"><a href="../docs/marker" class="svelte-c4rnox">Marker</a></li> <li class="svelte-c4rnox"><a href="../docs/advanced-marker" class="svelte-c4rnox">AdvancedMarker</a></li> <li class="svelte-c4rnox"><a href="../docs/info-window" class="svelte-c4rnox">InfoWindow</a></li> <li class="svelte-c4rnox"><a href="../docs/polyline" class="svelte-c4rnox">Polyline</a></li> <li class="svelte-c4rnox"><a href="../docs/polygon" class="svelte-c4rnox">Polygon</a></li> <li class="svelte-c4rnox"><a href="../docs/circle" class="svelte-c4rnox">Circle</a></li> <li class="svelte-c4rnox"><a href="../docs/rectangle" class="svelte-c4rnox">Rectangle</a></li> <li class="svelte-c4rnox"><a href="../docs/heatmap-layer" class="svelte-c4rnox">HeatmapLayer</a></li> <li class="svelte-c4rnox"><a href="../docs/ground-overlay" class="svelte-c4rnox">GroundOverlay</a></li> <li class="svelte-c4rnox"><a href="../docs/directions-renderer" class="svelte-c4rnox">DirectionsRenderer</a></li>  <li class="svelte-c4rnox"><a href="../docs/kml-layer" class="svelte-c4rnox">KmlLayer</a></li> <li class="svelte-c4rnox"><a href="../docs/map-control" class="svelte-c4rnox">MapControl</a></li> <li class="svelte-c4rnox"><a href="../docs/autocomplete" class="svelte-c4rnox">Autocomplete</a></li> <li class="svelte-c4rnox"><a href="../docs/overlay-view" class="svelte-c4rnox">OverlayView</a></li> <li class="svelte-c4rnox"><a href="../docs/street-view-panorama" class="svelte-c4rnox">StreetViewPanorama</a></li> <li class="svelte-c4rnox"><a href="../docs/hooks-context" class="svelte-c4rnox">Hooks / Context</a></li></ul></nav> <main class="main-content svelte-c4rnox"><!----><!----><h1>InfoWindow</h1> <p>Displays content (usually text or HTML) in a popup window on the map, typically anchored to a <a href="../docs/marker"><code class="svelte-rgydg9">Marker</code></a> or <a href="../docs/advanced-marker"><code class="svelte-rgydg9">AdvancedMarker</code></a>.</p> <h2>Props</h2> <table class="svelte-rgydg9"><thead><tr><th class="svelte-rgydg9">Prop</th><th class="svelte-rgydg9">Type</th><th class="svelte-rgydg9">Description</th></tr></thead><tbody><tr><td class="svelte-rgydg9"><code class="svelte-rgydg9">anchor</code></td><td class="svelte-rgydg9"><code class="svelte-rgydg9">MVCObject | AdvancedMarkerElement | LatLng | LatLngLiteral</code> (optional)</td><td class="svelte-rgydg9">The anchor point for the InfoWindow. This is typically a <code class="svelte-rgydg9">Marker</code> or <code class="svelte-rgydg9">AdvancedMarkerElement</code> instance (obtained via <code class="svelte-rgydg9">bind:this</code> and potentially <code class="svelte-rgydg9">getMarkerInstance()</code>). If not set, <code class="svelte-rgydg9">position</code> must be provided.</td></tr><tr><td class="svelte-rgydg9"><code class="svelte-rgydg9">position</code></td><td class="svelte-rgydg9"><code class="svelte-rgydg9">LatLng | LatLngLiteral</code> (optional)</td><td class="svelte-rgydg9">The LatLng at which to display this InfoWindow. If the anchor is set, the InfoWindow's
+				position is based on the anchor.</td></tr><tr><td class="svelte-rgydg9"><code class="svelte-rgydg9">options</code></td><td class="svelte-rgydg9"><code class="svelte-rgydg9">google.maps.InfoWindowOptions</code> (optional)</td><td class="svelte-rgydg9">Additional InfoWindow options. See <a href="https://developers.google.com/maps/documentation/javascript/reference/info-window#InfoWindowOptions" target="_blank" rel="noopener noreferrer">InfoWindowOptions docs</a>. Note that <code class="svelte-rgydg9">content</code>, <code class="svelte-rgydg9">headerContent</code>, <code class="svelte-rgydg9">position</code>, and <code class="svelte-rgydg9">zIndex</code> are also available as direct props.</td></tr><tr><td class="svelte-rgydg9"><code class="svelte-rgydg9">headerContent</code></td><td class="svelte-rgydg9"><code class="svelte-rgydg9">Element | string</code> (optional)</td><td class="svelte-rgydg9">Content to display in the InfoWindow header. Can be an HTML Element or a string. Overrides <code class="svelte-rgydg9">options.headerContent</code>.</td></tr><tr><td class="svelte-rgydg9"><code class="svelte-rgydg9">zIndex</code></td><td class="svelte-rgydg9"><code class="svelte-rgydg9">number</code> (optional)</td><td class="svelte-rgydg9">The z-index relative to other InfoWindows. Overrides <code class="svelte-rgydg9">options.zIndex</code>.</td></tr><tr><td class="svelte-rgydg9"><code class="svelte-rgydg9">shouldFocus</code></td><td class="svelte-rgydg9"><code class="svelte-rgydg9">boolean</code> (default: <code class="svelte-rgydg9">true</code>)</td><td class="svelte-rgydg9">Whether the InfoWindow should receive focus when opened.</td></tr><tr><td class="svelte-rgydg9"><code class="svelte-rgydg9">isOpen</code></td><td class="svelte-rgydg9"><code class="svelte-rgydg9">boolean</code> (default: <code class="svelte-rgydg9">true</code>)</td><td class="svelte-rgydg9">Controls the open/closed state of the InfoWindow. Use <code class="svelte-rgydg9">bind:isOpen</code> for two-way binding.</td></tr><tr><td class="svelte-rgydg9"><i>InfoWindow Events</i></td><td class="svelte-rgydg9"><code class="svelte-rgydg9">() => void</code> (optional)</td><td class="svelte-rgydg9">Standard <a href="https://developers.google.com/maps/documentation/javascript/reference/info-window#InfoWindow-Events" target="_blank" rel="noopener noreferrer">google.maps.InfoWindow events</a>: <code class="svelte-rgydg9">onCloseClick</code>, <code class="svelte-rgydg9">onDomReady</code>, <code class="svelte-rgydg9">onContentChanged</code>, <code class="svelte-rgydg9">onPositionChanged</code>, <code class="svelte-rgydg9">onZIndexChanged</code>.</td></tr><tr><td class="svelte-rgydg9"><code class="svelte-rgydg9">onLoad</code></td><td class="svelte-rgydg9"><code class="svelte-rgydg9">(infoWindow: InfoWindow) => void</code> (optional)</td><td class="svelte-rgydg9">Callback fired when the InfoWindow instance is created.</td></tr><tr><td class="svelte-rgydg9"><code class="svelte-rgydg9">onUnmount</code></td><td class="svelte-rgydg9"><code class="svelte-rgydg9">(infoWindow: InfoWindow) => void</code> (optional)</td><td class="svelte-rgydg9">Callback fired before the InfoWindow is destroyed.</td></tr></tbody></table> <h2>Slots</h2> <ul><li><strong>Default Slot:</strong> HTML content to be displayed inside the main body of the
+		InfoWindow. Overrides the <code class="svelte-rgydg9">options.content</code> prop.</li> <li><strong><code class="svelte-rgydg9">header</code> Slot:</strong> HTML content to be displayed inside the header of the
+		InfoWindow. Overrides the <code class="svelte-rgydg9">headerContent</code> and <code class="svelte-rgydg9">options.headerContent</code> props.</li></ul> <h2>Example: Open on Marker Click</h2> <pre class="svelte-rgydg9"><!---->
+&lt;script lang="ts"&gt;
+  import { Marker, InfoWindow } from 'svelte-google-maps-api';
+  import AdvancedMarker from './AdvancedMarker.svelte'; // Assuming local path if used
+
+  let showInfoWindow = false;
+  let markerComponent: Marker;
+  let advMarkerComponent: AdvancedMarker;
+
+  function handleMarkerClick() {
+    showInfoWindow = !showInfoWindow;
+  }
+
+  function handleClose() {
+    showInfoWindow = false;
+  }
+&lt;/script&gt;
+
+&lt;GoogleMap {...mapOptions}&gt;
+  &lt;Marker
+    bind:this={markerComponent}
+    position={ { lat: 35.681, lng: 139.767 } }
+    onClick={handleMarkerClick}
+  /&gt;
+
+  {#if showInfoWindow && markerComponent}
+    &lt;InfoWindow
+      anchor={markerComponent.getMarkerInstance()}
+      onCloseClick={handleClose}
+      bind:isOpen={showInfoWindow}
+    &gt;
+      &lt;h3&gt;Standard Marker Info&lt;/h3&gt;
+      &lt;p&gt;This info window is anchored to the marker.&lt;/p&gt;
+    &lt;/InfoWindow&gt;
+  {/if}
+
+  {/* Example with AdvancedMarker */}
+  &lt;AdvancedMarker
+    bind:this={advMarkerComponent}
+    position={ { lat: 35.683, lng: 139.768 } }
+    onClick={handleMarkerClick}
+  /&gt;
+
+  {#if showInfoWindow && advMarkerComponent}
+    {@const instance = advMarkerComponent.getMarkerInstance()}
+    {#if instance}
+      &lt;InfoWindow
+        anchor={instance}
+        onCloseClick={handleClose}
+        bind:isOpen={showInfoWindow}
+      &gt;
+        &lt;strong&gt;Advanced Marker Info&lt;/strong&gt;
+      &lt;/InfoWindow&gt;
+    {/if}
+  {/if}
+&lt;/GoogleMap&gt;
+<!---->
+</pre><!----><!----></main></div><!----><!--]--><!----><!----><!--]--> <!--[!--><!--]--><!--]-->
+			
+			<script>
+				{
+					__sveltekit_1m5wfg8 = {
+						base: new URL("..", location).pathname.slice(0, -1),
+						assets: "/svelte-google-maps-api"
+					};
+
+					const element = document.currentScript.parentElement;
+
+					Promise.all([
+						import("../_app/immutable/entry/start.ODf7PBHQ.js"),
+						import("../_app/immutable/entry/app.BYpm42X6.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element, {
+							node_ids: [0, 2, 14],
+							data: [null,null,null],
+							form: null,
+							error: null
+						});
+					});
+				}
+			</script>
+		</div>
+	</body>
+</html>
