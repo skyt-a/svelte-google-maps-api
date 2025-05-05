@@ -1,57 +1,36 @@
 <script lang="ts">
-	// Simple Layer Component Boilerplate (e.g., for TrafficLayer, TransitLayer, BicyclingLayer)
 	import { getContext, onDestroy } from 'svelte';
 	import { BROWSER as browser } from 'esm-env';
 	import type { APIProviderContext } from '../APIProvider.svelte';
 
-	// --- Props (May vary slightly per layer) ---
-	// Most layers don't have many options settable after creation,
-	// they are primarily toggled on/off by mounting/unmounting.
-	// export let options: google.maps.TrafficLayerOptions | undefined = undefined; // Example
+	export let onLoad: ((layer: google.maps.TrafficLayer) => void) | undefined = undefined;
+	export let onUnmount: ((layer: google.maps.TrafficLayer) => void) | undefined = undefined;
 
-	// --- Events ---
-	export let onLoad: ((layer: google.maps.TrafficLayer) => void) | undefined = undefined; // Adjust type
-	export let onUnmount: ((layer: google.maps.TrafficLayer) => void) | undefined = undefined; // Adjust type
+	let layerInstance: google.maps.TrafficLayer | null = null;
 
-	// --- Internal State ---
-	let layerInstance: google.maps.TrafficLayer | null = null; // Adjust type
-
-	// --- Context ---
 	const { status, googleMapsApi } = getContext<APIProviderContext>('svelte-google-maps-api');
 	const map = getContext<google.maps.Map>('map');
 
-	// --- Initialization ---
 	function initializeLayer() {
 		if (!browser || $status !== 'loaded' || !googleMapsApi || !map || layerInstance) return;
 
-		// Ensure the specific layer class is available
 		if (!googleMapsApi.TrafficLayer) {
-			// Adjust class name
-			console.error('[TrafficLayer] google.maps.TrafficLayer not available.'); // Adjust log
+			console.error('[TrafficLayer] google.maps.TrafficLayer not available.');
 			return;
 		}
 
 		const layerOptions = {
-			// Adjust options type if needed
 			map
-			// ...(options ?? {}) // Include options if applicable
 		};
 
 		try {
-			layerInstance = new googleMapsApi.TrafficLayer(layerOptions); // Adjust class name
+			layerInstance = new googleMapsApi.TrafficLayer(layerOptions);
 			onLoad?.(layerInstance);
 		} catch (error) {
-			console.error('[TrafficLayer] Error creating instance:', error); // Adjust log
+			console.error('[TrafficLayer] Error creating instance:', error);
 		}
 	}
 
-	// --- Reactive Updates ---
-	// Most simple layers don't have reactive props other than being added/removed from the map.
-	// $: if (layerInstance && options) {
-	//   layerInstance.setOptions(options); // If setOptions exists
-	// }
-
-	// --- Lifecycle ---
 	onDestroy(() => {
 		if (layerInstance) {
 			onUnmount?.(layerInstance);
@@ -60,7 +39,6 @@
 		}
 	});
 
-	// Initialize when ready
 	$: if ($status === 'loaded' && map && !layerInstance) {
 		initializeLayer();
 	}

@@ -3,17 +3,16 @@
 	import { BROWSER as browser } from 'esm-env';
 	import type { APIProviderContext } from '../APIProvider.svelte';
 
-	// --- Props (Based on google.maps.StreetViewPanoramaOptions) ---
 	export let options: google.maps.StreetViewPanoramaOptions | undefined = undefined;
 	export let containerId: string | undefined = undefined;
 	export let containerClass: string = '';
 	export let containerStyle: string = 'width:100%;height:100%;';
-	// Individual options for convenience
+
 	export let position: google.maps.LatLng | google.maps.LatLngLiteral | undefined = undefined;
 	export let pov: google.maps.StreetViewPov | undefined = undefined;
 	export let zoom: number | undefined = undefined;
 	export let pano: string | undefined = undefined;
-	// Control options... (e.g., addressControl, fullscreenControl, etc.)
+
 	export let addressControl: boolean | undefined = undefined;
 	export let enableCloseButton: boolean | undefined = undefined;
 	export let fullscreenControl: boolean | undefined = undefined;
@@ -24,9 +23,8 @@
 	export let panControl: boolean | undefined = undefined;
 	export let scrollwheel: boolean | undefined = undefined;
 	export let zoomControl: boolean | undefined = undefined;
-	export let visible: boolean = true; // Initial visibility
+	export let visible: boolean = true;
 
-	// --- Events ---
 	export let onCloseClick: (() => void) | undefined = undefined;
 	export let onPanoChanged: (() => void) | undefined = undefined;
 	export let onPositionChanged: (() => void) | undefined = undefined;
@@ -39,19 +37,13 @@
 	export let onUnmount: ((panorama: google.maps.StreetViewPanorama) => void) | undefined =
 		undefined;
 
-	// --- Internal State ---
 	let panoramaInstance: google.maps.StreetViewPanorama | null = null;
 	let containerElement: HTMLDivElement | null = null;
 	let listeners: google.maps.MapsEventListener[] = [];
 
-	// --- Context ---
 	const { status, googleMapsApi } = getContext<APIProviderContext>('svelte-google-maps-api');
-	// Note: StreetViewPanorama usually doesn't need the main map instance directly,
-	// unless linking behavior is desired (which requires more complex logic).
 
-	// --- Initialization ---
 	onMount(() => {
-		// Initialize only after container element is available and API is loaded
 		initializePanorama();
 	});
 
@@ -83,7 +75,6 @@
 			visible
 		};
 
-		// Filter out undefined props
 		Object.keys(panoramaOptions).forEach((key) => {
 			if (panoramaOptions[key as keyof typeof panoramaOptions] === undefined) {
 				delete panoramaOptions[key as keyof typeof panoramaOptions];
@@ -99,7 +90,6 @@
 		}
 	}
 
-	// --- Reactive Updates ---
 	$: if (panoramaInstance && position && googleMapsApi) {
 		const newPos =
 			position instanceof googleMapsApi.LatLng
@@ -119,11 +109,10 @@
 	$: if (panoramaInstance && visible !== undefined) {
 		panoramaInstance.setVisible(visible);
 	}
-	// Update other options if the main options object changes
+
 	$: if (panoramaInstance && options) {
 		panoramaInstance.setOptions(options);
 	} else if (panoramaInstance) {
-		// Update individual control options
 		const controlOpts: google.maps.StreetViewPanoramaOptions = {};
 		if (addressControl !== undefined) controlOpts.addressControl = addressControl;
 		if (enableCloseButton !== undefined) controlOpts.enableCloseButton = enableCloseButton;
@@ -139,7 +128,6 @@
 		if (Object.keys(controlOpts).length > 0) panoramaInstance.setOptions(controlOpts);
 	}
 
-	// --- Event Listeners ---
 	function setupListeners() {
 		if (!panoramaInstance || !googleMapsApi) return;
 
@@ -169,18 +157,15 @@
 		setupListeners();
 	}
 
-	// --- Lifecycle ---
 	onDestroy(() => {
 		if (panoramaInstance) {
 			onUnmount?.(panoramaInstance);
 			listeners.forEach((listener) => googleMapsApi?.event.removeListener(listener));
-			// Panorama instance might be automatically cleaned up by GC when container is removed,
-			// but explicit cleanup if available is good practice (no setMap(null) for panorama).
+
 			panoramaInstance = null;
 		}
 	});
 
-	// Initialize when ready
 	$: if ($status === 'loaded' && containerElement && !panoramaInstance) {
 		initializePanorama();
 	}

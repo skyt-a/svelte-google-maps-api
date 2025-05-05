@@ -229,7 +229,6 @@
 		);
 	}
 
-	// Function to get the marker instance
 	export function getMarkerInstance(): google.maps.Marker | null {
 		return marker;
 	}

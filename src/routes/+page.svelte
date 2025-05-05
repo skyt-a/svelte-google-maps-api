@@ -45,18 +45,15 @@
 	let directionsResult: google.maps.DirectionsResult | undefined = undefined;
 	let directionsStatus: string = 'Click button to fetch directions';
 
-	// State for additional layers
 	let showTraffic = false;
 	let showTransit = false;
 	let showBicycling = false;
 
-	// State for Autocomplete
 	let autocompleteValue = '';
 	let selectedPlace: google.maps.places.PlaceResult | null = null;
 
-	// State for StreetView
 	let showStreetView = false;
-	let streetViewPosition = { lat: 35.681, lng: 139.767 }; // Initial position for SV
+	let streetViewPosition = { lat: 35.681, lng: 139.767 };
 
 	function handleMarkerClick() {
 		showInfoWindow = !showInfoWindow;
@@ -112,7 +109,6 @@
 		on:place_changed={(e) => {
 			selectedPlace = e.detail;
 			console.log('Place selected:', selectedPlace);
-			// Optionally move map to selected place
 		}}
 		placeholder="Search for a place"
 		options={{ fields: ['name', 'geometry'] }}

@@ -3,7 +3,6 @@
 	import { BROWSER as browser } from 'esm-env';
 	import type { APIProviderContext } from '../APIProvider.svelte';
 
-	// --- Props (Based on google.maps.KmlLayerOptions) ---
 	export let url: string | undefined = undefined;
 	export let options: google.maps.KmlLayerOptions | undefined = undefined;
 	export let clickable: boolean | undefined = undefined;
@@ -12,22 +11,18 @@
 	export let suppressInfoWindows: boolean | undefined = undefined;
 	export let zIndex: number | undefined = undefined;
 
-	// --- Events ---
 	export let onClick: ((e: google.maps.KmlMouseEvent) => void) | undefined = undefined;
 	export let onDefaultViewportChanged: (() => void) | undefined = undefined;
 	export let onStatusChanged: (() => void) | undefined = undefined;
 	export let onLoad: ((layer: google.maps.KmlLayer) => void) | undefined = undefined;
 	export let onUnmount: ((layer: google.maps.KmlLayer) => void) | undefined = undefined;
 
-	// --- Internal State ---
 	let layerInstance: google.maps.KmlLayer | null = null;
 	let listeners: google.maps.MapsEventListener[] = [];
 
-	// --- Context ---
 	const { status, googleMapsApi } = getContext<APIProviderContext>('svelte-google-maps-api');
 	const map = getContext<google.maps.Map>('map');
 
-	// --- Initialization ---
 	function initializeLayer() {
 		if (!browser || $status !== 'loaded' || !googleMapsApi || !map || layerInstance) return;
 
@@ -47,7 +42,6 @@
 			zIndex
 		};
 
-		// Filter out undefined props
 		Object.keys(layerOptions).forEach((key) => {
 			if (layerOptions[key as keyof typeof layerOptions] === undefined) {
 				delete layerOptions[key as keyof typeof layerOptions];
@@ -63,23 +57,14 @@
 		}
 	}
 
-	// --- Reactive Updates ---
-	// KML Layer options are mostly set at creation. URL change might require re-creation.
 	$: if (layerInstance && url && layerInstance.getUrl() !== url) {
 		console.warn('[KmlLayer] URL changed. Re-initializing KML layer.');
-		layerInstance.setMap(null); // Remove old
+		layerInstance.setMap(null);
 		layerInstance = null;
-		// Let initialization logic re-run
 	}
 	$: if (layerInstance && options) {
-		// KmlLayer doesn't have a setOptions method in the typings.
-		// Individual setters might exist but are limited.
-		// layerInstance.setOptions(options);
 	}
-	// Individual props update (if setters exist)
-	// $: if (layerInstance && zIndex !== undefined) layerInstance.setZIndex(zIndex); // Example if setZIndex existed
 
-	// --- Event Listeners ---
 	function setupListeners() {
 		if (!layerInstance || !googleMapsApi) return;
 
@@ -104,7 +89,6 @@
 		setupListeners();
 	}
 
-	// --- Lifecycle ---
 	onDestroy(() => {
 		if (layerInstance) {
 			onUnmount?.(layerInstance);
@@ -114,7 +98,6 @@
 		}
 	});
 
-	// Initialize when ready
 	$: if ($status === 'loaded' && map && url && !layerInstance) {
 		initializeLayer();
 	}
