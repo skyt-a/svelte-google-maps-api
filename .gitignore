@@ -1,15 +1,24 @@
 .DS_Store
+
+# Dependencies
 node_modules
-build
-/dist
-.svelte-kit
-.sveltepress
-/package
-.env
-.env.*
-!.env.example
-vite.config.js.timestamp-*
-vite.config.ts.timestamp-*
+
+# Build artifacts
+**/dist
+**/build
+**/.svelte-kit
+**/.sveltepress
 
 # Turborepo cache
 .turbo
+
+# Env files
+.env
+.env.*
+!.env.example
+
+# Temporary files
+/package # Keep this if needed for root pnpm pack output, otherwise remove or change to **/package
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+*.log

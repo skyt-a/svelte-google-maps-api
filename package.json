@@ -1,6 +1,7 @@
 {
 	"name": "svelte-google-maps-api-monorepo",
 	"version": "0.1.4",
+	"private": true,
 	"scripts": {
 		"build": "turbo run build",
 		"dev": "turbo run dev",
@@ -8,135 +9,9 @@
 		"check": "turbo run check",
 		"test": "turbo run test",
 		"lint": "turbo run lint",
-		"format": "turbo run format",
-		"publish": "publish --filter svelte-google-maps-api"
+		"format": "turbo run format"
 	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/skyt-a/svelte-google-maps-api.git"
-	},
-	"homepage": "https://skyt-a.github.io/svelte-google-maps-api/",
-	"exports": {
-		".": {
-			"types": "./dist/index.d.ts",
-			"svelte": "./dist/index.js",
-			"import": "./dist/index.js"
-		},
-		"./APIProvider.svelte": {
-			"types": "./dist/APIProvider.svelte.d.ts",
-			"svelte": "./dist/APIProvider.svelte"
-		},
-		"./AdvancedMarker.svelte": {
-			"types": "./dist/AdvancedMarker.svelte.d.ts",
-			"svelte": "./dist/AdvancedMarker.svelte"
-		},
-		"./InfoWindow.svelte": {
-			"types": "./dist/InfoWindow.svelte.d.ts",
-			"svelte": "./dist/InfoWindow.svelte"
-		},
-		"./Polyline.svelte": {
-			"types": "./dist/Polyline.svelte.d.ts",
-			"svelte": "./dist/Polyline.svelte"
-		},
-		"./Polygon.svelte": {
-			"types": "./dist/Polygon.svelte.d.ts",
-			"svelte": "./dist/Polygon.svelte"
-		},
-		"./Circle.svelte": {
-			"types": "./dist/Circle.svelte.d.ts",
-			"svelte": "./dist/Circle.svelte"
-		},
-		"./Rectangle.svelte": {
-			"types": "./dist/Rectangle.svelte.d.ts",
-			"svelte": "./dist/Rectangle.svelte"
-		},
-		"./HeatmapLayer.svelte": {
-			"types": "./dist/HeatmapLayer.svelte.d.ts",
-			"svelte": "./dist/HeatmapLayer.svelte"
-		},
-		"./GroundOverlay.svelte": {
-			"types": "./dist/GroundOverlay.svelte.d.ts",
-			"svelte": "./dist/GroundOverlay.svelte"
-		},
-		"./DirectionsRenderer.svelte": {
-			"types": "./dist/DirectionsRenderer.svelte.d.ts",
-			"svelte": "./dist/DirectionsRenderer.svelte"
-		},
-		"./MapControl.svelte": {
-			"types": "./dist/controls/MapControl.svelte.d.ts",
-			"svelte": "./dist/controls/MapControl.svelte"
-		},
-		"./TrafficLayer.svelte": {
-			"types": "./dist/layers/TrafficLayer.svelte.d.ts",
-			"svelte": "./dist/layers/TrafficLayer.svelte"
-		},
-		"./TransitLayer.svelte": {
-			"types": "./dist/layers/TransitLayer.svelte.d.ts",
-			"svelte": "./dist/layers/TransitLayer.svelte"
-		},
-		"./BicyclingLayer.svelte": {
-			"types": "./dist/layers/BicyclingLayer.svelte.d.ts",
-			"svelte": "./dist/layers/BicyclingLayer.svelte"
-		},
-		"./KmlLayer.svelte": {
-			"types": "./dist/layers/KmlLayer.svelte.d.ts",
-			"svelte": "./dist/layers/KmlLayer.svelte"
-		},
-		"./Autocomplete.svelte": {
-			"types": "./dist/places/Autocomplete.svelte.d.ts",
-			"svelte": "./dist/places/Autocomplete.svelte"
-		},
-		"./OverlayView.svelte": {
-			"types": "./dist/overlay/OverlayView.svelte.d.ts",
-			"svelte": "./dist/overlay/OverlayView.svelte"
-		},
-		"./StreetViewPanorama.svelte": {
-			"types": "./dist/street-view/StreetViewPanorama.svelte.d.ts",
-			"svelte": "./dist/street-view/StreetViewPanorama.svelte"
-		},
-		"./GoogleMap.svelte": {
-			"types": "./dist/GoogleMap.svelte.d.ts",
-			"svelte": "./dist/GoogleMap.svelte"
-		},
-		"./Marker.svelte": {
-			"types": "./dist/Marker.svelte.d.ts",
-			"svelte": "./dist/Marker.svelte"
-		}
-	},
-	"typesVersions": {
-		">4.0": {
-			"LoadScript.svelte": [
-				"./dist/LoadScript.svelte.d.ts"
-			],
-			"GoogleMap.svelte": [
-				"./dist/GoogleMap.svelte.d.ts"
-			],
-			"Marker.svelte": [
-				"./dist/Marker.svelte.d.ts"
-			]
-		}
-	},
-	"files": [
-		"dist",
-		"!dist/**/*.test.*",
-		"!dist/**/*.spec.*",
-		"src/lib",
-		"!src/lib/**/*.test.*",
-		"!src/lib/**/*.spec.*"
-	],
-	"peerDependencies": {
-		"svelte": "^5.0.0"
-	},
-	"license": "MIT",
 	"devDependencies": {
-		"@sveltejs/adapter-static": "^3.0.1",
-		"@sveltejs/kit": "^2.20.8",
-		"@sveltejs/package": "^2.3.11",
-		"@sveltejs/vite-plugin-svelte": "^4.0.4",
-		"@sveltepress/theme-default": "^6.0.1",
-		"@sveltepress/vite": "^1.2.1",
-		"@types/google.maps": "^3.58.1",
-		"@types/node": "^20.11.20",
 		"@typescript-eslint/eslint-plugin": "^5.45.0",
 		"@typescript-eslint/parser": "^5.45.0",
 		"eslint": "^8.28.0",
@@ -144,36 +19,10 @@
 		"eslint-plugin-svelte": "^2.30.0",
 		"prettier": "^2.8.0",
 		"prettier-plugin-svelte": "^2.10.1",
-		"publint": "^0.1.9",
-		"svelte": "^5.28.2",
-		"svelte-check": "^3.4.3",
-		"svelte2tsx": "^0.6.19",
-		"tslib": "^2.4.1",
 		"turbo": "^2.5.2",
 		"typescript": "^5.0.0",
-		"vite": "^5.0.3",
 		"vitest": "^0.32.2"
 	},
-	"type": "module",
-	"dependencies": {
-		"esm-env": "^1.0.0"
-	},
-	"keywords": [
-		"Svelte",
-		"SvelteKit",
-		"Google",
-		"Google Maps",
-		"google maps",
-		"google-maps",
-		"@google-maps",
-		"google-maps-api",
-		"@google-maps-api",
-		"Map",
-		"Maps",
-		"API",
-		"GoogleMap",
-		"Typescript"
-	],
 	"packageManager": "pnpm@10.4.1",
 	"workspaces": [
 		"apps/*",
