@@ -1,0 +1,12 @@
+{
+	"extends": "../../tsconfig.json",
+	"compilerOptions": {
+		"outDir": "./dist",
+		"rootDir": "./src/lib",
+		"declarationDir": "./dist",
+		// SvelteKit 関連の types は不要な場合がある
+		"types": ["@types/google.maps", "node"]
+	},
+	"include": ["src/lib/**/*"],
+	"exclude": ["node_modules", "dist"]
+}

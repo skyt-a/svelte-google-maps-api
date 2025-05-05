@@ -1,0 +1,8 @@
+
+
+> svelte-google-maps-api@0.1.3 build /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api
+> svelte-package -i src/lib && publint
+
+[1m[32msrc/lib -> dist[22m[39m
+[1msvelte-google-maps-api[22m lint results:
+[1m[32mAll good![39m[22m

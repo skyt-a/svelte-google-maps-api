@@ -1,14 +1,17 @@
 {
+	"extends": "./.svelte-kit/tsconfig.json",
 	"compilerOptions": {
-		"allowJs": true,
-		"checkJs": true,
+		"target": "ESNext",
+		"module": "ESNext",
+		"moduleResolution": "node",
+		"strict": true,
 		"esModuleInterop": true,
+		"skipLibCheck": true,
 		"forceConsistentCasingInFileNames": true,
 		"resolveJsonModule": true,
-		"skipLibCheck": true,
+		"isolatedModules": true,
 		"sourceMap": true,
-		"strict": true,
-		"moduleResolution": "NodeNext",
-		"types": ["@types/google.maps"]
+		"declaration": true,
+		"declarationMap": true
 	}
 }

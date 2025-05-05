@@ -1,0 +1,9 @@
+src/
+node_modules/
+.DS_Store
+*.log
+
+# Config files
+.eslint*
+.prettier*
+tsconfig.json 

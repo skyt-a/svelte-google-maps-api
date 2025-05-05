@@ -1,0 +1,1072 @@
+
+
+> docs@0.0.1 build /Users/yutasakou/workspace/oss/svelte-google-maps-api/apps/docs
+> vite build
+
+[1m[31mThe following Vite config options will be overridden by SvelteKit:[22m[39m
+  - base
+[36mvite v5.4.19 [32mbuilding SSR bundle for production...[36m[39m
+[2K[1Gtransforming (1) [2m.svelte-kit/generated/server/internal.js[22m[2K[1Gtransforming (20) [2msrc/routes/components/ground-overlay/+page.md[22m[2K[1Gtransforming (23) [2m../../node_modules/.pnpm/@sveltejs+kit@2.20.8_@sveltejs+vite-plugin-sv[2K[1Gtransforming (32) [2m../../node_modules/.pnpm/@sveltepress+theme-default@6.0.2_@algolia+cli[2K[1Gtransforming (37) [2m.svelte-kit/generated/root.svelte[22m[2K[1Gtransforming (90) [2m../../node_modules/.pnpm/@sveltejs+kit@2.20.8_@sveltejs+vite-plugin-sv[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polyline.svelte:19:12 Component has unused export property 'onClick'. If it is for external reference only, please consider using `export const onClick`
+https://svelte.dev/e/export_let_unused[39m
+17:   export let zIndex: number | undefined = undefined;
+18: 
+19:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                              ^
+20:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+21:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polyline.svelte:20:12 Component has unused export property 'onDblClick'. If it is for external reference only, please consider using `export const onDblClick`
+https://svelte.dev/e/export_let_unused[39m
+18: 
+19:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+20:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                 ^
+21:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+22:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polyline.svelte:21:12 Component has unused export property 'onDrag'. If it is for external reference only, please consider using `export const onDrag`
+https://svelte.dev/e/export_let_unused[39m
+19:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+20:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+21:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                             ^
+22:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+23:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polyline.svelte:22:12 Component has unused export property 'onDragEnd'. If it is for external reference only, please consider using `export const onDragEnd`
+https://svelte.dev/e/export_let_unused[39m
+20:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+21:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+22:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                ^
+23:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+24:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polyline.svelte:23:12 Component has unused export property 'onDragStart'. If it is for external reference only, please consider using `export const onDragStart`
+https://svelte.dev/e/export_let_unused[39m
+21:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+22:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+23:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                  ^
+24:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+25:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polyline.svelte:24:12 Component has unused export property 'onMouseDown'. If it is for external reference only, please consider using `export const onMouseDown`
+https://svelte.dev/e/export_let_unused[39m
+22:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+23:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+24:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                  ^
+25:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+26:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polyline.svelte:25:12 Component has unused export property 'onMouseMove'. If it is for external reference only, please consider using `export const onMouseMove`
+https://svelte.dev/e/export_let_unused[39m
+23:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+24:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+25:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                  ^
+26:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+27:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polyline.svelte:26:12 Component has unused export property 'onMouseOut'. If it is for external reference only, please consider using `export const onMouseOut`
+https://svelte.dev/e/export_let_unused[39m
+24:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+25:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+26:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                 ^
+27:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+28:   export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polyline.svelte:27:12 Component has unused export property 'onMouseOver'. If it is for external reference only, please consider using `export const onMouseOver`
+https://svelte.dev/e/export_let_unused[39m
+25:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+26:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+27:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                  ^
+28:   export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+29:   export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polyline.svelte:28:12 Component has unused export property 'onMouseUp'. If it is for external reference only, please consider using `export const onMouseUp`
+https://svelte.dev/e/export_let_unused[39m
+26:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+27:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+28:   export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                ^
+29:   export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+30:   export let onPathChanged:
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polyline.svelte:29:12 Component has unused export property 'onRightClick'. If it is for external reference only, please consider using `export const onRightClick`
+https://svelte.dev/e/export_let_unused[39m
+27:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+28:   export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+29:   export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                   ^
+30:   export let onPathChanged:
+31:     | ((newPath: google.maps.MVCArray<google.maps.LatLng>) => void)
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polygon.svelte:24:12 Component has unused export property 'onClick'. If it is for external reference only, please consider using `export const onClick`
+https://svelte.dev/e/export_let_unused[39m
+22:   export let zIndex: number | undefined = undefined;
+23: 
+24:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                              ^
+25:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+26:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polygon.svelte:25:12 Component has unused export property 'onDblClick'. If it is for external reference only, please consider using `export const onDblClick`
+https://svelte.dev/e/export_let_unused[39m
+23: 
+24:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+25:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                 ^
+26:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+27:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polygon.svelte:26:12 Component has unused export property 'onDrag'. If it is for external reference only, please consider using `export const onDrag`
+https://svelte.dev/e/export_let_unused[39m
+24:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+25:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+26:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                             ^
+27:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+28:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polygon.svelte:27:12 Component has unused export property 'onDragEnd'. If it is for external reference only, please consider using `export const onDragEnd`
+https://svelte.dev/e/export_let_unused[39m
+25:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+26:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+27:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                ^
+28:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+29:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polygon.svelte:28:12 Component has unused export property 'onDragStart'. If it is for external reference only, please consider using `export const onDragStart`
+https://svelte.dev/e/export_let_unused[39m
+26:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+27:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+28:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                  ^
+29:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+30:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polygon.svelte:29:12 Component has unused export property 'onMouseDown'. If it is for external reference only, please consider using `export const onMouseDown`
+https://svelte.dev/e/export_let_unused[39m
+27:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+28:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+29:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                  ^
+30:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+31:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polygon.svelte:30:12 Component has unused export property 'onMouseMove'. If it is for external reference only, please consider using `export const onMouseMove`
+https://svelte.dev/e/export_let_unused[39m
+28:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+29:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+30:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                  ^
+31:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+32:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polygon.svelte:31:12 Component has unused export property 'onMouseOut'. If it is for external reference only, please consider using `export const onMouseOut`
+https://svelte.dev/e/export_let_unused[39m
+29:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+30:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+31:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                 ^
+32:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+33:   export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polygon.svelte:32:12 Component has unused export property 'onMouseOver'. If it is for external reference only, please consider using `export const onMouseOver`
+https://svelte.dev/e/export_let_unused[39m
+30:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+31:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+32:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                  ^
+33:   export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+34:   export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polygon.svelte:33:12 Component has unused export property 'onMouseUp'. If it is for external reference only, please consider using `export const onMouseUp`
+https://svelte.dev/e/export_let_unused[39m
+31:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+32:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+33:   export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                ^
+34:   export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+35:   export let onPathsChanged:
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polygon.svelte:34:12 Component has unused export property 'onRightClick'. If it is for external reference only, please consider using `export const onRightClick`
+https://svelte.dev/e/export_let_unused[39m
+32:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+33:   export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+34:   export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                   ^
+35:   export let onPathsChanged:
+36:     | ((newPaths: google.maps.MVCArray<google.maps.MVCArray<google.maps.LatLng>>) => void)
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Circle.svelte:20:12 Component has unused export property 'onCenterChanged'. If it is for external reference only, please consider using `export const onCenterChanged`
+https://svelte.dev/e/export_let_unused[39m
+18:   export let zIndex: number | undefined = undefined;
+19: 
+20:   export let onCenterChanged: (() => void) | undefined = undefined;
+                                                          ^
+21:   export let onRadiusChanged: (() => void) | undefined = undefined;
+22:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Circle.svelte:21:12 Component has unused export property 'onRadiusChanged'. If it is for external reference only, please consider using `export const onRadiusChanged`
+https://svelte.dev/e/export_let_unused[39m
+19: 
+20:   export let onCenterChanged: (() => void) | undefined = undefined;
+21:   export let onRadiusChanged: (() => void) | undefined = undefined;
+                                                          ^
+22:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+23:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Circle.svelte:22:12 Component has unused export property 'onClick'. If it is for external reference only, please consider using `export const onClick`
+https://svelte.dev/e/export_let_unused[39m
+20:   export let onCenterChanged: (() => void) | undefined = undefined;
+21:   export let onRadiusChanged: (() => void) | undefined = undefined;
+22:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                              ^
+23:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+24:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Circle.svelte:23:12 Component has unused export property 'onDblClick'. If it is for external reference only, please consider using `export const onDblClick`
+https://svelte.dev/e/export_let_unused[39m
+21:   export let onRadiusChanged: (() => void) | undefined = undefined;
+22:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+23:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                 ^
+24:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+25:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Circle.svelte:24:12 Component has unused export property 'onDrag'. If it is for external reference only, please consider using `export const onDrag`
+https://svelte.dev/e/export_let_unused[39m
+22:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+23:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+24:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                             ^
+25:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+26:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Circle.svelte:25:12 Component has unused export property 'onDragEnd'. If it is for external reference only, please consider using `export const onDragEnd`
+https://svelte.dev/e/export_let_unused[39m
+23:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+24:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+25:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                ^
+26:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+27:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Circle.svelte:26:12 Component has unused export property 'onDragStart'. If it is for external reference only, please consider using `export const onDragStart`
+https://svelte.dev/e/export_let_unused[39m
+24:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+25:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+26:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                  ^
+27:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+28:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Circle.svelte:27:12 Component has unused export property 'onMouseDown'. If it is for external reference only, please consider using `export const onMouseDown`
+https://svelte.dev/e/export_let_unused[39m
+25:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+26:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+27:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                  ^
+28:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+29:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Circle.svelte:28:12 Component has unused export property 'onMouseMove'. If it is for external reference only, please consider using `export const onMouseMove`
+https://svelte.dev/e/export_let_unused[39m
+26:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+27:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+28:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                  ^
+29:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+30:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Circle.svelte:29:12 Component has unused export property 'onMouseOut'. If it is for external reference only, please consider using `export const onMouseOut`
+https://svelte.dev/e/export_let_unused[39m
+27:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+28:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+29:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                 ^
+30:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+31:   export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Circle.svelte:30:12 Component has unused export property 'onMouseOver'. If it is for external reference only, please consider using `export const onMouseOver`
+https://svelte.dev/e/export_let_unused[39m
+28:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+29:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+30:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                  ^
+31:   export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+32:   export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Circle.svelte:31:12 Component has unused export property 'onMouseUp'. If it is for external reference only, please consider using `export const onMouseUp`
+https://svelte.dev/e/export_let_unused[39m
+29:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+30:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+31:   export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                ^
+32:   export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+33:   export let onLoad: ((circle: google.maps.Circle) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Circle.svelte:32:12 Component has unused export property 'onRightClick'. If it is for external reference only, please consider using `export const onRightClick`
+https://svelte.dev/e/export_let_unused[39m
+30:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+31:   export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+32:   export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                   ^
+33:   export let onLoad: ((circle: google.maps.Circle) => void) | undefined = undefined;
+34:   export let onUnmount: ((circle: google.maps.Circle) => void) | undefined = undefined;
+[2K[1Gtransforming (146) [2m../../packages/svelte-google-maps-api/dist/Circle.svelte[22m[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Rectangle.svelte:19:12 Component has unused export property 'onBoundsChanged'. If it is for external reference only, please consider using `export const onBoundsChanged`
+https://svelte.dev/e/export_let_unused[39m
+17:   export let zIndex: number | undefined = undefined;
+18: 
+19:   export let onBoundsChanged: (() => void) | undefined = undefined;
+                                                          ^
+20:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+21:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Rectangle.svelte:20:12 Component has unused export property 'onClick'. If it is for external reference only, please consider using `export const onClick`
+https://svelte.dev/e/export_let_unused[39m
+18: 
+19:   export let onBoundsChanged: (() => void) | undefined = undefined;
+20:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                              ^
+21:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+22:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Rectangle.svelte:21:12 Component has unused export property 'onDblClick'. If it is for external reference only, please consider using `export const onDblClick`
+https://svelte.dev/e/export_let_unused[39m
+19:   export let onBoundsChanged: (() => void) | undefined = undefined;
+20:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+21:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                 ^
+22:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+23:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Rectangle.svelte:22:12 Component has unused export property 'onDrag'. If it is for external reference only, please consider using `export const onDrag`
+https://svelte.dev/e/export_let_unused[39m
+20:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+21:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+22:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                             ^
+23:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+24:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Rectangle.svelte:23:12 Component has unused export property 'onDragEnd'. If it is for external reference only, please consider using `export const onDragEnd`
+https://svelte.dev/e/export_let_unused[39m
+21:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+22:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+23:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                ^
+24:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+25:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Rectangle.svelte:24:12 Component has unused export property 'onDragStart'. If it is for external reference only, please consider using `export const onDragStart`
+https://svelte.dev/e/export_let_unused[39m
+22:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+23:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+24:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                  ^
+25:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+26:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Rectangle.svelte:25:12 Component has unused export property 'onMouseDown'. If it is for external reference only, please consider using `export const onMouseDown`
+https://svelte.dev/e/export_let_unused[39m
+23:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+24:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+25:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                  ^
+26:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+27:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Rectangle.svelte:26:12 Component has unused export property 'onMouseMove'. If it is for external reference only, please consider using `export const onMouseMove`
+https://svelte.dev/e/export_let_unused[39m
+24:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+25:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+26:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                  ^
+27:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+28:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Rectangle.svelte:27:12 Component has unused export property 'onMouseOut'. If it is for external reference only, please consider using `export const onMouseOut`
+https://svelte.dev/e/export_let_unused[39m
+25:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+26:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+27:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                 ^
+28:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+29:   export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Rectangle.svelte:28:12 Component has unused export property 'onMouseOver'. If it is for external reference only, please consider using `export const onMouseOver`
+https://svelte.dev/e/export_let_unused[39m
+26:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+27:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+28:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                  ^
+29:   export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+30:   export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Rectangle.svelte:29:12 Component has unused export property 'onMouseUp'. If it is for external reference only, please consider using `export const onMouseUp`
+https://svelte.dev/e/export_let_unused[39m
+27:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+28:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+29:   export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                ^
+30:   export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+31:   export let onLoad: ((rectangle: google.maps.Rectangle) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Rectangle.svelte:30:12 Component has unused export property 'onRightClick'. If it is for external reference only, please consider using `export const onRightClick`
+https://svelte.dev/e/export_let_unused[39m
+28:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+29:   export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+30:   export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                   ^
+31:   export let onLoad: ((rectangle: google.maps.Rectangle) => void) | undefined = undefined;
+32:   export let onUnmount: ((rectangle: google.maps.Rectangle) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/GroundOverlay.svelte:13:12 Component has unused export property 'onClick'. If it is for external reference only, please consider using `export const onClick`
+https://svelte.dev/e/export_let_unused[39m
+11:   export let opacity: number | undefined = undefined;
+12: 
+13:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                              ^
+14:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+15:   export let onLoad: ((overlay: google.maps.GroundOverlay) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/GroundOverlay.svelte:14:12 Component has unused export property 'onDblClick'. If it is for external reference only, please consider using `export const onDblClick`
+https://svelte.dev/e/export_let_unused[39m
+12: 
+13:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+14:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                 ^
+15:   export let onLoad: ((overlay: google.maps.GroundOverlay) => void) | undefined = undefined;
+16:   export let onUnmount: ((overlay: google.maps.GroundOverlay) => void) | undefined = undefined;
+[2K[1Gtransforming (151) [2m../../packages/svelte-google-maps-api/dist/layers/TrafficLayer.svelte[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/layers/KmlLayer.svelte:14:12 Component has unused export property 'onClick'. If it is for external reference only, please consider using `export const onClick`
+https://svelte.dev/e/export_let_unused[39m
+12:   export let zIndex: number | undefined = undefined;
+13: 
+14:   export let onClick: ((e: google.maps.KmlMouseEvent) => void) | undefined = undefined;
+                                                                              ^
+15:   export let onDefaultViewportChanged: (() => void) | undefined = undefined;
+16:   export let onStatusChanged: (() => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/layers/KmlLayer.svelte:15:12 Component has unused export property 'onDefaultViewportChanged'. If it is for external reference only, please consider using `export const onDefaultViewportChanged`
+https://svelte.dev/e/export_let_unused[39m
+13: 
+14:   export let onClick: ((e: google.maps.KmlMouseEvent) => void) | undefined = undefined;
+15:   export let onDefaultViewportChanged: (() => void) | undefined = undefined;
+                                                                   ^
+16:   export let onStatusChanged: (() => void) | undefined = undefined;
+17:   export let onLoad: ((layer: google.maps.KmlLayer) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/layers/KmlLayer.svelte:16:12 Component has unused export property 'onStatusChanged'. If it is for external reference only, please consider using `export const onStatusChanged`
+https://svelte.dev/e/export_let_unused[39m
+14:   export let onClick: ((e: google.maps.KmlMouseEvent) => void) | undefined = undefined;
+15:   export let onDefaultViewportChanged: (() => void) | undefined = undefined;
+16:   export let onStatusChanged: (() => void) | undefined = undefined;
+                                                          ^
+17:   export let onLoad: ((layer: google.maps.KmlLayer) => void) | undefined = undefined;
+18:   export let onUnmount: ((layer: google.maps.KmlLayer) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/street-view/StreetViewPanorama.svelte:28:12 Component has unused export property 'onCloseClick'. If it is for external reference only, please consider using `export const onCloseClick`
+https://svelte.dev/e/export_let_unused[39m
+26:   export let visible: boolean = true;
+27: 
+28:   export let onCloseClick: (() => void) | undefined = undefined;
+                                                       ^
+29:   export let onPanoChanged: (() => void) | undefined = undefined;
+30:   export let onPositionChanged: (() => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/street-view/StreetViewPanorama.svelte:29:12 Component has unused export property 'onPanoChanged'. If it is for external reference only, please consider using `export const onPanoChanged`
+https://svelte.dev/e/export_let_unused[39m
+27: 
+28:   export let onCloseClick: (() => void) | undefined = undefined;
+29:   export let onPanoChanged: (() => void) | undefined = undefined;
+                                                        ^
+30:   export let onPositionChanged: (() => void) | undefined = undefined;
+31:   export let onPovChanged: (() => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/street-view/StreetViewPanorama.svelte:30:12 Component has unused export property 'onPositionChanged'. If it is for external reference only, please consider using `export const onPositionChanged`
+https://svelte.dev/e/export_let_unused[39m
+28:   export let onCloseClick: (() => void) | undefined = undefined;
+29:   export let onPanoChanged: (() => void) | undefined = undefined;
+30:   export let onPositionChanged: (() => void) | undefined = undefined;
+                                                            ^
+31:   export let onPovChanged: (() => void) | undefined = undefined;
+32:   export let onResize: (() => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/street-view/StreetViewPanorama.svelte:31:12 Component has unused export property 'onPovChanged'. If it is for external reference only, please consider using `export const onPovChanged`
+https://svelte.dev/e/export_let_unused[39m
+29:   export let onPanoChanged: (() => void) | undefined = undefined;
+30:   export let onPositionChanged: (() => void) | undefined = undefined;
+31:   export let onPovChanged: (() => void) | undefined = undefined;
+                                                       ^
+32:   export let onResize: (() => void) | undefined = undefined;
+33:   export let onStatusChanged: (() => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/street-view/StreetViewPanorama.svelte:32:12 Component has unused export property 'onResize'. If it is for external reference only, please consider using `export const onResize`
+https://svelte.dev/e/export_let_unused[39m
+30:   export let onPositionChanged: (() => void) | undefined = undefined;
+31:   export let onPovChanged: (() => void) | undefined = undefined;
+32:   export let onResize: (() => void) | undefined = undefined;
+                                                   ^
+33:   export let onStatusChanged: (() => void) | undefined = undefined;
+34:   export let onVisibleChanged: (() => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/street-view/StreetViewPanorama.svelte:33:12 Component has unused export property 'onStatusChanged'. If it is for external reference only, please consider using `export const onStatusChanged`
+https://svelte.dev/e/export_let_unused[39m
+31:   export let onPovChanged: (() => void) | undefined = undefined;
+32:   export let onResize: (() => void) | undefined = undefined;
+33:   export let onStatusChanged: (() => void) | undefined = undefined;
+                                                          ^
+34:   export let onVisibleChanged: (() => void) | undefined = undefined;
+35:   export let onZoomChanged: (() => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/street-view/StreetViewPanorama.svelte:34:12 Component has unused export property 'onVisibleChanged'. If it is for external reference only, please consider using `export const onVisibleChanged`
+https://svelte.dev/e/export_let_unused[39m
+32:   export let onResize: (() => void) | undefined = undefined;
+33:   export let onStatusChanged: (() => void) | undefined = undefined;
+34:   export let onVisibleChanged: (() => void) | undefined = undefined;
+                                                           ^
+35:   export let onZoomChanged: (() => void) | undefined = undefined;
+36:   export let onLoad: ((panorama: google.maps.StreetViewPanorama) => void) | undefined = undefined;
+[33m11:09:15 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/street-view/StreetViewPanorama.svelte:35:12 Component has unused export property 'onZoomChanged'. If it is for external reference only, please consider using `export const onZoomChanged`
+https://svelte.dev/e/export_let_unused[39m
+33:   export let onStatusChanged: (() => void) | undefined = undefined;
+34:   export let onVisibleChanged: (() => void) | undefined = undefined;
+35:   export let onZoomChanged: (() => void) | undefined = undefined;
+                                                        ^
+36:   export let onLoad: ((panorama: google.maps.StreetViewPanorama) => void) | undefined = undefined;
+37:   export let onUnmount: ((panorama: google.maps.StreetViewPanorama) => void) | undefined =
+[2K[1Gtransforming (213) [2m../../node_modules/.pnpm/svelte@5.28.2/node_modules/svelte/src/intern[2K[1Gtransforming (301) [2m../../node_modules/.pnpm/@shikijs+langs@1.29.2/node_modules/@shikijs/[2K[1Gtransforming (523) [2m../../node_modules/.pnpm/devalue@5.1.1/node_modules/devalue/src/utils[2K[1G[2K[1G[2K[1Gtransforming (570) [2m../../node_modules/.pnpm/@sveltepress+theme-default@6.0.2_@algolia+cl[2K[1Gtransforming (628) [2m../../node_modules/.pnpm/@sveltepress+theme-default@6.0.2_@algolia+cl[2K[1Gtransforming (671) [2m../../node_modules/.pnpm/zwitch@2.0.4/node_modules/zwitch/index.js[2[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[32m✓[39m 704 modules transformed.
+[2K[1Grendering chunks (1)...[2K[1Grendering chunks (2)...[2K[1Grendering chunks (3)...[2K[1Grendering chunks (4)...[2K[1Grendering chunks (5)...[2K[1Grendering chunks (6)...[2K[1Grendering chunks (7)...[2K[1Grendering chunks (8)...[2K[1Grendering chunks (9)...[2K[1Grendering chunks (10)...[2K[1Grendering chunks (11)...[2K[1Grendering chunks (12)...[2K[1Grendering chunks (13)...[2K[1Grendering chunks (14)...[2K[1Grendering chunks (15)...[2K[1Grendering chunks (16)...[2K[1Grendering chunks (17)...[2K[1Grendering chunks (18)...[2K[1Grendering chunks (19)...[2K[1Grendering chunks (20)...[2K[1Grendering chunks (21)...[2K[1Grendering chunks (22)...[2K[1Grendering chunks (23)...[2K[1Grendering chunks (24)...[2K[1Grendering chunks (25)...[2K[1Grendering chunks (26)...[2K[1Grendering chunks (27)...[2K[1Grendering chunks (28)...[2K[1Grendering chunks (29)...[2K[1Grendering chunks (30)...[2K[1Grendering chunks (31)...[2K[1Grendering chunks (32)...[2K[1Grendering chunks (33)...[2K[1Grendering chunks (34)...[2K[1Grendering chunks (35)...[2K[1Grendering chunks (36)...[2K[1Grendering chunks (37)...[2K[1G[1m[31mThe following Vite config options will be overridden by SvelteKit:[22m[39m
+  - base
+[36mvite v5.4.19 [32mbuilding for production...[36m[39m
+[2K[1Gtransforming (1) [2m.svelte-kit/generated/client-optimized/app.js[22m[2K[1Gtransforming (37) [2msrc/routes/components/heatmap-layer/+page.md[22m[2K[1Gtransforming (41) [2msrc/routes/components/map-control/+page.md[22m[2K[1Gtransforming (47) [2m.svelte-kit/generated/root.svelte[22m[2K[1Gtransforming (55) [2m../../node_modules/.pnpm/svelte@5.28.2/node_modules/svelte/src/interna[2K[1Gtransforming (61) [2m../../node_modules/.pnpm/@sveltepress+theme-default@6.0.2_@algolia+cli[2K[1Gtransforming (143) [2m../../node_modules/.pnpm/@sveltejs+kit@2.20.8_@sveltejs+vite-plugin-s[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polyline.svelte:19:12 Component has unused export property 'onClick'. If it is for external reference only, please consider using `export const onClick`
+https://svelte.dev/e/export_let_unused[39m
+17:   export let zIndex: number | undefined = undefined;
+18: 
+19:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                              ^
+20:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+21:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polyline.svelte:20:12 Component has unused export property 'onDblClick'. If it is for external reference only, please consider using `export const onDblClick`
+https://svelte.dev/e/export_let_unused[39m
+18: 
+19:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+20:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                 ^
+21:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+22:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polyline.svelte:21:12 Component has unused export property 'onDrag'. If it is for external reference only, please consider using `export const onDrag`
+https://svelte.dev/e/export_let_unused[39m
+19:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+20:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+21:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                             ^
+22:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+23:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polyline.svelte:22:12 Component has unused export property 'onDragEnd'. If it is for external reference only, please consider using `export const onDragEnd`
+https://svelte.dev/e/export_let_unused[39m
+20:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+21:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+22:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                ^
+23:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+24:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polyline.svelte:23:12 Component has unused export property 'onDragStart'. If it is for external reference only, please consider using `export const onDragStart`
+https://svelte.dev/e/export_let_unused[39m
+21:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+22:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+23:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                  ^
+24:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+25:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polyline.svelte:24:12 Component has unused export property 'onMouseDown'. If it is for external reference only, please consider using `export const onMouseDown`
+https://svelte.dev/e/export_let_unused[39m
+22:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+23:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+24:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                  ^
+25:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+26:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polyline.svelte:25:12 Component has unused export property 'onMouseMove'. If it is for external reference only, please consider using `export const onMouseMove`
+https://svelte.dev/e/export_let_unused[39m
+23:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+24:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+25:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                  ^
+26:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+27:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polyline.svelte:26:12 Component has unused export property 'onMouseOut'. If it is for external reference only, please consider using `export const onMouseOut`
+https://svelte.dev/e/export_let_unused[39m
+24:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+25:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+26:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                 ^
+27:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+28:   export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polyline.svelte:27:12 Component has unused export property 'onMouseOver'. If it is for external reference only, please consider using `export const onMouseOver`
+https://svelte.dev/e/export_let_unused[39m
+25:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+26:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+27:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                  ^
+28:   export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+29:   export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polyline.svelte:28:12 Component has unused export property 'onMouseUp'. If it is for external reference only, please consider using `export const onMouseUp`
+https://svelte.dev/e/export_let_unused[39m
+26:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+27:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+28:   export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                ^
+29:   export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+30:   export let onPathChanged:
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polyline.svelte:29:12 Component has unused export property 'onRightClick'. If it is for external reference only, please consider using `export const onRightClick`
+https://svelte.dev/e/export_let_unused[39m
+27:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+28:   export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+29:   export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                   ^
+30:   export let onPathChanged:
+31:     | ((newPath: google.maps.MVCArray<google.maps.LatLng>) => void)
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polygon.svelte:24:12 Component has unused export property 'onClick'. If it is for external reference only, please consider using `export const onClick`
+https://svelte.dev/e/export_let_unused[39m
+22:   export let zIndex: number | undefined = undefined;
+23: 
+24:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                              ^
+25:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+26:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polygon.svelte:25:12 Component has unused export property 'onDblClick'. If it is for external reference only, please consider using `export const onDblClick`
+https://svelte.dev/e/export_let_unused[39m
+23: 
+24:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+25:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                 ^
+26:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+27:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polygon.svelte:26:12 Component has unused export property 'onDrag'. If it is for external reference only, please consider using `export const onDrag`
+https://svelte.dev/e/export_let_unused[39m
+24:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+25:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+26:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                             ^
+27:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+28:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polygon.svelte:27:12 Component has unused export property 'onDragEnd'. If it is for external reference only, please consider using `export const onDragEnd`
+https://svelte.dev/e/export_let_unused[39m
+25:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+26:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+27:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                ^
+28:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+29:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polygon.svelte:28:12 Component has unused export property 'onDragStart'. If it is for external reference only, please consider using `export const onDragStart`
+https://svelte.dev/e/export_let_unused[39m
+26:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+27:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+28:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                  ^
+29:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+30:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polygon.svelte:29:12 Component has unused export property 'onMouseDown'. If it is for external reference only, please consider using `export const onMouseDown`
+https://svelte.dev/e/export_let_unused[39m
+27:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+28:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+29:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                  ^
+30:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+31:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polygon.svelte:30:12 Component has unused export property 'onMouseMove'. If it is for external reference only, please consider using `export const onMouseMove`
+https://svelte.dev/e/export_let_unused[39m
+28:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+29:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+30:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                  ^
+31:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+32:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polygon.svelte:31:12 Component has unused export property 'onMouseOut'. If it is for external reference only, please consider using `export const onMouseOut`
+https://svelte.dev/e/export_let_unused[39m
+29:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+30:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+31:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                 ^
+32:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+33:   export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polygon.svelte:32:12 Component has unused export property 'onMouseOver'. If it is for external reference only, please consider using `export const onMouseOver`
+https://svelte.dev/e/export_let_unused[39m
+30:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+31:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+32:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                  ^
+33:   export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+34:   export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polygon.svelte:33:12 Component has unused export property 'onMouseUp'. If it is for external reference only, please consider using `export const onMouseUp`
+https://svelte.dev/e/export_let_unused[39m
+31:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+32:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+33:   export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                ^
+34:   export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+35:   export let onPathsChanged:
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Polygon.svelte:34:12 Component has unused export property 'onRightClick'. If it is for external reference only, please consider using `export const onRightClick`
+https://svelte.dev/e/export_let_unused[39m
+32:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+33:   export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+34:   export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                   ^
+35:   export let onPathsChanged:
+36:     | ((newPaths: google.maps.MVCArray<google.maps.MVCArray<google.maps.LatLng>>) => void)
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Circle.svelte:20:12 Component has unused export property 'onCenterChanged'. If it is for external reference only, please consider using `export const onCenterChanged`
+https://svelte.dev/e/export_let_unused[39m
+18:   export let zIndex: number | undefined = undefined;
+19: 
+20:   export let onCenterChanged: (() => void) | undefined = undefined;
+                                                          ^
+21:   export let onRadiusChanged: (() => void) | undefined = undefined;
+22:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Circle.svelte:21:12 Component has unused export property 'onRadiusChanged'. If it is for external reference only, please consider using `export const onRadiusChanged`
+https://svelte.dev/e/export_let_unused[39m
+19: 
+20:   export let onCenterChanged: (() => void) | undefined = undefined;
+21:   export let onRadiusChanged: (() => void) | undefined = undefined;
+                                                          ^
+22:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+23:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Circle.svelte:22:12 Component has unused export property 'onClick'. If it is for external reference only, please consider using `export const onClick`
+https://svelte.dev/e/export_let_unused[39m
+20:   export let onCenterChanged: (() => void) | undefined = undefined;
+21:   export let onRadiusChanged: (() => void) | undefined = undefined;
+22:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                              ^
+23:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+24:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Circle.svelte:23:12 Component has unused export property 'onDblClick'. If it is for external reference only, please consider using `export const onDblClick`
+https://svelte.dev/e/export_let_unused[39m
+21:   export let onRadiusChanged: (() => void) | undefined = undefined;
+22:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+23:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                 ^
+24:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+25:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Circle.svelte:24:12 Component has unused export property 'onDrag'. If it is for external reference only, please consider using `export const onDrag`
+https://svelte.dev/e/export_let_unused[39m
+22:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+23:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+24:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                             ^
+25:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+26:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Circle.svelte:25:12 Component has unused export property 'onDragEnd'. If it is for external reference only, please consider using `export const onDragEnd`
+https://svelte.dev/e/export_let_unused[39m
+23:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+24:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+25:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                ^
+26:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+27:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Circle.svelte:26:12 Component has unused export property 'onDragStart'. If it is for external reference only, please consider using `export const onDragStart`
+https://svelte.dev/e/export_let_unused[39m
+24:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+25:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+26:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                  ^
+27:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+28:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Circle.svelte:27:12 Component has unused export property 'onMouseDown'. If it is for external reference only, please consider using `export const onMouseDown`
+https://svelte.dev/e/export_let_unused[39m
+25:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+26:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+27:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                  ^
+28:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+29:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Circle.svelte:28:12 Component has unused export property 'onMouseMove'. If it is for external reference only, please consider using `export const onMouseMove`
+https://svelte.dev/e/export_let_unused[39m
+26:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+27:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+28:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                  ^
+29:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+30:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Circle.svelte:29:12 Component has unused export property 'onMouseOut'. If it is for external reference only, please consider using `export const onMouseOut`
+https://svelte.dev/e/export_let_unused[39m
+27:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+28:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+29:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                 ^
+30:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+31:   export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Circle.svelte:30:12 Component has unused export property 'onMouseOver'. If it is for external reference only, please consider using `export const onMouseOver`
+https://svelte.dev/e/export_let_unused[39m
+28:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+29:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+30:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                  ^
+31:   export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+32:   export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Circle.svelte:31:12 Component has unused export property 'onMouseUp'. If it is for external reference only, please consider using `export const onMouseUp`
+https://svelte.dev/e/export_let_unused[39m
+29:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+30:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+31:   export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                ^
+32:   export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+33:   export let onLoad: ((circle: google.maps.Circle) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Circle.svelte:32:12 Component has unused export property 'onRightClick'. If it is for external reference only, please consider using `export const onRightClick`
+https://svelte.dev/e/export_let_unused[39m
+30:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+31:   export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+32:   export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                   ^
+33:   export let onLoad: ((circle: google.maps.Circle) => void) | undefined = undefined;
+34:   export let onUnmount: ((circle: google.maps.Circle) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/GroundOverlay.svelte:13:12 Component has unused export property 'onClick'. If it is for external reference only, please consider using `export const onClick`
+https://svelte.dev/e/export_let_unused[39m
+11:   export let opacity: number | undefined = undefined;
+12: 
+13:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                              ^
+14:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+15:   export let onLoad: ((overlay: google.maps.GroundOverlay) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/GroundOverlay.svelte:14:12 Component has unused export property 'onDblClick'. If it is for external reference only, please consider using `export const onDblClick`
+https://svelte.dev/e/export_let_unused[39m
+12: 
+13:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+14:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                 ^
+15:   export let onLoad: ((overlay: google.maps.GroundOverlay) => void) | undefined = undefined;
+16:   export let onUnmount: ((overlay: google.maps.GroundOverlay) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Rectangle.svelte:19:12 Component has unused export property 'onBoundsChanged'. If it is for external reference only, please consider using `export const onBoundsChanged`
+https://svelte.dev/e/export_let_unused[39m
+17:   export let zIndex: number | undefined = undefined;
+18: 
+19:   export let onBoundsChanged: (() => void) | undefined = undefined;
+                                                          ^
+20:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+21:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Rectangle.svelte:20:12 Component has unused export property 'onClick'. If it is for external reference only, please consider using `export const onClick`
+https://svelte.dev/e/export_let_unused[39m
+18: 
+19:   export let onBoundsChanged: (() => void) | undefined = undefined;
+20:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                              ^
+21:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+22:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Rectangle.svelte:21:12 Component has unused export property 'onDblClick'. If it is for external reference only, please consider using `export const onDblClick`
+https://svelte.dev/e/export_let_unused[39m
+19:   export let onBoundsChanged: (() => void) | undefined = undefined;
+20:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+21:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                 ^
+22:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+23:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Rectangle.svelte:22:12 Component has unused export property 'onDrag'. If it is for external reference only, please consider using `export const onDrag`
+https://svelte.dev/e/export_let_unused[39m
+20:   export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+21:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+22:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                             ^
+23:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+24:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Rectangle.svelte:23:12 Component has unused export property 'onDragEnd'. If it is for external reference only, please consider using `export const onDragEnd`
+https://svelte.dev/e/export_let_unused[39m
+21:   export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+22:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+23:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                ^
+24:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+25:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Rectangle.svelte:24:12 Component has unused export property 'onDragStart'. If it is for external reference only, please consider using `export const onDragStart`
+https://svelte.dev/e/export_let_unused[39m
+22:   export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+23:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+24:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                  ^
+25:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+26:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Rectangle.svelte:25:12 Component has unused export property 'onMouseDown'. If it is for external reference only, please consider using `export const onMouseDown`
+https://svelte.dev/e/export_let_unused[39m
+23:   export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+24:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+25:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                  ^
+26:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+27:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Rectangle.svelte:26:12 Component has unused export property 'onMouseMove'. If it is for external reference only, please consider using `export const onMouseMove`
+https://svelte.dev/e/export_let_unused[39m
+24:   export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+25:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+26:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                  ^
+27:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+28:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Rectangle.svelte:27:12 Component has unused export property 'onMouseOut'. If it is for external reference only, please consider using `export const onMouseOut`
+https://svelte.dev/e/export_let_unused[39m
+25:   export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+26:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+27:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                 ^
+28:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+29:   export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Rectangle.svelte:28:12 Component has unused export property 'onMouseOver'. If it is for external reference only, please consider using `export const onMouseOver`
+https://svelte.dev/e/export_let_unused[39m
+26:   export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+27:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+28:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                  ^
+29:   export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+30:   export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Rectangle.svelte:29:12 Component has unused export property 'onMouseUp'. If it is for external reference only, please consider using `export const onMouseUp`
+https://svelte.dev/e/export_let_unused[39m
+27:   export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+28:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+29:   export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                ^
+30:   export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+31:   export let onLoad: ((rectangle: google.maps.Rectangle) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/Rectangle.svelte:30:12 Component has unused export property 'onRightClick'. If it is for external reference only, please consider using `export const onRightClick`
+https://svelte.dev/e/export_let_unused[39m
+28:   export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+29:   export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+30:   export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+                                                                                   ^
+31:   export let onLoad: ((rectangle: google.maps.Rectangle) => void) | undefined = undefined;
+32:   export let onUnmount: ((rectangle: google.maps.Rectangle) => void) | undefined = undefined;
+[2K[1Gtransforming (200) [2m../../packages/svelte-google-maps-api/dist/layers/BicyclingLayer.svel[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/layers/KmlLayer.svelte:14:12 Component has unused export property 'onClick'. If it is for external reference only, please consider using `export const onClick`
+https://svelte.dev/e/export_let_unused[39m
+12:   export let zIndex: number | undefined = undefined;
+13: 
+14:   export let onClick: ((e: google.maps.KmlMouseEvent) => void) | undefined = undefined;
+                                                                              ^
+15:   export let onDefaultViewportChanged: (() => void) | undefined = undefined;
+16:   export let onStatusChanged: (() => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/layers/KmlLayer.svelte:15:12 Component has unused export property 'onDefaultViewportChanged'. If it is for external reference only, please consider using `export const onDefaultViewportChanged`
+https://svelte.dev/e/export_let_unused[39m
+13: 
+14:   export let onClick: ((e: google.maps.KmlMouseEvent) => void) | undefined = undefined;
+15:   export let onDefaultViewportChanged: (() => void) | undefined = undefined;
+                                                                   ^
+16:   export let onStatusChanged: (() => void) | undefined = undefined;
+17:   export let onLoad: ((layer: google.maps.KmlLayer) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/layers/KmlLayer.svelte:16:12 Component has unused export property 'onStatusChanged'. If it is for external reference only, please consider using `export const onStatusChanged`
+https://svelte.dev/e/export_let_unused[39m
+14:   export let onClick: ((e: google.maps.KmlMouseEvent) => void) | undefined = undefined;
+15:   export let onDefaultViewportChanged: (() => void) | undefined = undefined;
+16:   export let onStatusChanged: (() => void) | undefined = undefined;
+                                                          ^
+17:   export let onLoad: ((layer: google.maps.KmlLayer) => void) | undefined = undefined;
+18:   export let onUnmount: ((layer: google.maps.KmlLayer) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/street-view/StreetViewPanorama.svelte:28:12 Component has unused export property 'onCloseClick'. If it is for external reference only, please consider using `export const onCloseClick`
+https://svelte.dev/e/export_let_unused[39m
+26:   export let visible: boolean = true;
+27: 
+28:   export let onCloseClick: (() => void) | undefined = undefined;
+                                                       ^
+29:   export let onPanoChanged: (() => void) | undefined = undefined;
+30:   export let onPositionChanged: (() => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/street-view/StreetViewPanorama.svelte:29:12 Component has unused export property 'onPanoChanged'. If it is for external reference only, please consider using `export const onPanoChanged`
+https://svelte.dev/e/export_let_unused[39m
+27: 
+28:   export let onCloseClick: (() => void) | undefined = undefined;
+29:   export let onPanoChanged: (() => void) | undefined = undefined;
+                                                        ^
+30:   export let onPositionChanged: (() => void) | undefined = undefined;
+31:   export let onPovChanged: (() => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/street-view/StreetViewPanorama.svelte:30:12 Component has unused export property 'onPositionChanged'. If it is for external reference only, please consider using `export const onPositionChanged`
+https://svelte.dev/e/export_let_unused[39m
+28:   export let onCloseClick: (() => void) | undefined = undefined;
+29:   export let onPanoChanged: (() => void) | undefined = undefined;
+30:   export let onPositionChanged: (() => void) | undefined = undefined;
+                                                            ^
+31:   export let onPovChanged: (() => void) | undefined = undefined;
+32:   export let onResize: (() => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/street-view/StreetViewPanorama.svelte:31:12 Component has unused export property 'onPovChanged'. If it is for external reference only, please consider using `export const onPovChanged`
+https://svelte.dev/e/export_let_unused[39m
+29:   export let onPanoChanged: (() => void) | undefined = undefined;
+30:   export let onPositionChanged: (() => void) | undefined = undefined;
+31:   export let onPovChanged: (() => void) | undefined = undefined;
+                                                       ^
+32:   export let onResize: (() => void) | undefined = undefined;
+33:   export let onStatusChanged: (() => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/street-view/StreetViewPanorama.svelte:32:12 Component has unused export property 'onResize'. If it is for external reference only, please consider using `export const onResize`
+https://svelte.dev/e/export_let_unused[39m
+30:   export let onPositionChanged: (() => void) | undefined = undefined;
+31:   export let onPovChanged: (() => void) | undefined = undefined;
+32:   export let onResize: (() => void) | undefined = undefined;
+                                                   ^
+33:   export let onStatusChanged: (() => void) | undefined = undefined;
+34:   export let onVisibleChanged: (() => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/street-view/StreetViewPanorama.svelte:33:12 Component has unused export property 'onStatusChanged'. If it is for external reference only, please consider using `export const onStatusChanged`
+https://svelte.dev/e/export_let_unused[39m
+31:   export let onPovChanged: (() => void) | undefined = undefined;
+32:   export let onResize: (() => void) | undefined = undefined;
+33:   export let onStatusChanged: (() => void) | undefined = undefined;
+                                                          ^
+34:   export let onVisibleChanged: (() => void) | undefined = undefined;
+35:   export let onZoomChanged: (() => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/street-view/StreetViewPanorama.svelte:34:12 Component has unused export property 'onVisibleChanged'. If it is for external reference only, please consider using `export const onVisibleChanged`
+https://svelte.dev/e/export_let_unused[39m
+32:   export let onResize: (() => void) | undefined = undefined;
+33:   export let onStatusChanged: (() => void) | undefined = undefined;
+34:   export let onVisibleChanged: (() => void) | undefined = undefined;
+                                                           ^
+35:   export let onZoomChanged: (() => void) | undefined = undefined;
+36:   export let onLoad: ((panorama: google.maps.StreetViewPanorama) => void) | undefined = undefined;
+[33m11:09:19 PM [vite-plugin-svelte] /Users/yutasakou/workspace/oss/svelte-google-maps-api/packages/svelte-google-maps-api/dist/street-view/StreetViewPanorama.svelte:35:12 Component has unused export property 'onZoomChanged'. If it is for external reference only, please consider using `export const onZoomChanged`
+https://svelte.dev/e/export_let_unused[39m
+33:   export let onStatusChanged: (() => void) | undefined = undefined;
+34:   export let onVisibleChanged: (() => void) | undefined = undefined;
+35:   export let onZoomChanged: (() => void) | undefined = undefined;
+                                                        ^
+36:   export let onLoad: ((panorama: google.maps.StreetViewPanorama) => void) | undefined = undefined;
+37:   export let onUnmount: ((panorama: google.maps.StreetViewPanorama) => void) | undefined =
+[2K[1Gtransforming (240) [2m../../node_modules/.pnpm/@shikijs+langs@1.29.2/node_modules/@shikijs/[2K[1Gtransforming (431) [2m../../node_modules/.pnpm/@shikijs+langs@1.29.2/node_modules/@shikijs/[2K[1Gtransforming (546) [2m../../node_modules/.pnpm/@sveltepress+theme-default@6.0.2_@algolia+cl[2K[1G[2K[1G[2K[1Gtransforming (611) [2m../../node_modules/.pnpm/@sveltepress+theme-default@6.0.2_@algolia+cl[2K[1Gtransforming (669) [2m../../node_modules/.pnpm/property-information@7.0.0/node_modules/prop[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[32m✓[39m 691 modules transformed.
+[2K[1Grendering chunks (1)...[2K[1Grendering chunks (2)...[2K[1Grendering chunks (3)...[2K[1Grendering chunks (4)...[2K[1Grendering chunks (5)...[2K[1Grendering chunks (6)...[2K[1Grendering chunks (7)...[2K[1Grendering chunks (8)...[2K[1Grendering chunks (9)...[2K[1Grendering chunks (10)...[2K[1Grendering chunks (11)...[2K[1Grendering chunks (12)...[2K[1Grendering chunks (13)...[2K[1Grendering chunks (14)...[2K[1Grendering chunks (15)...[2K[1Grendering chunks (16)...[2K[1Grendering chunks (17)...[2K[1Grendering chunks (18)...[2K[1Grendering chunks (19)...[2K[1Grendering chunks (20)...[2K[1Grendering chunks (21)...[2K[1Grendering chunks (22)...[2K[1Grendering chunks (23)...[2K[1Grendering chunks (24)...[2K[1Grendering chunks (25)...[2K[1Grendering chunks (26)...[2K[1Grendering chunks (27)...[2K[1Grendering chunks (28)...[2K[1Grendering chunks (29)...[2K[1Grendering chunks (30)...[2K[1Grendering chunks (31)...[2K[1Grendering chunks (32)...[2K[1Grendering chunks (33)...[2K[1Grendering chunks (34)...[2K[1Grendering chunks (35)...[2K[1Grendering chunks (36)...[2K[1Grendering chunks (37)...[2K[1Grendering chunks (38)...[2K[1Grendering chunks (39)...[2K[1Grendering chunks (40)...[2K[1G[2K[1Gcomputing gzip size (0)...[2K[1Gcomputing gzip size (1)...[2K[1Gcomputing gzip size (2)...[2K[1Gcomputing gzip size (3)...[2K[1Gcomputing gzip size (4)...[2K[1Gcomputing gzip size (5)...[2K[1Gcomputing gzip size (6)...[2K[1Gcomputing gzip size (7)...[2K[1Gcomputing gzip size (8)...[2K[1Gcomputing gzip size (9)...[2K[1Gcomputing gzip size (10)...[2K[1Gcomputing gzip size (11)...[2K[1Gcomputing gzip size (12)...[2K[1Gcomputing gzip size (13)...[2K[1Gcomputing gzip size (14)...[2K[1Gcomputing gzip size (15)...[2K[1Gcomputing gzip size (16)...[2K[1Gcomputing gzip size (17)...[2K[1Gcomputing gzip size (18)...[2K[1Gcomputing gzip size (19)...[2K[1Gcomputing gzip size (20)...[2K[1Gcomputing gzip size (21)...[2K[1Gcomputing gzip size (22)...[2K[1Gcomputing gzip size (23)...[2K[1Gcomputing gzip size (24)...[2K[1Gcomputing gzip size (25)...[2K[1Gcomputing gzip size (26)...[2K[1Gcomputing gzip size (27)...[2K[1Gcomputing gzip size (28)...[2K[1Gcomputing gzip size (29)...[2K[1Gcomputing gzip size (30)...[2K[1Gcomputing gzip size (31)...[2K[1Gcomputing gzip size (32)...[2K[1Gcomputing gzip size (33)...[2K[1Gcomputing gzip size (34)...[2K[1Gcomputing gzip size (35)...[2K[1Gcomputing gzip size (36)...[2K[1Gcomputing gzip size (37)...[2K[1Gcomputing gzip size (38)...[2K[1Gcomputing gzip size (39)...[2K[1Gcomputing gzip size (40)...[2K[1Gcomputing gzip size (41)...[2K[1Gcomputing gzip size (42)...[2K[1Gcomputing gzip size (43)...[2K[1Gcomputing gzip size (44)...[2K[1Gcomputing gzip size (45)...[2K[1Gcomputing gzip size (46)...[2K[1G[2m.svelte-kit/output/client/[22m[32m_app/version.json                                     [39m[1m[2m  0.03 kB[22m[1m[22m[2m │ gzip:  0.05 kB[22m
+[2m.svelte-kit/output/client/[22m[32m.vite/manifest.json                                   [39m[1m[2m 17.85 kB[22m[1m[22m[2m │ gzip:  1.80 kB[22m
+[2m.svelte-kit/output/client/[22m[32m_app/immutable/assets/Dank Mono Regular.CfN0Ttr4.otf  [39m[1m[2m 49.81 kB[22m[1m[22m
+[2m.svelte-kit/output/client/[22m[32m_app/immutable/assets/Dank Mono Italic.DdvTjQwK.otf   [39m[1m[2m 49.88 kB[22m[1m[22m
+[2m.svelte-kit/output/client/[22m[35m_app/immutable/assets/Expansion.BkqePQXH.css          [39m[1m[2m  2.10 kB[22m[1m[22m[2m │ gzip:  0.71 kB[22m
+[2m.svelte-kit/output/client/[22m[35m_app/immutable/assets/ReloadPrompt.CsBE-kdr.css       [39m[1m[2m  3.40 kB[22m[1m[22m[2m │ gzip:  0.80 kB[22m
+[2m.svelte-kit/output/client/[22m[35m_app/immutable/assets/TabPanel.CAXAk2zS.css           [39m[1m[2m 13.00 kB[22m[1m[22m[2m │ gzip:  2.35 kB[22m
+[2m.svelte-kit/output/client/[22m[35m_app/immutable/assets/0.CDkx3M21.css                  [39m[1m[2m 70.67 kB[22m[1m[22m[2m │ gzip: 11.84 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/C8T3Yng4.js                     [39m[1m[2m  0.04 kB[22m[1m[22m[2m │ gzip:  0.06 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/DUSzA03R.js                     [39m[1m[2m  0.04 kB[22m[1m[22m[2m │ gzip:  0.06 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/entry/start.K3E4nXc7.js                [39m[1m[2m  0.08 kB[22m[1m[22m[2m │ gzip:  0.09 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/nodes/0.DlWDQohp.js                    [39m[1m[2m  0.09 kB[22m[1m[22m[2m │ gzip:  0.10 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/D3ssPK-Y.js                     [39m[1m[2m  0.52 kB[22m[1m[22m[2m │ gzip:  0.33 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/nodes/1.ACAu4xFB.js                    [39m[1m[2m  0.58 kB[22m[1m[22m[2m │ gzip:  0.36 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/nodes/2.ZHY0moWh.js                    [39m[1m[2m  1.02 kB[22m[1m[22m[2m │ gzip:  0.58 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/B-fCW7e8.js                     [39m[1m[2m  1.04 kB[22m[1m[22m[2m │ gzip:  0.62 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/C1FmrZbK.js                     [39m[1m[2m  1.14 kB[22m[1m[22m[2m │ gzip:  0.68 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/DnPYCgNW.js                     [39m[1m[2m  1.49 kB[22m[1m[22m[2m │ gzip:  0.81 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/DvyBJmiI.js                     [39m[1m[2m  3.01 kB[22m[1m[22m[2m │ gzip:  1.49 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/CmgaCqrq.js                     [39m[1m[2m  3.88 kB[22m[1m[22m[2m │ gzip:  1.82 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/Jo_nZczK.js                     [39m[1m[2m  5.84 kB[22m[1m[22m[2m │ gzip:  2.72 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/entry/app.D32XhR9c.js                  [39m[1m[2m  7.88 kB[22m[1m[22m[2m │ gzip:  2.79 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/nodes/21.CA1cozRD.js                   [39m[1m[2m 15.05 kB[22m[1m[22m[2m │ gzip:  2.57 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/nodes/6.Dqzxl9Pi.js                    [39m[1m[2m 15.16 kB[22m[1m[22m[2m │ gzip:  2.61 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/nodes/20.Cljg7oTo.js                   [39m[1m[2m 16.16 kB[22m[1m[22m[2m │ gzip:  2.74 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/D0_yjw2a.js                     [39m[1m[2m 17.02 kB[22m[1m[22m[2m │ gzip:  6.92 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/nodes/12.Bw9wb7z_.js                   [39m[1m[2m 18.17 kB[22m[1m[22m[2m │ gzip:  3.78 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/nodes/9.S5ijI3-Y.js                    [39m[1m[2m 19.31 kB[22m[1m[22m[2m │ gzip:  3.50 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/1m-1qmyz.js                     [39m[1m[2m 20.07 kB[22m[1m[22m[2m │ gzip:  8.21 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/nodes/23.B4pWUmiD.js                   [39m[1m[2m 22.40 kB[22m[1m[22m[2m │ gzip:  3.63 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/nodes/13.CjJPXrye.js                   [39m[1m[2m 22.83 kB[22m[1m[22m[2m │ gzip:  3.41 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/CnFvY-mH.js                     [39m[1m[2m 22.91 kB[22m[1m[22m[2m │ gzip:  7.96 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/nodes/15.DUnQn-A8.js                   [39m[1m[2m 24.18 kB[22m[1m[22m[2m │ gzip:  4.25 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/nodes/10.eI1myimi.js                   [39m[1m[2m 30.91 kB[22m[1m[22m[2m │ gzip:  4.30 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/Camscgxd.js                     [39m[1m[2m 32.13 kB[22m[1m[22m[2m │ gzip: 12.49 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/nodes/19.C7v3AV3L.js                   [39m[1m[2m 33.86 kB[22m[1m[22m[2m │ gzip:  5.18 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/nodes/5.BZWbfRVn.js                    [39m[1m[2m 35.70 kB[22m[1m[22m[2m │ gzip:  4.27 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/nodes/4.azXolC6L.js                    [39m[1m[2m 38.61 kB[22m[1m[22m[2m │ gzip:  3.69 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/nodes/8.Bc8j8bNL.js                    [39m[1m[2m 41.38 kB[22m[1m[22m[2m │ gzip:  3.85 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/nodes/3.BQ-jOJGR.js                    [39m[1m[2m 42.21 kB[22m[1m[22m[2m │ gzip:  4.08 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/nodes/11.PN3ZBxgk.js                   [39m[1m[2m 43.17 kB[22m[1m[22m[2m │ gzip:  3.92 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/nodes/14.CbOv_yf3.js                   [39m[1m[2m 47.24 kB[22m[1m[22m[2m │ gzip:  4.17 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/nodes/17.CTunPhMv.js                   [39m[1m[2m 53.08 kB[22m[1m[22m[2m │ gzip:  4.39 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/nodes/7.LwjmnOdD.js                    [39m[1m[2m 55.52 kB[22m[1m[22m[2m │ gzip:  4.45 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/nodes/18.BhH4ZjSA.js                   [39m[1m[2m 56.34 kB[22m[1m[22m[2m │ gzip:  4.44 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/nodes/16.BqLBL7G1.js                   [39m[1m[2m 73.96 kB[22m[1m[22m[2m │ gzip:  4.90 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/nodes/22.ZnxCAJEo.js                   [39m[1m[2m159.92 kB[22m[1m[22m[2m │ gzip: 14.06 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/Dpt-7wB9.js                     [39m[1m[2m165.68 kB[22m[1m[22m[2m │ gzip: 50.24 kB[22m
+[32m✓ built in 3.47s[39m
+[2K[1G[2m.svelte-kit/output/server/[22m[32m.vite/manifest.json                                        [39m[1m[2m 13.98 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[32m_app/immutable/assets/Dank Mono Regular.CfN0Ttr4.otf       [39m[1m[2m 49.81 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[32m_app/immutable/assets/Dank Mono Italic.DdvTjQwK.otf        [39m[1m[2m 49.88 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[35m_app/immutable/assets/Expansion.BkqePQXH.css               [39m[1m[2m  2.10 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[35m_app/immutable/assets/TabPanel.CAXAk2zS.css                [39m[1m[2m 13.00 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[35m_app/immutable/assets/_layout.9f_7h4RP.css                 [39m[1m[2m 70.16 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mentries/pages/_layout.ts.js                                [39m[1m[2m  0.10 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36minternal.js                                                [39m[1m[2m  0.34 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mchunks/paths.js                                            [39m[1m[2m  0.41 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mentries/fallbacks/error.svelte.js                          [39m[1m[2m  0.59 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mchunks/client.js                                           [39m[1m[2m  0.93 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mchunks/CopyCode.js                                         [39m[1m[2m  1.14 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mchunks/Link.js                                             [39m[1m[2m  1.36 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mentries/pages/_page.md.js                                  [39m[1m[2m  1.39 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mchunks/Expansion.js                                        [39m[1m[2m  6.87 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mchunks/exports.js                                          [39m[1m[2m  7.01 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mchunks/Expansion.svelte_svelte_type_style_lang.js          [39m[1m[2m  7.34 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mentries/pages/components/transit-layer/_page.md.js         [39m[1m[2m 15.19 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mentries/pages/components/bicycling-layer/_page.md.js       [39m[1m[2m 15.30 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mchunks/internal.js                                         [39m[1m[2m 15.84 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mentries/pages/components/traffic-layer/_page.md.js         [39m[1m[2m 15.97 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mentries/pages/components/kml-layer/_page.md.js             [39m[1m[2m 16.60 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mentries/pages/components/ground-overlay/_page.md.js        [39m[1m[2m 18.17 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mchunks/TabPanel.svelte_svelte_type_style_lang.js           [39m[1m[2m 20.64 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mentries/pages/components/map-control/_page.md.js           [39m[1m[2m 22.15 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mentries/pages/components/overlay-view/_page.md.js          [39m[1m[2m 23.10 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mentries/pages/guide/getting-started/_page.md.js            [39m[1m[2m 23.42 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mentries/pages/components/heatmap-layer/_page.md.js         [39m[1m[2m 29.19 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mentries/pages/components/street-view-panorama/_page.md.js  [39m[1m[2m 29.76 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mentries/pages/_layout.svelte.js                            [39m[1m[2m 33.16 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mentries/pages/components/autocomplete/_page.md.js          [39m[1m[2m 35.26 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mentries/pages/components/api-provider/_page.md.js          [39m[1m[2m 38.56 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mentries/pages/components/google-map/_page.md.js            [39m[1m[2m 41.43 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mentries/pages/components/advanced-marker/_page.md.js       [39m[1m[2m 42.05 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mentries/pages/components/info-window/_page.md.js           [39m[1m[2m 43.02 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mentries/pages/components/marker/_page.md.js                [39m[1m[2m 47.05 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mchunks/index.js                                            [39m[1m[2m 48.63 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mentries/pages/components/polyline/_page.md.js              [39m[1m[2m 52.86 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mentries/pages/components/circle/_page.md.js                [39m[1m[2m 55.29 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mentries/pages/components/rectangle/_page.md.js             [39m[1m[2m 56.11 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mentries/pages/components/polygon/_page.md.js               [39m[1m[2m 73.63 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mindex.js                                                   [39m[1m[2m127.52 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mentries/pages/examples/_page.md.js                         [39m[1m[2m142.32 kB[22m[1m[22m
+[32m✓ built in 7.86s[39m
+
+Run [1m[36mnpm run preview[22m[39m to preview your production build locally.
+[1m[36m
+> Using @sveltejs/adapter-static[22m[39m
+  Wrote site to "build"
+  [32m✔ done[39m

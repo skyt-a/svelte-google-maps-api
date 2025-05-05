@@ -1,0 +1,69 @@
+{
+	"/": [
+		"src/routes/+layout.ts",
+		"src/routes/+layout.ts"
+	],
+	"/components/advanced-marker": [
+		"src/routes/+layout.ts"
+	],
+	"/components/api-provider": [
+		"src/routes/+layout.ts"
+	],
+	"/components/autocomplete": [
+		"src/routes/+layout.ts"
+	],
+	"/components/bicycling-layer": [
+		"src/routes/+layout.ts"
+	],
+	"/components/circle": [
+		"src/routes/+layout.ts"
+	],
+	"/components/google-map": [
+		"src/routes/+layout.ts"
+	],
+	"/components/ground-overlay": [
+		"src/routes/+layout.ts"
+	],
+	"/components/heatmap-layer": [
+		"src/routes/+layout.ts"
+	],
+	"/components/info-window": [
+		"src/routes/+layout.ts"
+	],
+	"/components/kml-layer": [
+		"src/routes/+layout.ts"
+	],
+	"/components/map-control": [
+		"src/routes/+layout.ts"
+	],
+	"/components/marker": [
+		"src/routes/+layout.ts"
+	],
+	"/components/overlay-view": [
+		"src/routes/+layout.ts"
+	],
+	"/components/polygon": [
+		"src/routes/+layout.ts"
+	],
+	"/components/polyline": [
+		"src/routes/+layout.ts"
+	],
+	"/components/rectangle": [
+		"src/routes/+layout.ts"
+	],
+	"/components/street-view-panorama": [
+		"src/routes/+layout.ts"
+	],
+	"/components/traffic-layer": [
+		"src/routes/+layout.ts"
+	],
+	"/components/transit-layer": [
+		"src/routes/+layout.ts"
+	],
+	"/examples": [
+		"src/routes/+layout.ts"
+	],
+	"/guide/getting-started": [
+		"src/routes/+layout.ts"
+	]
+}
