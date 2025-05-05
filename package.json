@@ -17,6 +17,7 @@
 		"type": "git",
 		"url": "https://github.com/skyt-a/svelte-google-maps-api.git"
 	},
+	"homepage": "https://skyt-a.github.io/svelte-google-maps-api-docs/",
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
