@@ -3,33 +3,39 @@
 	import { BROWSER as browser } from 'esm-env';
 	import type { APIProviderContext } from '../APIProvider.svelte';
 
+	// --- Props ---
 	export let position: google.maps.LatLng | google.maps.LatLngLiteral | undefined = undefined;
 	export let bounds: google.maps.LatLngBounds | google.maps.LatLngBoundsLiteral | undefined =
 		undefined;
-	export let mapPaneName: keyof google.maps.MapPanes = 'floatPane';
+	export let mapPaneName: keyof google.maps.MapPanes = 'floatPane'; // Default pane
 
-	export let onload: ((overlay: google.maps.OverlayView) => void) | undefined = undefined;
-	export let onunmount: ((overlay: google.maps.OverlayView) => void) | undefined = undefined;
-	export let onadd: (() => void) | undefined = undefined;
-	export let onremove: (() => void) | undefined = undefined;
+	// --- Events ---
+	export let onLoad: ((overlayView: google.maps.OverlayView) => void) | undefined = undefined;
+	export let onUnmount: ((overlayView: google.maps.OverlayView) => void) | undefined = undefined;
 
+	// --- Internal State ---
 	let overlayViewInstance: google.maps.OverlayView | null = null;
-	let divRef: HTMLDivElement | null = null;
+	let contentWrapper: HTMLDivElement | null = null;
 	let isAdded = false;
 	let isMounted = false;
 
+	// --- Context ---
 	const { status, googleMapsApi } = getContext<APIProviderContext>('svelte-google-maps-api');
 	const map = getContext<google.maps.Map>('map');
 
+	// --- OverlayView Subclass/Implementation ---
+	// Define class at the top level, but instantiate only when API is ready.
+	// Avoid direct reference to googleMapsApi in class definition itself.
 	class CustomOverlay extends google.maps.OverlayView {
+		// Temporarily use global google.maps for definition
 		private paneName: keyof google.maps.MapPanes;
 		private container: HTMLDivElement;
 		private pos: google.maps.LatLng | undefined;
 		private bnds: google.maps.LatLngBounds | undefined;
-		private api: typeof google.maps | null = null;
+		private api: typeof google.maps | null = null; // Store API ref internally
 
 		constructor(
-			apiRef: typeof google.maps,
+			apiRef: typeof google.maps, // Pass API reference
 			paneName: keyof google.maps.MapPanes,
 			containerElement: HTMLDivElement,
 			initialPosition?: google.maps.LatLng | google.maps.LatLngLiteral,
@@ -39,7 +45,7 @@
 			this.api = apiRef;
 			this.paneName = paneName;
 			this.container = containerElement;
-
+			// Convert literals to instances using the passed API reference
 			if (initialPosition) {
 				this.pos =
 					initialPosition instanceof this.api.LatLng
@@ -130,95 +136,82 @@
 		}
 	}
 
+	// --- Initialization ---
 	onMount(() => {
-		if (browser && $status === 'loaded') {
-			initializeOverlayView();
-		}
+		isMounted = true;
+		// Need to wait for the wrapper div to be created
+		tick().then(initializeOverlayView);
 	});
 
 	function initializeOverlayView() {
-		if (!browser || !googleMapsApi || !map || overlayViewInstance || !divRef) return;
+		if (
+			!browser ||
+			$status !== 'loaded' ||
+			!googleMapsApi ||
+			!map ||
+			!contentWrapper ||
+			!isMounted ||
+			overlayViewInstance
+		)
+			return;
+
+		if (!googleMapsApi.OverlayView) {
+			console.error('[OverlayView] google.maps.OverlayView not available.');
+			return;
+		}
 
 		try {
-			const CustomOverlayView = (() => {
-				return class extends googleMapsApi.OverlayView {
-					constructor() {
-						super();
-						overlayViewInstance = this;
-						onload?.(this);
-					}
-					onAdd = () => {
-						if (divRef) {
-							const paneKey = mapPaneName ? mapPaneName : 'floatPane';
-							const pane = this.getPanes()?.[paneKey];
-							if (pane) {
-								pane.appendChild(divRef);
-								onadd?.();
-							} else {
-								console.error(`[OverlayView] Pane "${paneKey}" not found.`);
-							}
-						}
-					};
-					draw = () => {
-						if (position && divRef) {
-							const overlayProjection = this.getProjection();
-							const point = overlayProjection.fromLatLngToDivPixel(position);
-							if (point) {
-								divRef.style.left = `${point.x}px`;
-								divRef.style.top = `${point.y}px`;
-							}
-						}
-					};
-					onRemove = () => {
-						if (divRef && divRef.parentNode) {
-							divRef.parentNode.removeChild(divRef);
-							onremove?.();
-						}
-					};
-				};
-			})();
-
-			new CustomOverlayView().setMap(map);
+			// Pass googleMapsApi to the constructor
+			overlayViewInstance = new CustomOverlay(
+				googleMapsApi,
+				mapPaneName,
+				contentWrapper,
+				position,
+				bounds
+			);
+			overlayViewInstance.setMap(map);
+			onLoad?.(overlayViewInstance);
+			console.log('[OverlayView] Instance created and set on map.');
 		} catch (error) {
 			console.error('[OverlayView] Error creating instance:', error);
 		}
 	}
 
+	// --- Reactive Updates ---
 	$: if (overlayViewInstance && position && googleMapsApi) {
 		console.log('[OverlayView] Position changed');
-
+		// Pass position (literal or instance) directly to the update method
 		(overlayViewInstance as CustomOverlay).updatePosition(position);
 	} else if (overlayViewInstance && bounds && googleMapsApi) {
 		console.log('[OverlayView] Bounds changed');
-
+		// Pass bounds (literal or instance) directly to the update method
 		(overlayViewInstance as CustomOverlay).updateBounds(bounds);
 	} else if (overlayViewInstance && !position && !bounds) {
+		// Handle case where both position and bounds become undefined - perhaps hide or remove?
 		console.warn(
 			'[OverlayView] Both position and bounds are undefined. Hiding overlay content element.'
 		);
-		if (divRef) divRef.style.display = 'none';
+		if (contentWrapper) contentWrapper.style.display = 'none'; // Simple hide
 	}
 
+	// --- Lifecycle ---
 	onDestroy(() => {
 		if (overlayViewInstance) {
-			onunmount?.(overlayViewInstance);
-			overlayViewInstance.setMap(null);
+			onUnmount?.(overlayViewInstance);
+			overlayViewInstance.setMap(null); // This triggers onRemove
 			overlayViewInstance = null;
 		}
 	});
 
-	$: if ($status === 'loaded' && map && !overlayViewInstance && divRef) {
+	// Initialize after mount and API ready
+	$: if ($status === 'loaded' && map && contentWrapper && isMounted && !overlayViewInstance) {
 		initializeOverlayView();
-	}
-
-	$: if (overlayViewInstance && position) {
-		overlayViewInstance.draw();
 	}
 </script>
 
 <!-- This div wraps the slot content and is managed by OverlayView -->
 <!-- Initial styles might be needed to prevent flash of unstyled content -->
-<div bind:this={divRef} style="position: absolute;">
+<div bind:this={contentWrapper}>
 	{#if isAdded}
 		<!-- Render slot content only after onAdd has been called -->
 		<slot />

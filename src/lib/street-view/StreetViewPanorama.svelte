@@ -1,18 +1,19 @@
 <script lang="ts">
-	import { getContext, setContext, onDestroy, onMount } from 'svelte';
+	import { getContext, onDestroy, onMount } from 'svelte';
 	import { BROWSER as browser } from 'esm-env';
 	import type { APIProviderContext } from '../APIProvider.svelte';
 
+	// --- Props (Based on google.maps.StreetViewPanoramaOptions) ---
 	export let options: google.maps.StreetViewPanoramaOptions | undefined = undefined;
 	export let containerId: string | undefined = undefined;
 	export let containerClass: string = '';
 	export let containerStyle: string = 'width:100%;height:100%;';
-
+	// Individual options for convenience
 	export let position: google.maps.LatLng | google.maps.LatLngLiteral | undefined = undefined;
 	export let pov: google.maps.StreetViewPov | undefined = undefined;
 	export let zoom: number | undefined = undefined;
 	export let pano: string | undefined = undefined;
-
+	// Control options... (e.g., addressControl, fullscreenControl, etc.)
 	export let addressControl: boolean | undefined = undefined;
 	export let enableCloseButton: boolean | undefined = undefined;
 	export let fullscreenControl: boolean | undefined = undefined;
@@ -23,27 +24,34 @@
 	export let panControl: boolean | undefined = undefined;
 	export let scrollwheel: boolean | undefined = undefined;
 	export let zoomControl: boolean | undefined = undefined;
-	export let visible: boolean = true;
+	export let visible: boolean = true; // Initial visibility
 
-	export let oncloseclick: ((event: Event) => void) | undefined = undefined;
-	export let onpanochanged: (() => void) | undefined = undefined;
-	export let onpositionchanged: (() => void) | undefined = undefined;
-	export let onpovchanged: (() => void) | undefined = undefined;
-	export let onresize: (() => void) | undefined = undefined;
-	export let onstatuschanged: (() => void) | undefined = undefined;
-	export let onvisiblechanged: (() => void) | undefined = undefined;
-	export let onzoomchanged: (() => void) | undefined = undefined;
-	export let onload: ((panorama: google.maps.StreetViewPanorama) => void) | undefined = undefined;
-	export let onunmount: ((panorama: google.maps.StreetViewPanorama) => void) | undefined =
+	// --- Events ---
+	export let onCloseClick: (() => void) | undefined = undefined;
+	export let onPanoChanged: (() => void) | undefined = undefined;
+	export let onPositionChanged: (() => void) | undefined = undefined;
+	export let onPovChanged: (() => void) | undefined = undefined;
+	export let onResize: (() => void) | undefined = undefined;
+	export let onStatusChanged: (() => void) | undefined = undefined;
+	export let onVisibleChanged: (() => void) | undefined = undefined;
+	export let onZoomChanged: (() => void) | undefined = undefined;
+	export let onLoad: ((panorama: google.maps.StreetViewPanorama) => void) | undefined = undefined;
+	export let onUnmount: ((panorama: google.maps.StreetViewPanorama) => void) | undefined =
 		undefined;
 
+	// --- Internal State ---
 	let panoramaInstance: google.maps.StreetViewPanorama | null = null;
 	let containerElement: HTMLDivElement | null = null;
 	let listeners: google.maps.MapsEventListener[] = [];
 
+	// --- Context ---
 	const { status, googleMapsApi } = getContext<APIProviderContext>('svelte-google-maps-api');
+	// Note: StreetViewPanorama usually doesn't need the main map instance directly,
+	// unless linking behavior is desired (which requires more complex logic).
 
+	// --- Initialization ---
 	onMount(() => {
+		// Initialize only after container element is available and API is loaded
 		initializePanorama();
 	});
 
@@ -75,6 +83,7 @@
 			visible
 		};
 
+		// Filter out undefined props
 		Object.keys(panoramaOptions).forEach((key) => {
 			if (panoramaOptions[key as keyof typeof panoramaOptions] === undefined) {
 				delete panoramaOptions[key as keyof typeof panoramaOptions];
@@ -83,14 +92,14 @@
 
 		try {
 			panoramaInstance = new googleMapsApi.StreetViewPanorama(containerElement, panoramaOptions);
-			onload?.(panoramaInstance);
-			setContext('street-view-panorama', panoramaInstance);
+			onLoad?.(panoramaInstance);
 			setupListeners();
 		} catch (error) {
 			console.error('[StreetViewPanorama] Error creating instance:', error);
 		}
 	}
 
+	// --- Reactive Updates ---
 	$: if (panoramaInstance && position && googleMapsApi) {
 		const newPos =
 			position instanceof googleMapsApi.LatLng
@@ -110,10 +119,11 @@
 	$: if (panoramaInstance && visible !== undefined) {
 		panoramaInstance.setVisible(visible);
 	}
-
+	// Update other options if the main options object changes
 	$: if (panoramaInstance && options) {
 		panoramaInstance.setOptions(options);
 	} else if (panoramaInstance) {
+		// Update individual control options
 		const controlOpts: google.maps.StreetViewPanoramaOptions = {};
 		if (addressControl !== undefined) controlOpts.addressControl = addressControl;
 		if (enableCloseButton !== undefined) controlOpts.enableCloseButton = enableCloseButton;
@@ -129,6 +139,7 @@
 		if (Object.keys(controlOpts).length > 0) panoramaInstance.setOptions(controlOpts);
 	}
 
+	// --- Event Listeners ---
 	function setupListeners() {
 		if (!panoramaInstance || !googleMapsApi) return;
 
@@ -136,14 +147,14 @@
 		listeners = [];
 
 		const eventMap = {
-			oncloseclick: 'closeclick',
-			onpanochanged: 'pano_changed',
-			onpositionchanged: 'position_changed',
-			onpovchanged: 'pov_changed',
-			onresize: 'resize',
-			onstatuschanged: 'status_changed',
-			onvisiblechanged: 'visible_changed',
-			onzoomchanged: 'zoom_changed'
+			onCloseClick: 'closeclick',
+			onPanoChanged: 'pano_changed',
+			onPositionChanged: 'position_changed',
+			onPovChanged: 'pov_changed',
+			onResize: 'resize',
+			onStatusChanged: 'status_changed',
+			onVisibleChanged: 'visible_changed',
+			onZoomChanged: 'zoom_changed'
 		};
 
 		Object.entries(eventMap).forEach(([propName, eventName]) => {
@@ -158,15 +169,18 @@
 		setupListeners();
 	}
 
+	// --- Lifecycle ---
 	onDestroy(() => {
 		if (panoramaInstance) {
-			onunmount?.(panoramaInstance);
+			onUnmount?.(panoramaInstance);
 			listeners.forEach((listener) => googleMapsApi?.event.removeListener(listener));
-			panoramaInstance.setVisible(false);
+			// Panorama instance might be automatically cleaned up by GC when container is removed,
+			// but explicit cleanup if available is good practice (no setMap(null) for panorama).
 			panoramaInstance = null;
 		}
 	});
 
+	// Initialize when ready
 	$: if ($status === 'loaded' && containerElement && !panoramaInstance) {
 		initializePanorama();
 	}

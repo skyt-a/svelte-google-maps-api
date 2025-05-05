@@ -21,22 +21,22 @@
 	export let strokeWeight: number | undefined = undefined;
 	export let zIndex: number | undefined = undefined;
 
-	export let onclick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let ondblclick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let ondrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let ondragend: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let ondragstart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onmousedown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onmousemove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onmouseout: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onmouseover: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onmouseup: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onrightclick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onpathschanged:
+	export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onPathsChanged:
 		| ((newPaths: google.maps.MVCArray<google.maps.MVCArray<google.maps.LatLng>>) => void)
 		| undefined = undefined;
-	export let onload: ((polygon: google.maps.Polygon) => void) | undefined = undefined;
-	export let onunmount: ((polygon: google.maps.Polygon) => void) | undefined = undefined;
+	export let onLoad: ((polygon: google.maps.Polygon) => void) | undefined = undefined;
+	export let onUnmount: ((polygon: google.maps.Polygon) => void) | undefined = undefined;
 
 	let polygonInstance: google.maps.Polygon | null = null;
 	let listeners: google.maps.MapsEventListener[] = [];
@@ -70,7 +70,7 @@
 
 		try {
 			polygonInstance = new googleMapsApi.Polygon(polygonOptions);
-			onload?.(polygonInstance);
+			onLoad?.(polygonInstance);
 			setupListeners();
 		} catch (error) {
 			console.error('[Polygon] Error creating instance:', error);
@@ -103,17 +103,17 @@
 		listeners = [];
 
 		const eventMap = {
-			onclick: 'click',
-			ondblclick: 'dblclick',
-			ondrag: 'drag',
-			ondragend: 'dragend',
-			ondragstart: 'dragstart',
-			onmousedown: 'mousedown',
-			onmousemove: 'mousemove',
-			onmouseout: 'mouseout',
-			onmouseover: 'mouseover',
-			onmouseup: 'mouseup',
-			onrightclick: 'rightclick'
+			onClick: 'click',
+			onDblClick: 'dblclick',
+			onDrag: 'drag',
+			onDragEnd: 'dragend',
+			onDragStart: 'dragstart',
+			onMouseDown: 'mousedown',
+			onMouseMove: 'mousemove',
+			onMouseOut: 'mouseout',
+			onMouseOver: 'mouseover',
+			onMouseUp: 'mouseup',
+			onRightClick: 'rightclick'
 		};
 
 		Object.entries(eventMap).forEach(([propName, eventName]) => {
@@ -123,10 +123,10 @@
 			}
 		});
 
-		if (onpathschanged) {
+		if (onPathsChanged) {
 			const polygonPaths = polygonInstance.getPaths();
 			if (polygonPaths) {
-				const updatePaths = () => onpathschanged(polygonPaths);
+				const updatePaths = () => onPathsChanged(polygonPaths);
 
 				listeners.push(googleMapsApi.event.addListener(polygonPaths, 'insert_at', updatePaths));
 				listeners.push(googleMapsApi.event.addListener(polygonPaths, 'remove_at', updatePaths));
@@ -140,7 +140,7 @@
 
 			if (draggable) {
 				listeners.push(
-					polygonInstance!.addListener('dragend', () => onpathschanged(polygonInstance!.getPaths()))
+					polygonInstance!.addListener('dragend', () => onPathsChanged(polygonInstance!.getPaths()))
 				);
 			}
 		}
@@ -152,7 +152,7 @@
 
 	onDestroy(() => {
 		if (polygonInstance) {
-			onunmount?.(polygonInstance);
+			onUnmount?.(polygonInstance);
 			listeners.forEach((listener) => googleMapsApi?.event.removeListener(listener));
 			polygonInstance.setMap(null);
 			polygonInstance = null;

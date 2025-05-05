@@ -16,15 +16,15 @@
 	export let zIndex: number | undefined = undefined;
 	export let shouldFocus: boolean = true;
 
-	export let isopen: boolean = true;
+	export let isOpen: boolean = true;
 
-	export let oncloseclick: (() => void) | undefined = undefined;
-	export let ondomready: (() => void) | undefined = undefined;
-	export let oncontentchanged: (() => void) | undefined = undefined;
-	export let onpositionchanged: (() => void) | undefined = undefined;
-	export let onzindexchanged: (() => void) | undefined = undefined;
-	export let onload: ((infoWindow: google.maps.InfoWindow) => void) | undefined = undefined;
-	export let onunmount: ((infoWindow: google.maps.InfoWindow) => void) | undefined = undefined;
+	export let onCloseClick: (() => void) | undefined = undefined;
+	export let onDomReady: (() => void) | undefined = undefined;
+	export let onContentChanged: (() => void) | undefined = undefined;
+	export let onPositionChanged: (() => void) | undefined = undefined;
+	export let onZIndexChanged: (() => void) | undefined = undefined;
+	export let onLoad: ((infoWindow: google.maps.InfoWindow) => void) | undefined = undefined;
+	export let onUnmount: ((infoWindow: google.maps.InfoWindow) => void) | undefined = undefined;
 
 	let infoWindowInstance: google.maps.InfoWindow | null = null;
 	let contentWrapper: HTMLDivElement | null = null;
@@ -35,7 +35,7 @@
 	let positionChangedListener: google.maps.MapsEventListener | null = null;
 	let zIndexChangedListener: google.maps.MapsEventListener | null = null;
 
-	let internalOpenState = isopen;
+	let internalOpenState = isOpen;
 
 	const { status, googleMapsApi } = getContext<APIProviderContext>('svelte-google-maps-api');
 	const map = getContext<google.maps.Map>('map');
@@ -46,7 +46,7 @@
 
 	onDestroy(() => {
 		if (infoWindowInstance) {
-			onunmount?.(infoWindowInstance);
+			onUnmount?.(infoWindowInstance);
 			if (googleMapsApi) {
 				googleMapsApi.event.clearInstanceListeners(infoWindowInstance);
 			}
@@ -77,7 +77,7 @@
 		});
 
 		infoWindowInstance = new googleMapsApi.InfoWindow(infoWindowOptions);
-		onload?.(infoWindowInstance);
+		onLoad?.(infoWindowInstance);
 
 		setupListeners();
 
@@ -94,8 +94,8 @@
 		infoWindowInstance.setOptions(options);
 	}
 
-	$: if (isopen !== internalOpenState) {
-		internalOpenState = isopen;
+	$: if (isOpen !== internalOpenState) {
+		internalOpenState = isOpen;
 		updateOpenState();
 	}
 
@@ -108,27 +108,27 @@
 		if (positionChangedListener) googleMapsApi.event.removeListener(positionChangedListener);
 		if (zIndexChangedListener) googleMapsApi.event.removeListener(zIndexChangedListener);
 
-		if (oncloseclick) {
+		if (onCloseClick) {
 			closeClickListener = infoWindowInstance.addListener('closeclick', () => {
 				internalOpenState = false;
-				isopen = false;
-				oncloseclick();
+				isOpen = false;
+				onCloseClick();
 			});
 		}
-		if (ondomready) {
-			domReadyListener = infoWindowInstance.addListener('domready', ondomready);
+		if (onDomReady) {
+			domReadyListener = infoWindowInstance.addListener('domready', onDomReady);
 		}
-		if (oncontentchanged) {
-			contentChangedListener = infoWindowInstance.addListener('content_changed', oncontentchanged);
+		if (onContentChanged) {
+			contentChangedListener = infoWindowInstance.addListener('content_changed', onContentChanged);
 		}
-		if (onpositionchanged) {
+		if (onPositionChanged) {
 			positionChangedListener = infoWindowInstance.addListener(
 				'position_changed',
-				onpositionchanged
+				onPositionChanged
 			);
 		}
-		if (onzindexchanged) {
-			zIndexChangedListener = infoWindowInstance.addListener('zindex_changed', onzindexchanged);
+		if (onZIndexChanged) {
+			zIndexChangedListener = infoWindowInstance.addListener('zindex_changed', onZIndexChanged);
 		}
 	}
 
