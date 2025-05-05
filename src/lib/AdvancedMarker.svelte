@@ -9,7 +9,12 @@
 	export let element: HTMLElement | undefined = undefined;
 	export let gmpDraggable: boolean | undefined = undefined;
 
-	export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	/** @deprecated Use `click` event instead. */
+	export let onclick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	/** @deprecated Use `gmp_domanchorintersect` event instead. */
+	export let ongmpdomanchorintersect: ((e: google.maps.MapMouseEvent) => void) | undefined =
+		undefined;
+
 	export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
 	export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
 	export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
@@ -100,8 +105,8 @@
 		if (dragEndListener) googleMapsApi.event.removeListener(dragEndListener);
 		if (dragStartListener) googleMapsApi.event.removeListener(dragStartListener);
 
-		if (onClick) {
-			clickListener = markerInstance.addListener('click', onClick);
+		if (onclick) {
+			clickListener = markerInstance.addListener('click', onclick);
 		}
 		if (onDrag) {
 			dragListener = markerInstance.addListener('gmp-drag', onDrag);
@@ -111,6 +116,12 @@
 		}
 		if (onDragStart) {
 			dragStartListener = markerInstance.addListener('gmp-dragstart', onDragStart);
+		}
+
+		if (ongmpdomanchorintersect) {
+			markerInstance.addListener('gmp-domanchorintersect', (e: google.maps.MapMouseEvent) =>
+				ongmpdomanchorintersect(e)
+			);
 		}
 	}
 

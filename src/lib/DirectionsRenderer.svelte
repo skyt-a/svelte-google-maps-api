@@ -17,9 +17,9 @@
 	export let markerOptions: google.maps.MarkerOptions | undefined = undefined;
 	export let polylineOptions: google.maps.PolylineOptions | undefined = undefined;
 
-	export let onDirectionsChanged: (() => void) | undefined = undefined;
-	export let onLoad: ((renderer: google.maps.DirectionsRenderer) => void) | undefined = undefined;
-	export let onUnmount: ((renderer: google.maps.DirectionsRenderer) => void) | undefined =
+	export let ondirectionschanged: (() => void) | undefined = undefined;
+	export let onload: ((renderer: google.maps.DirectionsRenderer) => void) | undefined = undefined;
+	export let onunmount: ((renderer: google.maps.DirectionsRenderer) => void) | undefined =
 		undefined;
 
 	let rendererInstance: google.maps.DirectionsRenderer | null = null;
@@ -62,7 +62,7 @@
 
 		try {
 			rendererInstance = new googleMapsApi.DirectionsRenderer(rendererOptions);
-			onLoad?.(rendererInstance);
+			onload?.(rendererInstance);
 			setupListeners();
 		} catch (error) {
 			console.error('[DirectionsRenderer] Error creating instance:', error);
@@ -100,10 +100,10 @@
 		if (directionsChangedListener) googleMapsApi.event.removeListener(directionsChangedListener);
 		directionsChangedListener = null;
 
-		if (onDirectionsChanged) {
+		if (ondirectionschanged) {
 			directionsChangedListener = rendererInstance.addListener(
 				'directions_changed',
-				onDirectionsChanged
+				ondirectionschanged
 			);
 		}
 	}
@@ -114,7 +114,7 @@
 
 	onDestroy(() => {
 		if (rendererInstance) {
-			onUnmount?.(rendererInstance);
+			onunmount?.(rendererInstance);
 			if (directionsChangedListener && googleMapsApi) {
 				googleMapsApi.event.removeListener(directionsChangedListener);
 			}
