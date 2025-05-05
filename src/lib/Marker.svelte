@@ -6,29 +6,29 @@
 	export let position: google.maps.LatLng | google.maps.LatLngLiteral;
 	export let options: google.maps.MarkerOptions = {};
 
-	export let onclick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onclickablechanged: (() => void) | undefined = undefined;
-	export let oncursorchanged: (() => void) | undefined = undefined;
-	export let onanimationchanged: (() => void) | undefined = undefined;
-	export let ondblclick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let ondrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let ondragend: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let ondraggablechanged: (() => void) | undefined = undefined;
-	export let ondragstart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onflatchanged: (() => void) | undefined = undefined;
-	export let oniconchanged: (() => void) | undefined = undefined;
-	export let onmousedown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onmouseout: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onmouseover: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onmouseup: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onpositionchanged: (() => void) | undefined = undefined;
-	export let onrightclick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onshapechanged: (() => void) | undefined = undefined;
-	export let ontitlechanged: (() => void) | undefined = undefined;
-	export let onvisiblechanged: (() => void) | undefined = undefined;
-	export let onzindexchanged: (() => void) | undefined = undefined;
-	export let onload: ((marker: google.maps.Marker) => void) | undefined = undefined;
-	export let onunmount: ((marker: google.maps.Marker) => void) | undefined = undefined;
+	export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onClickableChanged: (() => void) | undefined = undefined;
+	export let onCursorChanged: (() => void) | undefined = undefined;
+	export let onAnimationChanged: (() => void) | undefined = undefined;
+	export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onDraggableChanged: (() => void) | undefined = undefined;
+	export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onFlatChanged: (() => void) | undefined = undefined;
+	export let onIconChanged: (() => void) | undefined = undefined;
+	export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onPositionChanged: (() => void) | undefined = undefined;
+	export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onShapeChanged: (() => void) | undefined = undefined;
+	export let onTitleChanged: (() => void) | undefined = undefined;
+	export let onVisibleChanged: (() => void) | undefined = undefined;
+	export let onZindexChanged: (() => void) | undefined = undefined;
+	export let onLoad: ((marker: google.maps.Marker) => void) | undefined = undefined;
+	export let onUnmount: ((marker: google.maps.Marker) => void) | undefined = undefined;
 
 	let clickListener: google.maps.MapsEventListener | undefined = undefined;
 	let clickableChangedListener: google.maps.MapsEventListener | undefined = undefined;
@@ -62,7 +62,7 @@
 			map: map,
 			...options
 		});
-		onload?.(marker);
+		onLoad?.(marker);
 	}
 
 	onDestroy(() => {
@@ -71,7 +71,7 @@
 				googleMapsApi.event.clearInstanceListeners(marker);
 			}
 			marker.setMap(null);
-			onunmount?.(marker);
+			onUnmount?.(marker);
 			marker = null;
 		}
 	});
@@ -84,151 +84,152 @@
 		marker.setOptions(options);
 	}
 
-	$: if (marker && onclick && googleMapsApi && browser) {
+	$: if (marker && onClick && googleMapsApi && browser) {
 		if (clickListener) googleMapsApi.event.removeListener(clickListener);
-		clickListener = googleMapsApi.event.addListener(marker, 'click', onclick);
+		clickListener = googleMapsApi.event.addListener(marker, 'click', onClick);
 	} else if (clickListener && googleMapsApi) {
 		googleMapsApi.event.removeListener(clickListener);
 		clickListener = undefined;
 	}
 
-	$: if (marker && onclickablechanged && googleMapsApi && browser) {
+	$: if (marker && onClickableChanged && googleMapsApi && browser) {
 		if (clickableChangedListener) googleMapsApi.event.removeListener(clickableChangedListener);
 		clickableChangedListener = googleMapsApi.event.addListener(
 			marker,
 			'clickable_changed',
-			onclickablechanged
+			onClickableChanged
 		);
 	} else if (clickableChangedListener && googleMapsApi) {
 		googleMapsApi.event.removeListener(clickableChangedListener);
 		clickableChangedListener = undefined;
 	}
 
-	$: if (marker && oncursorchanged && googleMapsApi && browser) {
+	$: if (marker && onCursorChanged && googleMapsApi && browser) {
 		if (cursorChangedListener) googleMapsApi.event.removeListener(cursorChangedListener);
 		cursorChangedListener = googleMapsApi.event.addListener(
 			marker,
 			'cursor_changed',
-			oncursorchanged
+			onCursorChanged
 		);
 	} else if (cursorChangedListener && googleMapsApi) {
 		googleMapsApi.event.removeListener(cursorChangedListener);
 		cursorChangedListener = undefined;
 	}
 
-	$: if (marker && onanimationchanged && googleMapsApi && browser) {
+	$: if (marker && onAnimationChanged && googleMapsApi && browser) {
 		if (animationChangedListener) googleMapsApi.event.removeListener(animationChangedListener);
 		animationChangedListener = googleMapsApi.event.addListener(
 			marker,
 			'animation_changed',
-			onanimationchanged
+			onAnimationChanged
 		);
 	} else if (animationChangedListener && googleMapsApi) {
 		googleMapsApi.event.removeListener(animationChangedListener);
 		animationChangedListener = undefined;
 	}
 
-	$: if (marker && ondblclick && googleMapsApi && browser) {
+	$: if (marker && onDblClick && googleMapsApi && browser) {
 		if (dblclickListener) googleMapsApi.event.removeListener(dblclickListener);
-		dblclickListener = googleMapsApi.event.addListener(marker, 'dblclick', ondblclick);
+		dblclickListener = googleMapsApi.event.addListener(marker, 'dblclick', onDblClick);
 	}
 
-	$: if (marker && ondrag && googleMapsApi && browser) {
+	$: if (marker && onDrag && googleMapsApi && browser) {
 		if (dragListener) googleMapsApi.event.removeListener(dragListener);
-		dragListener = googleMapsApi.event.addListener(marker, 'drag', ondrag);
+		dragListener = googleMapsApi.event.addListener(marker, 'drag', onDrag);
 	}
 
-	$: if (marker && ondragend && googleMapsApi && browser) {
+	$: if (marker && onDragEnd && googleMapsApi && browser) {
 		if (dragendListener) googleMapsApi.event.removeListener(dragendListener);
-		dragendListener = googleMapsApi.event.addListener(marker, 'dragend', ondragend);
+		dragendListener = googleMapsApi.event.addListener(marker, 'dragend', onDragEnd);
 	}
 
-	$: if (marker && ondraggablechanged && googleMapsApi && browser) {
+	$: if (marker && onDraggableChanged && googleMapsApi && browser) {
 		if (draggableChangedListener) googleMapsApi.event.removeListener(draggableChangedListener);
 		draggableChangedListener = googleMapsApi.event.addListener(
 			marker,
 			'draggable_changed',
-			ondraggablechanged
+			onDraggableChanged
 		);
 	}
 
-	$: if (marker && ondragstart && googleMapsApi && browser) {
+	$: if (marker && onDragStart && googleMapsApi && browser) {
 		if (dragstartListener) googleMapsApi.event.removeListener(dragstartListener);
-		dragstartListener = googleMapsApi.event.addListener(marker, 'dragstart', ondragstart);
+		dragstartListener = googleMapsApi.event.addListener(marker, 'dragstart', onDragStart);
 	}
 
-	$: if (marker && onflatchanged && googleMapsApi && browser) {
+	$: if (marker && onFlatChanged && googleMapsApi && browser) {
 		if (flatChangedListener) googleMapsApi.event.removeListener(flatChangedListener);
-		flatChangedListener = googleMapsApi.event.addListener(marker, 'flat_changed', onflatchanged);
+		flatChangedListener = googleMapsApi.event.addListener(marker, 'flat_changed', onFlatChanged);
 	}
 
-	$: if (marker && oniconchanged && googleMapsApi && browser) {
+	$: if (marker && onIconChanged && googleMapsApi && browser) {
 		if (iconChangedListener) googleMapsApi.event.removeListener(iconChangedListener);
-		iconChangedListener = googleMapsApi.event.addListener(marker, 'icon_changed', oniconchanged);
+		iconChangedListener = googleMapsApi.event.addListener(marker, 'icon_changed', onIconChanged);
 	}
 
-	$: if (marker && onmousedown && googleMapsApi && browser) {
+	$: if (marker && onMouseDown && googleMapsApi && browser) {
 		if (mousedownListener) googleMapsApi.event.removeListener(mousedownListener);
-		mousedownListener = googleMapsApi.event.addListener(marker, 'mousedown', onmousedown);
+		mousedownListener = googleMapsApi.event.addListener(marker, 'mousedown', onMouseDown);
 	}
 
-	$: if (marker && onmouseout && googleMapsApi && browser) {
+	$: if (marker && onMouseOut && googleMapsApi && browser) {
 		if (mouseoutListener) googleMapsApi.event.removeListener(mouseoutListener);
-		mouseoutListener = googleMapsApi.event.addListener(marker, 'mouseout', onmouseout);
+		mouseoutListener = googleMapsApi.event.addListener(marker, 'mouseout', onMouseOut);
 	}
 
-	$: if (marker && onmouseover && googleMapsApi && browser) {
+	$: if (marker && onMouseOver && googleMapsApi && browser) {
 		if (mouseoverListener) googleMapsApi.event.removeListener(mouseoverListener);
-		mouseoverListener = googleMapsApi.event.addListener(marker, 'mouseover', onmouseover);
+		mouseoverListener = googleMapsApi.event.addListener(marker, 'mouseover', onMouseOver);
 	}
 
-	$: if (marker && onmouseup && googleMapsApi && browser) {
+	$: if (marker && onMouseUp && googleMapsApi && browser) {
 		if (mouseupListener) googleMapsApi.event.removeListener(mouseupListener);
-		mouseupListener = googleMapsApi.event.addListener(marker, 'mouseup', onmouseup);
+		mouseupListener = googleMapsApi.event.addListener(marker, 'mouseup', onMouseUp);
 	}
 
-	$: if (marker && onpositionchanged && googleMapsApi && browser) {
+	$: if (marker && onPositionChanged && googleMapsApi && browser) {
 		if (positionChangedListener) googleMapsApi.event.removeListener(positionChangedListener);
 		positionChangedListener = googleMapsApi.event.addListener(
 			marker,
 			'position_changed',
-			onpositionchanged
+			onPositionChanged
 		);
 	}
 
-	$: if (marker && onrightclick && googleMapsApi && browser) {
+	$: if (marker && onRightClick && googleMapsApi && browser) {
 		if (rightclickListener) googleMapsApi.event.removeListener(rightclickListener);
-		rightclickListener = googleMapsApi.event.addListener(marker, 'rightclick', onrightclick);
+		rightclickListener = googleMapsApi.event.addListener(marker, 'rightclick', onRightClick);
 	}
 
-	$: if (marker && onshapechanged && googleMapsApi && browser) {
+	$: if (marker && onShapeChanged && googleMapsApi && browser) {
 		if (shapeChangedListener) googleMapsApi.event.removeListener(shapeChangedListener);
-		shapeChangedListener = googleMapsApi.event.addListener(marker, 'shape_changed', onshapechanged);
+		shapeChangedListener = googleMapsApi.event.addListener(marker, 'shape_changed', onShapeChanged);
 	}
 
-	$: if (marker && ontitlechanged && googleMapsApi && browser) {
+	$: if (marker && onTitleChanged && googleMapsApi && browser) {
 		if (titleChangedListener) googleMapsApi.event.removeListener(titleChangedListener);
-		titleChangedListener = googleMapsApi.event.addListener(marker, 'title_changed', ontitlechanged);
+		titleChangedListener = googleMapsApi.event.addListener(marker, 'title_changed', onTitleChanged);
 	}
 
-	$: if (marker && onvisiblechanged && googleMapsApi && browser) {
+	$: if (marker && onVisibleChanged && googleMapsApi && browser) {
 		if (visibleChangedListener) googleMapsApi.event.removeListener(visibleChangedListener);
 		visibleChangedListener = googleMapsApi.event.addListener(
 			marker,
 			'visible_changed',
-			onvisiblechanged
+			onVisibleChanged
 		);
 	}
 
-	$: if (marker && onzindexchanged && googleMapsApi && browser) {
+	$: if (marker && onZindexChanged && googleMapsApi && browser) {
 		if (zindexChangedListener) googleMapsApi.event.removeListener(zindexChangedListener);
 		zindexChangedListener = googleMapsApi.event.addListener(
 			marker,
 			'zindex_changed',
-			onzindexchanged
+			onZindexChanged
 		);
 	}
 
+	// Function to get the marker instance
 	export function getMarkerInstance(): google.maps.Marker | null {
 		return marker;
 	}

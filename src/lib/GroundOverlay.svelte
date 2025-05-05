@@ -10,10 +10,10 @@
 	export let clickable: boolean | undefined = undefined;
 	export let opacity: number | undefined = undefined;
 
-	export let onclick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let ondblclick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onload: ((overlay: google.maps.GroundOverlay) => void) | undefined = undefined;
-	export let onunmount: ((overlay: google.maps.GroundOverlay) => void) | undefined = undefined;
+	export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onLoad: ((overlay: google.maps.GroundOverlay) => void) | undefined = undefined;
+	export let onUnmount: ((overlay: google.maps.GroundOverlay) => void) | undefined = undefined;
 
 	let overlayInstance: google.maps.GroundOverlay | null = null;
 	let listeners: google.maps.MapsEventListener[] = [];
@@ -39,7 +39,7 @@
 
 		try {
 			overlayInstance = new googleMapsApi.GroundOverlay(url, bounds, overlayOptions);
-			onload?.(overlayInstance);
+			onLoad?.(overlayInstance);
 			setupListeners();
 		} catch (error) {
 			console.error('[GroundOverlay] Error creating instance:', error);
@@ -57,8 +57,8 @@
 		listeners = [];
 
 		const eventMap = {
-			onclick: 'click',
-			ondblclick: 'dblclick'
+			onClick: 'click',
+			onDblClick: 'dblclick'
 		};
 
 		Object.entries(eventMap).forEach(([propName, eventName]) => {
@@ -75,7 +75,7 @@
 
 	onDestroy(() => {
 		if (overlayInstance) {
-			onunmount?.(overlayInstance);
+			onUnmount?.(overlayInstance);
 			listeners.forEach((listener) => googleMapsApi?.event.removeListener(listener));
 			overlayInstance.setMap(null);
 			overlayInstance = null;

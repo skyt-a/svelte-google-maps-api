@@ -16,20 +16,20 @@
 	export let strokeWeight: number | undefined = undefined;
 	export let zIndex: number | undefined = undefined;
 
-	export let onboundschanged: (() => void) | undefined = undefined;
-	export let onclick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let ondblclick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let ondrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let ondragend: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let ondragstart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onmousedown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onmousemove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onmouseout: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onmouseover: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onmouseup: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onrightclick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onload: ((rectangle: google.maps.Rectangle) => void) | undefined = undefined;
-	export let onunmount: ((rectangle: google.maps.Rectangle) => void) | undefined = undefined;
+	export let onBoundsChanged: (() => void) | undefined = undefined;
+	export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
+	export let onLoad: ((rectangle: google.maps.Rectangle) => void) | undefined = undefined;
+	export let onUnmount: ((rectangle: google.maps.Rectangle) => void) | undefined = undefined;
 
 	let rectangleInstance: google.maps.Rectangle | null = null;
 	let listeners: google.maps.MapsEventListener[] = [];
@@ -63,7 +63,7 @@
 
 		try {
 			rectangleInstance = new googleMapsApi.Rectangle(rectangleOptions);
-			onload?.(rectangleInstance);
+			onLoad?.(rectangleInstance);
 			setupListeners();
 		} catch (error) {
 			console.error('[Rectangle] Error creating instance:', error);
@@ -96,18 +96,18 @@
 		listeners = [];
 
 		const eventMap = {
-			onboundschanged: 'bounds_changed',
-			onclick: 'click',
-			ondblclick: 'dblclick',
-			ondrag: 'drag',
-			ondragend: 'dragend',
-			ondragstart: 'dragstart',
-			onmousedown: 'mousedown',
-			onmousemove: 'mousemove',
-			onmouseout: 'mouseout',
-			onmouseover: 'mouseover',
-			onmouseup: 'mouseup',
-			onrightclick: 'rightclick'
+			onBoundsChanged: 'bounds_changed',
+			onClick: 'click',
+			onDblClick: 'dblclick',
+			onDrag: 'drag',
+			onDragEnd: 'dragend',
+			onDragStart: 'dragstart',
+			onMouseDown: 'mousedown',
+			onMouseMove: 'mousemove',
+			onMouseOut: 'mouseout',
+			onMouseOver: 'mouseover',
+			onMouseUp: 'mouseup',
+			onRightClick: 'rightclick'
 		};
 
 		Object.entries(eventMap).forEach(([propName, eventName]) => {
@@ -124,7 +124,7 @@
 
 	onDestroy(() => {
 		if (rectangleInstance) {
-			onunmount?.(rectangleInstance);
+			onUnmount?.(rectangleInstance);
 			listeners.forEach((listener) => googleMapsApi?.event.removeListener(listener));
 			rectangleInstance.setMap(null);
 			rectangleInstance = null;
