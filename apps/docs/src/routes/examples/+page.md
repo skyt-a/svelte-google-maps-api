@@ -2,8 +2,6 @@
 title: Examples
 ---
 
-# Examples
-
 Here are some examples of how to use the Svelte Google Maps API library.
 
 **Note:** You need a Google Maps API key to view these examples. Enter your key in the input field provided for each demo.
