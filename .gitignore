@@ -3,6 +3,7 @@ node_modules
 /build
 /dist
 /.svelte-kit
+/.sveltepress
 /package
 .env
 .env.*
