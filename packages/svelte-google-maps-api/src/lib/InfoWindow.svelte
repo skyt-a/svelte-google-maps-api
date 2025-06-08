@@ -138,7 +138,7 @@
 
 	function updateOpenState() {
 		if (!infoWindowInstance || !map) return;
-
+		console.log('updateOpenState', internalOpenState);
 		if (internalOpenState) {
 			let openAnchor: google.maps.MVCObject | undefined = undefined;
 			if (anchor && typeof anchor === 'object' && anchor !== null) {
@@ -161,17 +161,12 @@
 	}
 </script>
 
-<!-- Wrapper for slot content -->
 <div bind:this={contentWrapper}>
 	<slot />
 </div>
 
-<!-- Wrapper for header slot content (optional) -->
 {#if $$slots.header}
 	<div bind:this={headerWrapper}>
 		<slot name="header" />
 	</div>
 {/if}
-
-<!-- This component doesn't render directly to the DOM where it's used,
-     it controls the InfoWindow on the map -->
