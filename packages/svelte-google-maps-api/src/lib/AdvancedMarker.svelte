@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getContext, onDestroy, onMount, tick } from 'svelte';
+	import { getContext, onDestroy, tick } from 'svelte';
 	import { BROWSER as browser } from 'esm-env';
 	import type { APIProviderContext } from './APIProvider.svelte';
 	import type { ClusterableMarker, MarkerClustererContext } from './types/markerClusterer.js';

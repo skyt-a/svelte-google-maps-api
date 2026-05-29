@@ -4,7 +4,8 @@
 	import type { APIProviderContext } from './APIProvider.svelte';
 
 	export let drawingMode: google.maps.drawing.OverlayType | null = null;
-	export let drawingControlOptions: google.maps.drawing.DrawingControlOptions | undefined = undefined;
+	export let drawingControlOptions: google.maps.drawing.DrawingControlOptions | undefined =
+		undefined;
 	export let circleOptions: google.maps.CircleOptions | undefined = undefined;
 	export let markerOptions: google.maps.MarkerOptions | undefined = undefined;
 	export let polygonOptions: google.maps.PolygonOptions | undefined = undefined;
@@ -14,13 +15,18 @@
 
 	export let onCircleComplete: ((circle: google.maps.Circle) => void) | undefined = undefined;
 	export let onMarkerComplete: ((marker: google.maps.Marker) => void) | undefined = undefined;
-	export let onOverlayComplete: ((event: google.maps.drawing.OverlayCompleteEvent) => void) | undefined = undefined;
+	export let onOverlayComplete:
+		| ((event: google.maps.drawing.OverlayCompleteEvent) => void)
+		| undefined = undefined;
 	export let onPolygonComplete: ((polygon: google.maps.Polygon) => void) | undefined = undefined;
 	export let onPolylineComplete: ((polyline: google.maps.Polyline) => void) | undefined = undefined;
-	export let onRectangleComplete: ((rectangle: google.maps.Rectangle) => void) | undefined = undefined;
+	export let onRectangleComplete: ((rectangle: google.maps.Rectangle) => void) | undefined =
+		undefined;
 	export let onDrawingModeChange: (() => void) | undefined = undefined;
-	export let onLoad: ((drawingManager: google.maps.drawing.DrawingManager) => void) | undefined = undefined;
-	export let onUnmount: ((drawingManager: google.maps.drawing.DrawingManager) => void) | undefined = undefined;
+	export let onLoad: ((drawingManager: google.maps.drawing.DrawingManager) => void) | undefined =
+		undefined;
+	export let onUnmount: ((drawingManager: google.maps.drawing.DrawingManager) => void) | undefined =
+		undefined;
 
 	let circleCompleteListener: google.maps.MapsEventListener | undefined = undefined;
 	let markerCompleteListener: google.maps.MapsEventListener | undefined = undefined;
@@ -35,18 +41,24 @@
 	const map = getContext<google.maps.Map>('map');
 
 	$: if ($status === 'loaded' && googleMapsApi && map && !drawingManager) {
-		drawingManager = new googleMapsApi.drawing.DrawingManager({
-			map: map,
-			drawingMode,
-			drawingControl,
-			drawingControlOptions,
-			circleOptions,
-			markerOptions,
-			polygonOptions,
-			polylineOptions,
-			rectangleOptions
-		});
-		onLoad?.(drawingManager);
+		if (!googleMapsApi.drawing?.DrawingManager) {
+			console.error(
+				'svelte-google-maps-api: DrawingManager requires the "drawing" library and a Maps JavaScript API version where the Drawing Library is still available.'
+			);
+		} else {
+			drawingManager = new googleMapsApi.drawing.DrawingManager({
+				map: map,
+				drawingMode,
+				drawingControl,
+				drawingControlOptions,
+				circleOptions,
+				markerOptions,
+				polygonOptions,
+				polylineOptions,
+				rectangleOptions
+			});
+			onLoad?.(drawingManager);
+		}
 	}
 
 	onDestroy(() => {
