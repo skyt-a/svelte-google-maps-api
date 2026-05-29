@@ -2,6 +2,10 @@
 title: Circle
 ---
 
+## Storybook
+
+[Open the Circle story](https://skyt-a.github.io/svelte-google-maps-api/storybook/?path=/story/components-circle--basic)
+
 The `Circle` component draws a circle on the map with a specified center and radius.
 
 ## Props

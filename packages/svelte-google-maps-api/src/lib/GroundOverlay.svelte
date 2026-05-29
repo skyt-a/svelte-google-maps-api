@@ -56,13 +56,12 @@
 		listeners.forEach((listener) => googleMapsApi?.event.removeListener(listener));
 		listeners = [];
 
-		const eventMap = {
-			onClick: 'click',
-			onDblClick: 'dblclick'
-		};
+		const eventHandlers = [
+			['click', onClick],
+			['dblclick', onDblClick]
+		] as const;
 
-		Object.entries(eventMap).forEach(([propName, eventName]) => {
-			const callback = $$props[propName];
+		eventHandlers.forEach(([eventName, callback]) => {
 			if (callback) {
 				listeners.push(overlayInstance!.addListener(eventName, callback));
 			}

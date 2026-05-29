@@ -1,6 +1,10 @@
 ---
 title: OverlayView
 ---
+
+## Storybook
+
+[Open the OverlayView story](https://skyt-a.github.io/svelte-google-maps-api/storybook/?path=/story/components-overlayview--basic)
 A component for displaying custom HTML elements (`<slot>`) as an overlay at a specified position or bounds on the map.
 Wraps `google.maps.OverlayView` to integrate Svelte components into map panes.
 
@@ -40,6 +44,10 @@ Must be used within a `<GoogleMap>` component.
 | `position`    | `google.maps.LatLng \| google.maps.LatLngLiteral \| undefined`        | `undefined`   | The single geographical coordinate where the overlay should be displayed. If provided along with `bounds`, `position` takes precedence.                                              |
 | `bounds`      | `google.maps.LatLngBounds \| google.maps.LatLngBoundsLiteral \| undefined` | `undefined`   | The geographical bounds where the overlay should be displayed. If provided, the slot content will be stretched to fit these bounds. Used only if `position` is not provided.      |
 | `mapPaneName` | `keyof google.maps.MapPanes`                                       | `'floatPane'` | The name of the map pane where the overlay's container element should be added. See [MapPanes documentation](https://developers.google.com/maps/documentation/javascript/reference/map#MapPanes) for available pane names. |
+
+## Pane constants
+
+`FLOAT_PANE`, `MAP_PANE`, `MARKER_LAYER`, `OVERLAY_LAYER`, and `OVERLAY_MOUSE_TARGET` are exported from `svelte-google-maps-api` for convenient pane selection.
 
 **Note:** You cannot specify both `position` and `bounds` simultaneously. Provide one or the other, or neither (in which case the overlay won't be displayed).
 

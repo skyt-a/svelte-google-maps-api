@@ -1,6 +1,10 @@
 ---
 title: HeatmapLayer
 ---
+
+## Storybook
+
+[Open the HeatmapLayer story](https://skyt-a.github.io/svelte-google-maps-api/storybook/?path=/story/components-heatmaplayer--basic)
 A component to display a heatmap layer on the map.
 Requires the `visualization` library. Please specify `libraries={['visualization']}` in the `<APIProvider>` props.
 

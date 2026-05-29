@@ -1,6 +1,10 @@
 ---
 title: StreetViewPanorama
 ---
+
+## Storybook
+
+[Open the StreetViewPanorama story](https://skyt-a.github.io/svelte-google-maps-api/storybook/?path=/story/components-streetviewpanorama--basic)
 A component to display Street View panoramas.
 
 Must be used within an `<APIProvider>` component.

@@ -1,0 +1,7 @@
+{
+	"extends": "../../tsconfig.json",
+	"compilerOptions": {
+		"types": ["@types/google.maps", "node"]
+	},
+	"include": [".storybook/**/*", "src/**/*"]
+}

@@ -18,6 +18,10 @@ module.exports = {
 		es2017: true,
 		node: true
 	},
+	rules: {
+		'no-undef': 'off',
+		'@typescript-eslint/no-inferrable-types': 'off'
+	},
 	overrides: [
 		{
 			files: ['*.svelte'],

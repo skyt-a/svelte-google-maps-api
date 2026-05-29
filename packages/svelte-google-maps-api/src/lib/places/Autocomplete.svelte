@@ -10,6 +10,7 @@
 	export let placeholder: string | undefined = undefined;
 	export let inputId: string | undefined = undefined;
 	export let inputClass: string = '';
+	export let className: string = '';
 	export let inputStyle: string = '';
 	export let disabled: boolean = false;
 
@@ -17,11 +18,13 @@
 		undefined;
 	export let componentRestrictions: google.maps.places.ComponentRestrictions | undefined =
 		undefined;
+	export let restrictions: google.maps.places.ComponentRestrictions | undefined = undefined;
 	export let fields: string[] | undefined = undefined;
 	export let strictBounds: boolean | undefined = undefined;
 	export let types: string[] | undefined = undefined;
 
 	const dispatch = createEventDispatcher<{ place_changed: google.maps.places.PlaceResult }>();
+	export let onPlaceChanged: (() => void) | undefined = undefined;
 	export let onLoad: ((autocomplete: google.maps.places.Autocomplete) => void) | undefined =
 		undefined;
 	export let onUnmount: ((autocomplete: google.maps.places.Autocomplete) => void) | undefined =
@@ -80,7 +83,7 @@
 		const autocompleteOptions: google.maps.places.AutocompleteOptions = {
 			...(options ?? {}),
 			bounds,
-			componentRestrictions,
+			componentRestrictions: componentRestrictions ?? restrictions,
 			fields,
 			strictBounds,
 			types
@@ -109,8 +112,8 @@
 	} else if (autocompleteInstance) {
 		const individualOptions: google.maps.places.AutocompleteOptions = {};
 		if (bounds !== undefined) individualOptions.bounds = bounds;
-		if (componentRestrictions !== undefined)
-			individualOptions.componentRestrictions = componentRestrictions;
+		if (componentRestrictions !== undefined || restrictions !== undefined)
+			individualOptions.componentRestrictions = componentRestrictions ?? restrictions;
 		if (fields !== undefined) individualOptions.fields = fields;
 		if (strictBounds !== undefined) individualOptions.strictBounds = strictBounds;
 		if (types !== undefined) individualOptions.types = types;
@@ -131,6 +134,7 @@
 				if (inputElement && place.name) {
 					value = place.name;
 				}
+				onPlaceChanged?.();
 				dispatch('place_changed', place);
 			}
 		});
@@ -169,6 +173,6 @@
 	{placeholder}
 	{disabled}
 	id={inputId}
-	class="svelte-google-maps-autocomplete {inputClass}"
+	class="svelte-google-maps-autocomplete {inputClass} {className}"
 	style={inputStyle}
 />

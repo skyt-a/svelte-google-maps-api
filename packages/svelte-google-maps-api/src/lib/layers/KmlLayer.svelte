@@ -63,6 +63,7 @@
 		layerInstance = null;
 	}
 	$: if (layerInstance && options) {
+		layerInstance.setOptions(options);
 	}
 
 	function setupListeners() {
@@ -71,14 +72,13 @@
 		listeners.forEach((listener) => googleMapsApi?.event.removeListener(listener));
 		listeners = [];
 
-		const eventMap = {
-			onClick: 'click',
-			onDefaultViewportChanged: 'defaultviewport_changed',
-			onStatusChanged: 'status_changed'
-		};
+		const eventHandlers = [
+			['click', onClick],
+			['defaultviewport_changed', onDefaultViewportChanged],
+			['status_changed', onStatusChanged]
+		] as const;
 
-		Object.entries(eventMap).forEach(([propName, eventName]) => {
-			const callback = $$props[propName];
+		eventHandlers.forEach(([eventName, callback]) => {
 			if (callback) {
 				listeners.push(layerInstance!.addListener(eventName, callback));
 			}

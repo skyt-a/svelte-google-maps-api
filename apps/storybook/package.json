@@ -1,0 +1,23 @@
+{
+	"name": "storybook",
+	"private": true,
+	"version": "0.0.1",
+	"type": "module",
+	"scripts": {
+		"dev": "storybook dev -p 6006",
+		"build": "storybook build",
+		"storybook": "storybook dev -p 6006"
+	},
+	"dependencies": {
+		"svelte-google-maps-api": "workspace:*"
+	},
+	"devDependencies": {
+		"@sveltejs/vite-plugin-svelte": "^5.0.3",
+		"@storybook/svelte": "^8.6.14",
+		"@storybook/svelte-vite": "^8.6.14",
+		"storybook": "^8.6.14",
+		"svelte": "^5.28.2",
+		"typescript": "^5.0.0",
+		"vite": "^6.2.6"
+	}
+}

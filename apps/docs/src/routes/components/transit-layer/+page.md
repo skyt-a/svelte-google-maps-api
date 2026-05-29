@@ -1,6 +1,10 @@
 ---
 title: TransitLayer
 ---
+
+## Storybook
+
+[Open the TransitLayer story](https://skyt-a.github.io/svelte-google-maps-api/storybook/?path=/story/components-transitlayer--basic)
 The `TransitLayer` component displays the public transportation network on the map.
 
 ## Usage

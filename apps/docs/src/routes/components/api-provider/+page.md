@@ -2,18 +2,34 @@
 title: APIProvider
 ---
 
+## Storybook
+
+[Open the APIProvider story](https://skyt-a.github.io/svelte-google-maps-api/storybook/?path=/story/components-apiprovider--basic)
+
 The `APIProvider` component is responsible for loading the Google Maps JavaScript API.
 
 ## Props
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| apiKey | string | | Google Maps API key (required) |
-| libraries | string[] | [] | Optional array of Google Maps libraries to load |
-| version | string | 'weekly' | Google Maps API version to load |
-| language | string | | Language for the Google Maps API |
-| region | string | | Region for the Google Maps API |
-| mapIds | string[] | [] | Map IDs for cloud-based map styling |
+| apiKey | `string` | `''` | Google Maps API key. |
+| googleMapsApiKey | `string` | | React-compatible API key alias. |
+| googleMapsClientId | `string` | | Google Maps Premium Plan client id. Do not use with an API key. |
+| libraries | `Library[]` | `[]` | Google Maps libraries to load. |
+| version | `string` | `'weekly'` | Google Maps API version to load. |
+| language | `string` | | Language for the Google Maps API. |
+| region | `string` | | Region for the Google Maps API. |
+| channel | `string` | | Usage tracking channel. |
+| mapIds | `string[]` | | Map IDs for cloud-based map styling. |
+| authReferrerPolicy | `'origin'` | | Auth referrer policy. |
+| apiUrl | `string` | `'https://maps.googleapis.com'` | Google Maps API base URL. |
+| solutionChannel | `string` | | Google solution channel. |
+| id | `string` | `'svelte-google-maps-api-script'` | Script element id. |
+| nonce | `string` | | CSP nonce for the script tag. |
+| preventGoogleFontsLoading | `boolean` | `false` | Prevents Google Maps from injecting its default font styles. |
+| onLoad | `() => void` | | Called when the script has loaded. |
+| onError | `(error: Error) => void` | | Called when the script fails to load. |
+| onUnmount | `() => void` | | Called when the provider is destroyed. |
 
 ## Usage
 
@@ -32,13 +48,7 @@ The `APIProvider` component is responsible for loading the Google Maps JavaScrip
 
 ## Context
 
-The `APIProvider` component sets a context that is consumed by child components:
-
-```javascript
-setContext('googleMap', { isReady });
-```
-
-This context is used by components like `GoogleMap` to know when the Google Maps API is loaded and ready to use.
+The `APIProvider` component sets the `svelte-google-maps-api` context with the load status, API reference, and error state. `GoogleMap` and service components use that context to wait for the script before creating Google Maps objects.
 
 ## Loading Multiple Libraries
 
