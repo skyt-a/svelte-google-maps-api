@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import {
 		APIProvider,
 		AdvancedMarker,
@@ -34,7 +35,8 @@
 
 	export let componentName: string;
 
-	const apiKey = import.meta.env.STORYBOOK_GOOGLE_MAPS_API_KEY ?? '';
+	const STORYBOOK_API_KEY_STORAGE_KEY = 'svelte-google-maps-api:storybook-google-maps-api-key';
+	const fallbackApiKey = import.meta.env.STORYBOOK_GOOGLE_MAPS_API_KEY ?? '';
 	const center = { lat: 35.6812362, lng: 139.7649361 };
 	const second = { lat: 35.658584, lng: 139.7454316 };
 	const third = { lat: 35.710063, lng: 139.8107 };
@@ -55,7 +57,8 @@
 		{ location: second, weight: 2 },
 		{ location: third, weight: 4 }
 	];
-	const kmlUrl = 'https://developers.google.com/maps/documentation/javascript/examples/kml/westcampus.kml';
+	const kmlUrl =
+		'https://developers.google.com/maps/documentation/javascript/examples/kml/westcampus.kml';
 	const groundOverlayUrl =
 		'https://developers.google.com/maps/documentation/javascript/examples/full/images/talkeetna.png';
 	const distanceRequest: google.maps.DistanceMatrixRequest = {
@@ -79,8 +82,24 @@
 	let directions: google.maps.DirectionsResult | undefined = undefined;
 	let serviceStatus = 'Waiting';
 	let dataLoaded = false;
+	let apiKey = fallbackApiKey;
+	let apiKeyInput = fallbackApiKey;
+	let isApiKeyPanelOpen = false;
+	let apiKeyMessage = '';
 
 	$: libraries = getLibraries(componentName);
+
+	onMount(() => {
+		try {
+			const storedApiKey = window.localStorage.getItem(STORYBOOK_API_KEY_STORAGE_KEY);
+			if (storedApiKey) {
+				apiKey = storedApiKey;
+				apiKeyInput = storedApiKey;
+			}
+		} catch (error) {
+			apiKeyMessage = 'Could not read the saved API key.';
+		}
+	});
 
 	function getLibraries(name: string): Library[] {
 		if (name === 'Autocomplete' || name === 'StandaloneSearchBox') return ['places'];
@@ -135,14 +154,111 @@
 		});
 		dataLoaded = true;
 	}
+
+	function saveApiKey() {
+		const nextApiKey = apiKeyInput.trim();
+		if (!nextApiKey) {
+			apiKeyMessage = 'Enter an API key.';
+			return;
+		}
+
+		const shouldReload =
+			typeof document !== 'undefined' &&
+			Boolean(document.getElementById('svelte-google-maps-api-script')) &&
+			apiKey !== nextApiKey;
+
+		try {
+			window.localStorage.setItem(STORYBOOK_API_KEY_STORAGE_KEY, nextApiKey);
+			apiKeyMessage = 'API key saved in this browser.';
+		} catch (error) {
+			apiKeyMessage = 'Could not save the API key.';
+		}
+
+		apiKey = nextApiKey;
+		apiKeyInput = nextApiKey;
+		isApiKeyPanelOpen = false;
+
+		if (shouldReload) {
+			window.location.reload();
+		}
+	}
+
+	function clearSavedApiKey() {
+		const nextApiKey = fallbackApiKey;
+		const shouldReload =
+			typeof document !== 'undefined' &&
+			Boolean(document.getElementById('svelte-google-maps-api-script')) &&
+			apiKey !== nextApiKey;
+
+		try {
+			window.localStorage.removeItem(STORYBOOK_API_KEY_STORAGE_KEY);
+			apiKeyMessage = fallbackApiKey ? 'Using the environment API key.' : 'Saved API key cleared.';
+		} catch (error) {
+			apiKeyMessage = 'Could not clear the saved API key.';
+		}
+
+		apiKey = nextApiKey;
+		apiKeyInput = nextApiKey;
+		isApiKeyPanelOpen = !nextApiKey;
+
+		if (shouldReload) {
+			window.location.reload();
+		}
+	}
 </script>
 
 {#if !apiKey}
-	<div class="missing-key">
-		<strong>{componentName}</strong>
-		<span>Set STORYBOOK_GOOGLE_MAPS_API_KEY to run this story with Google Maps.</span>
+	<div class="api-key-empty-state">
+		<form class="api-key-card" on:submit|preventDefault={saveApiKey}>
+			<strong>{componentName}</strong>
+			<label for="storybook-google-maps-api-key">Google Maps API key</label>
+			<div class="api-key-row">
+				<input
+					id="storybook-google-maps-api-key"
+					type="password"
+					autocomplete="off"
+					bind:value={apiKeyInput}
+					placeholder="Paste an API key"
+				/>
+				<button type="submit">Apply</button>
+			</div>
+			<p>Saved in this browser and reused by all stories.</p>
+			{#if apiKeyMessage}
+				<p class="api-key-message">{apiKeyMessage}</p>
+			{/if}
+		</form>
 	</div>
-{:else if componentName === 'APIProvider'}
+{:else}
+	<div class="api-key-toolbar">
+		{#if isApiKeyPanelOpen}
+			<form class="api-key-popover" on:submit|preventDefault={saveApiKey}>
+				<label for="storybook-google-maps-api-key-toolbar">Google Maps API key</label>
+				<div class="api-key-row">
+					<input
+						id="storybook-google-maps-api-key-toolbar"
+						type="password"
+						autocomplete="off"
+						bind:value={apiKeyInput}
+					/>
+					<button type="submit">Save</button>
+				</div>
+				<div class="api-key-actions">
+					<button type="button" on:click={() => (isApiKeyPanelOpen = false)}>Close</button>
+					<button type="button" on:click={clearSavedApiKey}>Clear</button>
+				</div>
+				{#if apiKeyMessage}
+					<p class="api-key-message">{apiKeyMessage}</p>
+				{/if}
+			</form>
+		{:else}
+			<button type="button" class="api-key-toggle" on:click={() => (isApiKeyPanelOpen = true)}>
+				API key
+			</button>
+		{/if}
+	</div>
+{/if}
+
+{#if apiKey && componentName === 'APIProvider'}
 	<div class="map-frame">
 		<APIProvider {apiKey}>
 			<GoogleMap options={mapOptions} mapContainerStyle="width:100%;height:100%;">
@@ -150,19 +266,19 @@
 			</GoogleMap>
 		</APIProvider>
 	</div>
-{:else if componentName === 'Autocomplete'}
+{:else if apiKey && componentName === 'Autocomplete'}
 	<div class="panel-frame">
 		<APIProvider {apiKey} libraries={['places']}>
 			<Autocomplete placeholder="Search for a place" inputStyle="width:320px;padding:10px;" />
 		</APIProvider>
 	</div>
-{:else if componentName === 'StandaloneSearchBox'}
+{:else if apiKey && componentName === 'StandaloneSearchBox'}
 	<div class="panel-frame">
 		<APIProvider {apiKey} libraries={['places']}>
 			<StandaloneSearchBox placeholder="Search places" inputStyle="width:320px;padding:10px;" />
 		</APIProvider>
 	</div>
-{:else if componentName === 'StreetViewPanorama'}
+{:else if apiKey && componentName === 'StreetViewPanorama'}
 	<div class="map-frame">
 		<APIProvider {apiKey}>
 			<StreetViewPanorama
@@ -173,21 +289,21 @@
 			/>
 		</APIProvider>
 	</div>
-{:else if componentName === 'StreetViewService'}
+{:else if apiKey && componentName === 'StreetViewService'}
 	<div class="panel-frame">
 		<APIProvider {apiKey}>
 			<StreetViewService onLoad={() => (serviceStatus = 'StreetViewService loaded')} />
 			<p>{serviceStatus}</p>
 		</APIProvider>
 	</div>
-{:else if componentName === 'DistanceMatrixService'}
+{:else if apiKey && componentName === 'DistanceMatrixService'}
 	<div class="panel-frame">
 		<APIProvider {apiKey}>
 			<DistanceMatrixService options={distanceRequest} callback={handleDistanceMatrix} />
 			<p>{serviceStatus}</p>
 		</APIProvider>
 	</div>
-{:else}
+{:else if apiKey}
 	<div class="map-frame">
 		<APIProvider {apiKey} {libraries} mapIds={['DEMO_MAP_ID']}>
 			<GoogleMap options={mapOptions} mapContainerStyle="width:100%;height:100%;">
@@ -216,11 +332,17 @@
 						<div class="info-box">Custom InfoBox</div>
 					</InfoBox>
 				{:else if componentName === 'Polyline'}
-					<Polyline path={path} strokeColor="#0f766e" strokeWeight={4} />
+					<Polyline {path} strokeColor="#0f766e" strokeWeight={4} />
 				{:else if componentName === 'Polygon'}
 					<Polygon paths={path} fillColor="#0f766e" fillOpacity={0.25} strokeColor="#0f766e" />
 				{:else if componentName === 'Circle'}
-					<Circle center={center} radius={1200} fillColor="#2563eb" fillOpacity={0.2} strokeColor="#2563eb" />
+					<Circle
+						{center}
+						radius={1200}
+						fillColor="#2563eb"
+						fillOpacity={0.2}
+						strokeColor="#2563eb"
+					/>
 				{:else if componentName === 'Rectangle'}
 					<Rectangle {bounds} fillColor="#f59e0b" fillOpacity={0.2} strokeColor="#f59e0b" />
 				{:else if componentName === 'Data'}
@@ -288,27 +410,114 @@
 
 	.panel-frame {
 		padding: 24px;
-		font-family:
-			Inter,
-			system-ui,
-			sans-serif;
+		font-family: Inter, system-ui, sans-serif;
 	}
 
-	.missing-key {
+	.api-key-empty-state {
 		min-height: 100vh;
 		display: grid;
 		place-content: center;
-		gap: 8px;
-		font-family:
-			Inter,
-			system-ui,
-			sans-serif;
-		color: #1f2937;
-		background: #f8fafc;
+		font-family: Inter, system-ui, sans-serif;
+		background: #f5f7fb;
 	}
 
-	.missing-key span {
+	.api-key-card,
+	.api-key-popover {
+		background: white;
+		border: 1px solid #d6dbe4;
+		border-radius: 8px;
+		box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
+		color: #111827;
+		display: grid;
+		font-family: Inter, system-ui, sans-serif;
+		gap: 10px;
+		max-width: min(420px, calc(100vw - 32px));
+		padding: 18px;
+		width: 420px;
+	}
+
+	.api-key-card strong {
+		font-size: 14px;
+	}
+
+	.api-key-card label,
+	.api-key-popover label {
+		color: #334155;
+		font-size: 13px;
+		font-weight: 600;
+	}
+
+	.api-key-card p,
+	.api-key-popover p {
 		color: #64748b;
+		font-size: 12px;
+		line-height: 1.4;
+		margin: 0;
+	}
+
+	.api-key-row {
+		display: grid;
+		gap: 8px;
+		grid-template-columns: minmax(0, 1fr) auto;
+	}
+
+	.api-key-row input {
+		border: 1px solid #cbd5e1;
+		border-radius: 6px;
+		color: #111827;
+		font: 14px/1.4 system-ui, sans-serif;
+		min-width: 0;
+		padding: 9px 10px;
+	}
+
+	.api-key-row input:focus {
+		border-color: #2563eb;
+		box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+		outline: none;
+	}
+
+	.api-key-row button,
+	.api-key-actions button,
+	.api-key-toggle {
+		border: 1px solid #cbd5e1;
+		border-radius: 6px;
+		cursor: pointer;
+		font: 600 13px/1 system-ui, sans-serif;
+		min-height: 36px;
+		padding: 0 12px;
+	}
+
+	.api-key-row button {
+		background: #2563eb;
+		border-color: #2563eb;
+		color: white;
+	}
+
+	.api-key-actions button,
+	.api-key-toggle {
+		background: white;
+		color: #111827;
+	}
+
+	.api-key-toolbar {
+		position: fixed;
+		right: 14px;
+		top: 14px;
+		z-index: 10;
+	}
+
+	.api-key-popover {
+		width: min(380px, calc(100vw - 28px));
+	}
+
+	.api-key-actions {
+		display: flex;
+		gap: 8px;
+		justify-content: flex-end;
+	}
+
+	.api-key-message {
+		color: #334155;
 	}
 
 	.control,
