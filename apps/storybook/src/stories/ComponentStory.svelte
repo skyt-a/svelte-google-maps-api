@@ -86,20 +86,44 @@
 	let apiKeyInput = fallbackApiKey;
 	let isApiKeyPanelOpen = false;
 	let apiKeyMessage = '';
+	let shouldRememberApiKey = false;
 
 	$: libraries = getLibraries(componentName);
 
 	onMount(() => {
+		let storedApiKey = '';
+
 		try {
-			const storedApiKey = window.localStorage.getItem(STORYBOOK_API_KEY_STORAGE_KEY);
-			if (storedApiKey) {
-				apiKey = storedApiKey;
-				apiKeyInput = storedApiKey;
-			}
+			storedApiKey = window.localStorage.getItem(STORYBOOK_API_KEY_STORAGE_KEY) ?? '';
+			shouldRememberApiKey = Boolean(storedApiKey);
 		} catch (error) {
-			apiKeyMessage = 'Could not read the saved API key.';
+			apiKeyMessage = 'Could not read the remembered API key.';
+		}
+
+		if (!storedApiKey) {
+			try {
+				storedApiKey = window.sessionStorage.getItem(STORYBOOK_API_KEY_STORAGE_KEY) ?? '';
+			} catch (error) {
+				apiKeyMessage = apiKeyMessage || 'Could not read the session API key.';
+			}
+		}
+
+		if (storedApiKey) {
+			apiKey = storedApiKey;
+			apiKeyInput = storedApiKey;
 		}
 	});
+
+	function saveApiKeyForSession(nextApiKey: string) {
+		try {
+			window.sessionStorage.setItem(STORYBOOK_API_KEY_STORAGE_KEY, nextApiKey);
+		} catch (error) {
+			apiKeyMessage = 'Could not save the API key for this tab.';
+			return false;
+		}
+
+		return true;
+	}
 
 	function getLibraries(name: string): Library[] {
 		if (name === 'Autocomplete' || name === 'StandaloneSearchBox') return ['places'];
@@ -167,10 +191,26 @@
 			Boolean(document.getElementById('svelte-google-maps-api-script')) &&
 			apiKey !== nextApiKey;
 
-		try {
-			window.localStorage.setItem(STORYBOOK_API_KEY_STORAGE_KEY, nextApiKey);
-			apiKeyMessage = 'API key saved in this browser.';
-		} catch (error) {
+		const didSaveForSession = saveApiKeyForSession(nextApiKey);
+
+		if (shouldRememberApiKey) {
+			try {
+				window.localStorage.setItem(STORYBOOK_API_KEY_STORAGE_KEY, nextApiKey);
+				apiKeyMessage = 'API key remembered in this browser.';
+			} catch (error) {
+				apiKeyMessage = didSaveForSession
+					? 'API key saved for this tab. Browser remember was unavailable.'
+					: 'Could not save the API key.';
+			}
+		} else if (didSaveForSession) {
+			try {
+				window.localStorage.removeItem(STORYBOOK_API_KEY_STORAGE_KEY);
+			} catch (error) {
+				// The session value is enough; a blocked localStorage cleanup should not stop the story.
+			}
+
+			apiKeyMessage = 'API key saved for this tab.';
+		} else {
 			apiKeyMessage = 'Could not save the API key.';
 		}
 
@@ -191,14 +231,21 @@
 			apiKey !== nextApiKey;
 
 		try {
-			window.localStorage.removeItem(STORYBOOK_API_KEY_STORAGE_KEY);
-			apiKeyMessage = fallbackApiKey ? 'Using the environment API key.' : 'Saved API key cleared.';
+			window.sessionStorage.removeItem(STORYBOOK_API_KEY_STORAGE_KEY);
 		} catch (error) {
-			apiKeyMessage = 'Could not clear the saved API key.';
+			apiKeyMessage = 'Could not clear the tab API key.';
+		}
+
+		try {
+			window.localStorage.removeItem(STORYBOOK_API_KEY_STORAGE_KEY);
+			apiKeyMessage = fallbackApiKey ? 'Using the environment API key.' : 'API key cleared.';
+		} catch (error) {
+			apiKeyMessage = apiKeyMessage || 'Could not clear the remembered API key.';
 		}
 
 		apiKey = nextApiKey;
 		apiKeyInput = nextApiKey;
+		shouldRememberApiKey = false;
 		isApiKeyPanelOpen = !nextApiKey;
 
 		if (shouldReload) {
@@ -222,7 +269,11 @@
 				/>
 				<button type="submit">Apply</button>
 			</div>
-			<p>Saved in this browser and reused by all stories.</p>
+			<label class="api-key-remember">
+				<input type="checkbox" bind:checked={shouldRememberApiKey} />
+				<span>Remember in this browser</span>
+			</label>
+			<p>Shared by all stories in this tab. Use a restricted browser key.</p>
 			{#if apiKeyMessage}
 				<p class="api-key-message">{apiKeyMessage}</p>
 			{/if}
@@ -242,6 +293,10 @@
 					/>
 					<button type="submit">Save</button>
 				</div>
+				<label class="api-key-remember">
+					<input type="checkbox" bind:checked={shouldRememberApiKey} />
+					<span>Remember in this browser</span>
+				</label>
 				<div class="api-key-actions">
 					<button type="button" on:click={() => (isApiKeyPanelOpen = false)}>Close</button>
 					<button type="button" on:click={clearSavedApiKey}>Clear</button>
@@ -514,6 +569,22 @@
 		display: flex;
 		gap: 8px;
 		justify-content: flex-end;
+	}
+
+	.api-key-remember {
+		align-items: center;
+		color: #475569;
+		display: flex;
+		font-size: 12px;
+		font-weight: 500;
+		gap: 8px;
+	}
+
+	.api-key-remember input {
+		accent-color: #2563eb;
+		height: 16px;
+		margin: 0;
+		width: 16px;
 	}
 
 	.api-key-message {
