@@ -37,7 +37,9 @@
 
 	const STORYBOOK_API_KEY_STORAGE_KEY = 'svelte-google-maps-api:storybook-google-maps-api-key';
 	const fallbackApiKey = import.meta.env.STORYBOOK_GOOGLE_MAPS_API_KEY ?? '';
+	const mapsApiVersion = '3.64';
 	const center = { lat: 35.6812362, lng: 139.7649361 };
+	const bicyclingCenter = { lat: 45.523, lng: -122.676 };
 	const second = { lat: 35.658584, lng: 139.7454316 };
 	const third = { lat: 35.710063, lng: 139.8107 };
 	const bounds = {
@@ -50,6 +52,11 @@
 	const mapOptions: google.maps.MapOptions = {
 		center,
 		zoom: 12,
+		mapId: 'DEMO_MAP_ID'
+	};
+	const bicyclingMapOptions: google.maps.MapOptions = {
+		center: bicyclingCenter,
+		zoom: 14,
 		mapId: 'DEMO_MAP_ID'
 	};
 	const heatmapData = [
@@ -88,8 +95,15 @@
 	let apiKeyMessage = '';
 	let isApiKeyReady = false;
 	let shouldRememberApiKey = false;
+	let advancedMarkerLoaded = false;
+	let bicyclingLayerLoaded = false;
+	let drawingManagerLoaded = false;
 
 	$: libraries = getLibraries(componentName);
+	$: storyMapOptions = componentName === 'BicyclingLayer' ? bicyclingMapOptions : mapOptions;
+	$: if (componentName !== 'AdvancedMarker') advancedMarkerLoaded = false;
+	$: if (componentName !== 'BicyclingLayer') bicyclingLayerLoaded = false;
+	$: if (componentName !== 'DrawingManager') drawingManagerLoaded = false;
 
 	onMount(() => {
 		let storedApiKey = '';
@@ -321,7 +335,7 @@
 
 {#if isApiKeyReady && apiKey && componentName === 'APIProvider'}
 	<div class="map-frame">
-		<APIProvider {apiKey}>
+		<APIProvider {apiKey} version={mapsApiVersion}>
 			<GoogleMap options={mapOptions} mapContainerStyle="width:100%;height:100%;">
 				<Marker position={center} options={{ title: 'APIProvider story marker' }} />
 			</GoogleMap>
@@ -329,19 +343,19 @@
 	</div>
 {:else if isApiKeyReady && apiKey && componentName === 'Autocomplete'}
 	<div class="panel-frame">
-		<APIProvider {apiKey} libraries={['places']}>
+		<APIProvider {apiKey} libraries={['places']} version={mapsApiVersion}>
 			<Autocomplete placeholder="Search for a place" inputStyle="width:320px;padding:10px;" />
 		</APIProvider>
 	</div>
 {:else if isApiKeyReady && apiKey && componentName === 'StandaloneSearchBox'}
 	<div class="panel-frame">
-		<APIProvider {apiKey} libraries={['places']}>
+		<APIProvider {apiKey} libraries={['places']} version={mapsApiVersion}>
 			<StandaloneSearchBox placeholder="Search places" inputStyle="width:320px;padding:10px;" />
 		</APIProvider>
 	</div>
 {:else if isApiKeyReady && apiKey && componentName === 'StreetViewPanorama'}
 	<div class="map-frame">
-		<APIProvider {apiKey}>
+		<APIProvider {apiKey} version={mapsApiVersion}>
 			<StreetViewPanorama
 				position={center}
 				pov={{ heading: 165, pitch: 0 }}
@@ -352,30 +366,39 @@
 	</div>
 {:else if isApiKeyReady && apiKey && componentName === 'StreetViewService'}
 	<div class="panel-frame">
-		<APIProvider {apiKey}>
+		<APIProvider {apiKey} version={mapsApiVersion}>
 			<StreetViewService onLoad={() => (serviceStatus = 'StreetViewService loaded')} />
 			<p>{serviceStatus}</p>
 		</APIProvider>
 	</div>
 {:else if isApiKeyReady && apiKey && componentName === 'DistanceMatrixService'}
 	<div class="panel-frame">
-		<APIProvider {apiKey}>
+		<APIProvider {apiKey} version={mapsApiVersion}>
 			<DistanceMatrixService options={distanceRequest} callback={handleDistanceMatrix} />
 			<p>{serviceStatus}</p>
 		</APIProvider>
 	</div>
 {:else if isApiKeyReady && apiKey}
 	<div class="map-frame">
-		<APIProvider {apiKey} {libraries} mapIds={['DEMO_MAP_ID']}>
-			<GoogleMap options={mapOptions} mapContainerStyle="width:100%;height:100%;">
+		<APIProvider {apiKey} {libraries} version={mapsApiVersion} mapIds={['DEMO_MAP_ID']}>
+			<GoogleMap options={storyMapOptions} mapContainerStyle="width:100%;height:100%;">
 				{#if componentName === 'GoogleMap'}
 					<Marker position={center} options={{ title: 'Tokyo Station' }} />
 				{:else if componentName === 'Marker'}
 					<Marker position={center} options={{ title: 'Marker', draggable: true }} />
 				{:else if componentName === 'AdvancedMarker'}
-					<AdvancedMarker position={center} title="Advanced marker">
+					<AdvancedMarker
+						position={center}
+						title="Advanced marker"
+						onLoad={() => (advancedMarkerLoaded = true)}
+					>
 						<div class="advanced-marker">A</div>
 					</AdvancedMarker>
+					{#if advancedMarkerLoaded}
+						<MapControl position={2 as google.maps.ControlPosition}>
+							<div class="control">Advanced marker loaded</div>
+						</MapControl>
+					{/if}
 				{:else if componentName === 'InfoWindow'}
 					<Marker position={center} />
 					<InfoWindow position={center}>
@@ -422,7 +445,12 @@
 				{:else if componentName === 'TransitLayer'}
 					<TransitLayer />
 				{:else if componentName === 'BicyclingLayer'}
-					<BicyclingLayer />
+					<BicyclingLayer onLoad={() => (bicyclingLayerLoaded = true)} />
+					{#if bicyclingLayerLoaded}
+						<MapControl position={2 as google.maps.ControlPosition}>
+							<div class="control">Bicycling layer loaded</div>
+						</MapControl>
+					{/if}
 				{:else if componentName === 'GroundOverlay'}
 					<GroundOverlay url={groundOverlayUrl} {bounds} opacity={0.55} />
 				{:else if componentName === 'OverlayView'}
@@ -434,7 +462,12 @@
 						<button class="control">Map control</button>
 					</MapControl>
 				{:else if componentName === 'DrawingManager'}
-					<DrawingManager drawingControl />
+					<DrawingManager drawingControl onLoad={() => (drawingManagerLoaded = true)} />
+					{#if drawingManagerLoaded}
+						<MapControl position={2 as google.maps.ControlPosition}>
+							<div class="control">Drawing manager loaded</div>
+						</MapControl>
+					{/if}
 				{:else if componentName === 'DirectionsRenderer'}
 					<DirectionsService options={directionsRequest} callback={handleDirectionsResult} />
 					{#if directions}

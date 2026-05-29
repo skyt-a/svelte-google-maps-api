@@ -43,19 +43,71 @@
 	const CALLBACK_NAME = '__svelteGoogleMapApiCallback__';
 
 	let scriptElement: HTMLScriptElement | null = null;
+	let loadRequestId = 0;
+	let loadedLibrariesSignature = '';
+	let isDestroyed = false;
 	type CallbackWindow = Window & Record<string, (() => void) | undefined>;
+
+	function getLibrariesSignature(librariesToLoad: Library[]) {
+		return [...new Set(librariesToLoad)].sort().join(',');
+	}
+
+	function normalizeError(loadError: unknown) {
+		return loadError instanceof Error ? loadError : new Error(String(loadError));
+	}
+
+	async function importRequestedLibraries(gmaps: typeof google.maps) {
+		const librariesToLoad = [...new Set(libraries)].sort();
+
+		if (librariesToLoad.length === 0) return;
+		if (typeof gmaps.importLibrary !== 'function') return;
+
+		await Promise.all(librariesToLoad.map((library) => gmaps.importLibrary(library)));
+	}
+
+	async function completeLoad(gmaps: typeof google.maps) {
+		const requestId = ++loadRequestId;
+		const requestedLibrariesSignature = getLibrariesSignature(libraries);
+
+		statusStore.set('loading');
+		error = null;
+
+		try {
+			await importRequestedLibraries(gmaps);
+		} catch (loadError) {
+			if (requestId !== loadRequestId || isDestroyed) return;
+
+			const nextError = normalizeError(loadError);
+			console.error('svelte-google-maps-api: Failed to load Google Maps libraries.', nextError);
+			statusStore.set('error');
+			error = nextError;
+			onError?.(nextError);
+			return;
+		}
+
+		if (requestId !== loadRequestId || isDestroyed) return;
+
+		googleMapsApi = gmaps;
+		loadedLibrariesSignature = requestedLibrariesSignature;
+		statusStore.set('loaded');
+		onLoad?.();
+	}
 
 	$: if (browser && !document.getElementById(id)) {
 		const resolvedApiKey = googleMapsApiKey ?? apiKey;
 
 		if (resolvedApiKey && googleMapsClientId) {
-			const apiKeyError = new Error('Specify either apiKey/googleMapsApiKey or googleMapsClientId, not both');
+			const apiKeyError = new Error(
+				'Specify either apiKey/googleMapsApiKey or googleMapsClientId, not both'
+			);
 			console.error(`svelte-google-maps-api: ${apiKeyError.message}`);
 			statusStore.set('error');
 			error = apiKeyError;
 			onError?.(apiKeyError);
 		} else if (!resolvedApiKey && !googleMapsClientId) {
-			console.error('svelte-google-maps-api: apiKey or googleMapsClientId is required for APIProvider');
+			console.error(
+				'svelte-google-maps-api: apiKey or googleMapsClientId is required for APIProvider'
+			);
 			statusStore.set('error');
 			error = new Error('apiKey or googleMapsClientId is required');
 			onError?.(error);
@@ -66,15 +118,13 @@
 			const callbackWindow = window as unknown as CallbackWindow;
 
 			callbackWindow[CALLBACK_NAME] = () => {
-				googleMapsApi = window.google.maps;
-				statusStore.set('loaded');
-				onLoad?.();
-
-				try {
-					delete callbackWindow[CALLBACK_NAME];
-				} catch (e) {
-					callbackWindow[CALLBACK_NAME] = undefined;
-				}
+				completeLoad(window.google.maps).finally(() => {
+					try {
+						delete callbackWindow[CALLBACK_NAME];
+					} catch (e) {
+						callbackWindow[CALLBACK_NAME] = undefined;
+					}
+				});
 			};
 
 			const script = document.createElement('script');
@@ -125,8 +175,11 @@
 			document.head.appendChild(scriptElement);
 		}
 	} else if (browser && document.getElementById(id) && window.google && window.google.maps) {
-		statusStore.set('loaded');
-		googleMapsApi = window.google.maps;
+		const requestedLibrariesSignature = getLibrariesSignature(libraries);
+
+		if (!googleMapsApi || requestedLibrariesSignature !== loadedLibrariesSignature) {
+			completeLoad(window.google.maps);
+		}
 	}
 
 	$: setContext<APIProviderContext>('svelte-google-maps-api', {
@@ -137,6 +190,9 @@
 
 	onDestroy(() => {
 		if (browser) {
+			isDestroyed = true;
+			loadRequestId += 1;
+
 			const callbackWindow = window as unknown as CallbackWindow;
 			if (typeof callbackWindow[CALLBACK_NAME] !== 'undefined') {
 				try {

@@ -11,32 +11,30 @@ The `BicyclingLayer` component displays bicycle paths, suggested routes, and oth
 
 ```svelte
 <script lang="ts">
-  import { APIProvider, GoogleMap, BicyclingLayer } from 'svelte-google-maps-api';
+	import { APIProvider, GoogleMap, BicyclingLayer } from 'svelte-google-maps-api';
 
-  let apiKey = 'YOUR_MAP_KEY'; // Replace with your API key
-  let map: google.maps.Map | null = null;
-  let mapCenter = { lat: 45.523, lng: -122.676 }; // Portland
-  let mapZoom = 14;
-
+	let apiKey = 'YOUR_MAP_KEY'; // Replace with your API key
+	let mapCenter = { lat: 45.523, lng: -122.676 }; // Portland
+	let mapZoom = 14;
 </script>
 
 <div style="height: 500px; width: 100%;">
-  <APIProvider {apiKey}>
-    <GoogleMap bind:map options={{ center: mapCenter, zoom: mapZoom }}>
-      <BicyclingLayer />
-    </GoogleMap>
-  </APIProvider>
+	<APIProvider {apiKey}>
+		<GoogleMap options={{ center: mapCenter, zoom: mapZoom }}>
+			<BicyclingLayer />
+		</GoogleMap>
+	</APIProvider>
 </div>
 ```
 
 ## Props
 
-This component does not typically take specific options via props in the standard API.
+| Prop      | Type                                          | Description                         |
+| --------- | --------------------------------------------- | ----------------------------------- |
+| onLoad    | `(layer: google.maps.BicyclingLayer) => void` | Called after the layer is created.  |
+| onUnmount | `(layer: google.maps.BicyclingLayer) => void` | Called before the layer is removed. |
 
 ## Notes
 
-*   The layer highlights:
-    *   Dark green: Dedicated bike trails.
-    *   Light green: Streets with dedicated bike lanes.
-    *   Dashed green: Streets recommended for cycling but without dedicated lanes.
-*   Availability and detail depend on the region and zoom level. 
+- The layer highlights dedicated bike trails, streets with bike lanes, and recommended cycling streets.
+- Availability and detail depend on the region and zoom level. Use a location with cycling coverage when verifying the layer.

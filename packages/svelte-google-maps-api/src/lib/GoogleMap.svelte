@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getContext, onDestroy, onMount } from 'svelte';
+	import { getContext, onDestroy } from 'svelte';
 	import { BROWSER as browser } from 'esm-env';
 	import { setContext } from 'svelte';
 	import type { APIProviderContext } from './APIProvider.svelte';
@@ -108,7 +108,6 @@
 	}
 
 	$: if (map && onClick && googleMapsApi && browser) {
-		console.log('ddddd');
 		if (clickListener !== null) {
 			googleMapsApi.event.removeListener(clickListener);
 		}
@@ -127,6 +126,10 @@
 			googleMapsApi.event.removeListener(centerChangedListener);
 		}
 		centerChangedListener = googleMapsApi.event.addListener(map, 'center_changed', onCenterChanged);
+	}
+
+	$: if (map && options) {
+		map.setOptions(options);
 	}
 
 	const initialize = (gmaps: typeof google.maps) => {
