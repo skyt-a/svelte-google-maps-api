@@ -1,13 +1,19 @@
 import type { Meta, StoryObj } from '@storybook/svelte';
+import { StandaloneSearchBox } from 'svelte-google-maps-api';
 import ComponentStory from './ComponentStory.svelte';
 
 const meta = {
 	title: 'Components/StandaloneSearchBox',
-	component: ComponentStory,
-	args: { componentName: 'StandaloneSearchBox' }
-} satisfies Meta<typeof ComponentStory>;
+	component: StandaloneSearchBox,
+	tags: ['autodocs']
+} satisfies Meta<typeof StandaloneSearchBox>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Basic: Story = {};
+export const Basic: Story = {
+	render: () => ({
+		Component: ComponentStory,
+		props: { componentName: 'StandaloneSearchBox' }
+	})
+};

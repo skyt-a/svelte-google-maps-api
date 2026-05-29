@@ -1,13 +1,19 @@
 import type { Meta, StoryObj } from '@storybook/svelte';
+import { InfoWindow } from 'svelte-google-maps-api';
 import ComponentStory from './ComponentStory.svelte';
 
 const meta = {
 	title: 'Components/InfoWindow',
-	component: ComponentStory,
-	args: { componentName: 'InfoWindow' }
-} satisfies Meta<typeof ComponentStory>;
+	component: InfoWindow,
+	tags: ['autodocs']
+} satisfies Meta<typeof InfoWindow>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Basic: Story = {};
+export const Basic: Story = {
+	render: () => ({
+		Component: ComponentStory,
+		props: { componentName: 'InfoWindow' }
+	})
+};
