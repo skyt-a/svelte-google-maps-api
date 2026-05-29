@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'apps/docs/**'
+      - 'apps/storybook/**'
       - 'packages/svelte-google-maps-api/**'
       - '.github/workflows/deploy-docs.yml'
       - 'pnpm-lock.yaml'
@@ -46,6 +47,17 @@ jobs:
 
       - name: Build Docs
         run: pnpm build --filter=docs
+
+      - name: Build Storybook
+        run: pnpm build --filter=storybook
+        env:
+          STORYBOOK_DISABLE_TELEMETRY: '1'
+
+      - name: Attach Storybook to Docs
+        run: |
+          rm -rf apps/docs/build/storybook
+          mkdir -p apps/docs/build/storybook
+          cp -R apps/storybook/storybook-static/. apps/docs/build/storybook/
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
