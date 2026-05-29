@@ -101,24 +101,23 @@
 		listeners.forEach((listener) => googleMapsApi?.event.removeListener(listener));
 		listeners = [];
 
-		const eventMap = {
-			onCenterChanged: 'center_changed',
-			onRadiusChanged: 'radius_changed',
-			onClick: 'click',
-			onDblClick: 'dblclick',
-			onDrag: 'drag',
-			onDragEnd: 'dragend',
-			onDragStart: 'dragstart',
-			onMouseDown: 'mousedown',
-			onMouseMove: 'mousemove',
-			onMouseOut: 'mouseout',
-			onMouseOver: 'mouseover',
-			onMouseUp: 'mouseup',
-			onRightClick: 'rightclick'
-		};
+		const eventHandlers = [
+			['center_changed', onCenterChanged],
+			['radius_changed', onRadiusChanged],
+			['click', onClick],
+			['dblclick', onDblClick],
+			['drag', onDrag],
+			['dragend', onDragEnd],
+			['dragstart', onDragStart],
+			['mousedown', onMouseDown],
+			['mousemove', onMouseMove],
+			['mouseout', onMouseOut],
+			['mouseover', onMouseOver],
+			['mouseup', onMouseUp],
+			['rightclick', onRightClick]
+		] as const;
 
-		Object.entries(eventMap).forEach(([propName, eventName]) => {
-			const callback = $$props[propName];
+		eventHandlers.forEach(([eventName, callback]) => {
 			if (callback) {
 				listeners.push(circleInstance!.addListener(eventName, callback));
 			}

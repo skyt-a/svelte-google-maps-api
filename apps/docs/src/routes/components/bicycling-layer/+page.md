@@ -1,6 +1,10 @@
 ---
 title: BicyclingLayer
 ---
+
+## Storybook
+
+[Open the BicyclingLayer story](https://skyt-a.github.io/svelte-google-maps-api/storybook/?path=/story/components-bicyclinglayer--basic)
 The `BicyclingLayer` component displays bicycle paths, suggested routes, and other overlays specific to cycling on the map.
 
 ## Usage

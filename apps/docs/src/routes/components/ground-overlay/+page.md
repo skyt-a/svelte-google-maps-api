@@ -1,6 +1,10 @@
 ---
 title: GroundOverlay
 ---
+
+## Storybook
+
+[Open the GroundOverlay story](https://skyt-a.github.io/svelte-google-maps-api/storybook/?path=/story/components-groundoverlay--basic)
 A component to display an image on the map, fitted to the specified bounds.
 
 Must be used within a `<GoogleMap>` component.

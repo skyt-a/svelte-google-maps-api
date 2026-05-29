@@ -2,6 +2,10 @@
 title: Polyline
 ---
 
+## Storybook
+
+[Open the Polyline story](https://skyt-a.github.io/svelte-google-maps-api/storybook/?path=/story/components-polyline--basic)
+
 The `Polyline` component draws a line on the map connecting a series of locations.
 
 ## Props

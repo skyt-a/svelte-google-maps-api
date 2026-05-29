@@ -1,6 +1,10 @@
 ---
 title: TrafficLayer
 ---
+
+## Storybook
+
+[Open the TrafficLayer story](https://skyt-a.github.io/svelte-google-maps-api/storybook/?path=/story/components-trafficlayer--basic)
 A component to display the traffic layer on the map.
 
 Must be used within a `<GoogleMap>` component.

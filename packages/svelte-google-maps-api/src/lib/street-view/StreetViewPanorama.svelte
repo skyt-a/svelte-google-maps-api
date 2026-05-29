@@ -134,19 +134,18 @@
 		listeners.forEach((listener) => googleMapsApi?.event.removeListener(listener));
 		listeners = [];
 
-		const eventMap = {
-			onCloseClick: 'closeclick',
-			onPanoChanged: 'pano_changed',
-			onPositionChanged: 'position_changed',
-			onPovChanged: 'pov_changed',
-			onResize: 'resize',
-			onStatusChanged: 'status_changed',
-			onVisibleChanged: 'visible_changed',
-			onZoomChanged: 'zoom_changed'
-		};
+		const eventHandlers = [
+			['closeclick', onCloseClick],
+			['pano_changed', onPanoChanged],
+			['position_changed', onPositionChanged],
+			['pov_changed', onPovChanged],
+			['resize', onResize],
+			['status_changed', onStatusChanged],
+			['visible_changed', onVisibleChanged],
+			['zoom_changed', onZoomChanged]
+		] as const;
 
-		Object.entries(eventMap).forEach(([propName, eventName]) => {
-			const callback = $$props[propName];
+		eventHandlers.forEach(([eventName, callback]) => {
 			if (callback) {
 				listeners.push(panoramaInstance!.addListener(eventName, callback));
 			}

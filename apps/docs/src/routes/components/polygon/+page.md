@@ -2,6 +2,10 @@
 title: Polygon
 ---
 
+## Storybook
+
+[Open the Polygon story](https://skyt-a.github.io/svelte-google-maps-api/storybook/?path=/story/components-polygon--basic)
+
 The `Polygon` component draws a closed shape on the map defined by a series of coordinates.
 
 ## Props

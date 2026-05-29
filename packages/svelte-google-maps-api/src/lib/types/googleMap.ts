@@ -7,3 +7,5 @@ export type Library =
 	| 'places'
 	| 'routes'
 	| 'visualization';
+
+export type Libraries = Library[];
