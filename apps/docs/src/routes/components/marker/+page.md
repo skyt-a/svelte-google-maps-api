@@ -2,6 +2,10 @@
 title: Marker
 ---
 
+## Storybook
+
+[Open the Marker story](https://skyt-a.github.io/svelte-google-maps-api/storybook/?path=/story/components-marker--basic)
+
 The `Marker` component creates and manages markers on the map.
 
 ## Props

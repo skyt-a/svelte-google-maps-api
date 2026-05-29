@@ -1,6 +1,10 @@
 ---
 title: MapControl
 ---
+
+## Storybook
+
+[Open the MapControl story](https://skyt-a.github.io/svelte-google-maps-api/storybook/?path=/story/components-mapcontrol--basic)
 A component to add custom control elements to the map.
 Displays the HTML elements placed within its slot at the specified position.
 

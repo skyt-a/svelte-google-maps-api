@@ -2,12 +2,15 @@
 	import { getContext, onDestroy, onMount, tick } from 'svelte';
 	import { BROWSER as browser } from 'esm-env';
 	import type { APIProviderContext } from './APIProvider.svelte';
+	import type { ClusterableMarker, MarkerClustererContext } from './types/markerClusterer.js';
 
 	export let position: google.maps.LatLng | google.maps.LatLngLiteral | undefined = undefined;
 	export let title: string | undefined = undefined;
 	export let zIndex: number | undefined = undefined;
 	export let element: HTMLElement | undefined = undefined;
 	export let gmpDraggable: boolean | undefined = undefined;
+	export let options: Partial<google.maps.marker.AdvancedMarkerElementOptions> | undefined =
+		undefined;
 
 	export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
 	export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
@@ -19,6 +22,7 @@
 		undefined;
 
 	let markerInstance: google.maps.marker.AdvancedMarkerElement | null = null;
+	let isClustered = false;
 	let contentWrapper: HTMLDivElement | null = null;
 	let clickListener: google.maps.MapsEventListener | null = null;
 	let dragListener: google.maps.MapsEventListener | null = null;
@@ -27,6 +31,7 @@
 
 	const { status, googleMapsApi } = getContext<APIProviderContext>('svelte-google-maps-api');
 	const map = getContext<google.maps.Map>('map');
+	const markerClusterer = getContext<MarkerClustererContext | undefined>('markerClusterer');
 
 	onDestroy(() => {
 		if (markerInstance) {
@@ -35,8 +40,13 @@
 			if (googleMapsApi) {
 				googleMapsApi.event.clearInstanceListeners(markerInstance);
 			}
-			markerInstance.map = null;
+			if (isClustered && markerClusterer) {
+				markerClusterer.removeMarker(markerInstance as ClusterableMarker);
+			} else {
+				markerInstance.map = null;
+			}
 			markerInstance = null;
+			isClustered = false;
 		}
 	});
 
@@ -60,16 +70,21 @@
 		}
 
 		const markerOptions: google.maps.marker.AdvancedMarkerElementOptions = {
-			map,
-			position,
-			title,
-			zIndex,
-			content: markerContent,
-			gmpDraggable
+			...(options ?? {}),
+			...(markerClusterer ? {} : { map }),
+			position: position ?? options?.position,
+			title: title ?? options?.title,
+			zIndex: zIndex ?? options?.zIndex,
+			content: markerContent ?? options?.content,
+			gmpDraggable: gmpDraggable ?? options?.gmpDraggable
 		};
 
 		try {
 			markerInstance = new googleMapsApi.marker.AdvancedMarkerElement(markerOptions);
+			if (markerClusterer) {
+				markerClusterer.addMarker(markerInstance as ClusterableMarker);
+				isClustered = true;
+			}
 			onLoad?.(markerInstance);
 		} catch (error) {
 			console.error('[AdvancedMarker] Error creating instance:', error);

@@ -2,6 +2,10 @@
 title: GoogleMap
 ---
 
+## Storybook
+
+[Open the GoogleMap story](https://skyt-a.github.io/svelte-google-maps-api/storybook/?path=/story/components-googlemap--basic)
+
 The GoogleMap component renders a Google Map instance.
 
 ## Props

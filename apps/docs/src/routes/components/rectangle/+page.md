@@ -2,6 +2,10 @@
 title: Rectangle
 ---
 
+## Storybook
+
+[Open the Rectangle story](https://skyt-a.github.io/svelte-google-maps-api/storybook/?path=/story/components-rectangle--basic)
+
 The `Rectangle` component draws a rectangle on the map defined by southwest and northeast coordinates.
 
 ## Props

@@ -1,6 +1,10 @@
 ---
 title: KmlLayer
 ---
+
+## Storybook
+
+[Open the KmlLayer story](https://skyt-a.github.io/svelte-google-maps-api/storybook/?path=/story/components-kmllayer--basic)
 A component to display data from a KML (Keyhole Markup Language) file on the map.
 
 Must be used within a `<GoogleMap>` component.

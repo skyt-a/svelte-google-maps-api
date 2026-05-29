@@ -2,6 +2,7 @@
 	import { getContext, onDestroy } from 'svelte';
 	import { BROWSER as browser } from 'esm-env';
 	import type { APIProviderContext } from './APIProvider.svelte';
+	import type { ClusterableMarker, MarkerClustererContext } from './types/markerClusterer.js';
 
 	export let position: google.maps.LatLng | google.maps.LatLngLiteral;
 	export let options: google.maps.MarkerOptions = {};
@@ -53,15 +54,21 @@
 	let zindexChangedListener: google.maps.MapsEventListener | undefined = undefined;
 
 	let marker: google.maps.Marker | null = null;
+	let isClustered = false;
 	const { status, googleMapsApi } = getContext<APIProviderContext>('svelte-google-maps-api');
 	const map = getContext<google.maps.Map>('map');
+	const markerClusterer = getContext<MarkerClustererContext | undefined>('markerClusterer');
 
 	$: if ($status === 'loaded' && googleMapsApi && map && position && !marker) {
 		marker = new googleMapsApi.Marker({
 			position,
-			map: map,
+			...(markerClusterer ? {} : { map }),
 			...options
 		});
+		if (markerClusterer) {
+			markerClusterer.addMarker(marker as ClusterableMarker);
+			isClustered = true;
+		}
 		onLoad?.(marker);
 	}
 
@@ -70,9 +77,14 @@
 			if (googleMapsApi) {
 				googleMapsApi.event.clearInstanceListeners(marker);
 			}
-			marker.setMap(null);
+			if (isClustered && markerClusterer) {
+				markerClusterer.removeMarker(marker as ClusterableMarker);
+			} else {
+				marker.setMap(null);
+			}
 			onUnmount?.(marker);
 			marker = null;
+			isClustered = false;
 		}
 	});
 

@@ -2,6 +2,10 @@
 title: AdvancedMarker
 ---
 
+## Storybook
+
+[Open the AdvancedMarker story](https://skyt-a.github.io/svelte-google-maps-api/storybook/?path=/story/components-advancedmarker--basic)
+
 The `AdvancedMarker` component creates and manages advanced markers on the map, allowing for custom HTML content.
 
 ## Props

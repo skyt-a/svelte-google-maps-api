@@ -2,6 +2,10 @@
 title: InfoWindow
 ---
 
+## Storybook
+
+[Open the InfoWindow story](https://skyt-a.github.io/svelte-google-maps-api/storybook/?path=/story/components-infowindow--basic)
+
 The `InfoWindow` component creates and manages info windows on the map, which can display content when opened.
 
 ## Props

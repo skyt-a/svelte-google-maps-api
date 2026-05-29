@@ -58,6 +58,10 @@
 			"types": "./dist/DirectionsRenderer.svelte.d.ts",
 			"svelte": "./dist/DirectionsRenderer.svelte"
 		},
+		"./DrawingManager.svelte": {
+			"types": "./dist/DrawingManager.svelte.d.ts",
+			"svelte": "./dist/DrawingManager.svelte"
+		},
 		"./MapControl.svelte": {
 			"types": "./dist/controls/MapControl.svelte.d.ts",
 			"svelte": "./dist/controls/MapControl.svelte"
@@ -97,6 +101,38 @@
 		"./Marker.svelte": {
 			"types": "./dist/Marker.svelte.d.ts",
 			"svelte": "./dist/Marker.svelte"
+		},
+		"./MarkerClusterer.svelte": {
+			"types": "./dist/MarkerClusterer.svelte.d.ts",
+			"svelte": "./dist/MarkerClusterer.svelte"
+		},
+		"./GoogleMarkerClusterer.svelte": {
+			"types": "./dist/GoogleMarkerClusterer.svelte.d.ts",
+			"svelte": "./dist/GoogleMarkerClusterer.svelte"
+		},
+		"./InfoBox.svelte": {
+			"types": "./dist/InfoBox.svelte.d.ts",
+			"svelte": "./dist/InfoBox.svelte"
+		},
+		"./Data.svelte": {
+			"types": "./dist/Data.svelte.d.ts",
+			"svelte": "./dist/Data.svelte"
+		},
+		"./DirectionsService.svelte": {
+			"types": "./dist/DirectionsService.svelte.d.ts",
+			"svelte": "./dist/DirectionsService.svelte"
+		},
+		"./DistanceMatrixService.svelte": {
+			"types": "./dist/DistanceMatrixService.svelte.d.ts",
+			"svelte": "./dist/DistanceMatrixService.svelte"
+		},
+		"./StandaloneSearchBox.svelte": {
+			"types": "./dist/places/StandaloneSearchBox.svelte.d.ts",
+			"svelte": "./dist/places/StandaloneSearchBox.svelte"
+		},
+		"./StreetViewService.svelte": {
+			"types": "./dist/street-view/StreetViewService.svelte.d.ts",
+			"svelte": "./dist/street-view/StreetViewService.svelte"
 		}
 	},
 	"files": [
@@ -117,6 +153,7 @@
 		"typescript": "^5.0.0"
 	},
 	"dependencies": {
+		"@googlemaps/markerclusterer": "^2.6.2",
 		"esm-env": "^1.0.0"
 	},
 	"keywords": [
