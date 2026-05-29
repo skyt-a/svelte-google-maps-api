@@ -1,6 +1,6 @@
 {
 	"name": "svelte-google-maps-api",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"description": "A Svelte component library for integrating Google Maps JavaScript API into Svelte applications",
 	"svelte": "./dist/index.js",
 	"module": "./dist/index.js",
@@ -136,6 +136,7 @@
 		}
 	},
 	"files": [
+		"README.md",
 		"dist",
 		"!dist/**/*.test.*",
 		"!dist/**/*.spec.*"
@@ -174,7 +175,7 @@
 	],
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/skyt-a/svelte-google-maps-api.git",
+		"url": "git+https://github.com/skyt-a/svelte-google-maps-api.git",
 		"directory": "packages/svelte-google-maps-api"
 	},
 	"homepage": "https://skyt-a.github.io/svelte-google-maps-api/",
