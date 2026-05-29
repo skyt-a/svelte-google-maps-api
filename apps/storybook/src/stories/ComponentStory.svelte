@@ -82,10 +82,11 @@
 	let directions: google.maps.DirectionsResult | undefined = undefined;
 	let serviceStatus = 'Waiting';
 	let dataLoaded = false;
-	let apiKey = fallbackApiKey;
+	let apiKey = '';
 	let apiKeyInput = fallbackApiKey;
 	let isApiKeyPanelOpen = false;
 	let apiKeyMessage = '';
+	let isApiKeyReady = false;
 	let shouldRememberApiKey = false;
 
 	$: libraries = getLibraries(componentName);
@@ -111,7 +112,12 @@
 		if (storedApiKey) {
 			apiKey = storedApiKey;
 			apiKeyInput = storedApiKey;
+		} else {
+			apiKey = fallbackApiKey;
+			apiKeyInput = fallbackApiKey;
 		}
+
+		isApiKeyReady = true;
 	});
 
 	function saveApiKeyForSession(nextApiKey: string) {
@@ -254,7 +260,7 @@
 	}
 </script>
 
-{#if !apiKey}
+{#if isApiKeyReady && !apiKey}
 	<div class="api-key-empty-state">
 		<form class="api-key-card" on:submit|preventDefault={saveApiKey}>
 			<strong>{componentName}</strong>
@@ -279,7 +285,7 @@
 			{/if}
 		</form>
 	</div>
-{:else}
+{:else if isApiKeyReady}
 	<div class="api-key-toolbar">
 		{#if isApiKeyPanelOpen}
 			<form class="api-key-popover" on:submit|preventDefault={saveApiKey}>
@@ -313,7 +319,7 @@
 	</div>
 {/if}
 
-{#if apiKey && componentName === 'APIProvider'}
+{#if isApiKeyReady && apiKey && componentName === 'APIProvider'}
 	<div class="map-frame">
 		<APIProvider {apiKey}>
 			<GoogleMap options={mapOptions} mapContainerStyle="width:100%;height:100%;">
@@ -321,19 +327,19 @@
 			</GoogleMap>
 		</APIProvider>
 	</div>
-{:else if apiKey && componentName === 'Autocomplete'}
+{:else if isApiKeyReady && apiKey && componentName === 'Autocomplete'}
 	<div class="panel-frame">
 		<APIProvider {apiKey} libraries={['places']}>
 			<Autocomplete placeholder="Search for a place" inputStyle="width:320px;padding:10px;" />
 		</APIProvider>
 	</div>
-{:else if apiKey && componentName === 'StandaloneSearchBox'}
+{:else if isApiKeyReady && apiKey && componentName === 'StandaloneSearchBox'}
 	<div class="panel-frame">
 		<APIProvider {apiKey} libraries={['places']}>
 			<StandaloneSearchBox placeholder="Search places" inputStyle="width:320px;padding:10px;" />
 		</APIProvider>
 	</div>
-{:else if apiKey && componentName === 'StreetViewPanorama'}
+{:else if isApiKeyReady && apiKey && componentName === 'StreetViewPanorama'}
 	<div class="map-frame">
 		<APIProvider {apiKey}>
 			<StreetViewPanorama
@@ -344,21 +350,21 @@
 			/>
 		</APIProvider>
 	</div>
-{:else if apiKey && componentName === 'StreetViewService'}
+{:else if isApiKeyReady && apiKey && componentName === 'StreetViewService'}
 	<div class="panel-frame">
 		<APIProvider {apiKey}>
 			<StreetViewService onLoad={() => (serviceStatus = 'StreetViewService loaded')} />
 			<p>{serviceStatus}</p>
 		</APIProvider>
 	</div>
-{:else if apiKey && componentName === 'DistanceMatrixService'}
+{:else if isApiKeyReady && apiKey && componentName === 'DistanceMatrixService'}
 	<div class="panel-frame">
 		<APIProvider {apiKey}>
 			<DistanceMatrixService options={distanceRequest} callback={handleDistanceMatrix} />
 			<p>{serviceStatus}</p>
 		</APIProvider>
 	</div>
-{:else if apiKey}
+{:else if isApiKeyReady && apiKey}
 	<div class="map-frame">
 		<APIProvider {apiKey} {libraries} mapIds={['DEMO_MAP_ID']}>
 			<GoogleMap options={mapOptions} mapContainerStyle="width:100%;height:100%;">
