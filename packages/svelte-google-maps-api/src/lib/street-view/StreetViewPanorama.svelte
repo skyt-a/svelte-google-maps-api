@@ -130,6 +130,7 @@
 
 	function setupListeners() {
 		if (!panoramaInstance || !googleMapsApi) return;
+		const panorama = panoramaInstance;
 
 		listeners.forEach((listener) => googleMapsApi?.event.removeListener(listener));
 		listeners = [];
@@ -147,7 +148,7 @@
 
 		eventHandlers.forEach(([eventName, callback]) => {
 			if (callback) {
-				listeners.push(panoramaInstance!.addListener(eventName, callback));
+				listeners.push(panorama.addListener(eventName, callback));
 			}
 		});
 	}

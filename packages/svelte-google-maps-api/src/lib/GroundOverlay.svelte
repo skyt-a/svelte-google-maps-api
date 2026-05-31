@@ -52,6 +52,7 @@
 
 	function setupListeners() {
 		if (!overlayInstance || !googleMapsApi) return;
+		const overlay = overlayInstance;
 
 		listeners.forEach((listener) => googleMapsApi?.event.removeListener(listener));
 		listeners = [];
@@ -63,7 +64,7 @@
 
 		eventHandlers.forEach(([eventName, callback]) => {
 			if (callback) {
-				listeners.push(overlayInstance!.addListener(eventName, callback));
+				listeners.push(overlay.addListener(eventName, callback));
 			}
 		});
 	}

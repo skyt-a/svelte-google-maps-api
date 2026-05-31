@@ -42,7 +42,6 @@
 			removeControl();
 
 			controlIndex = map.controls[position].push(controlWrapper) - 1;
-			console.log('[MapControl] Control added to position:', position, 'at index:', controlIndex);
 		} catch (error) {
 			console.error('[MapControl] Error adding control:', error);
 		}
@@ -58,7 +57,6 @@
 						if (controlsArray.getAt(i) === controlWrapper) {
 							controlsArray.removeAt(i);
 							found = true;
-							console.log('[MapControl] Control removed from position:', position);
 							break;
 						}
 					}

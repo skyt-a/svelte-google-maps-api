@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getContext, onDestroy, onMount } from 'svelte';
+	import { getContext, onDestroy } from 'svelte';
 	import { BROWSER as browser } from 'esm-env';
 	import type { APIProviderContext } from './APIProvider.svelte';
 
@@ -88,6 +88,8 @@
 
 	function setupListeners() {
 		if (!polylineInstance || !googleMapsApi) return;
+		const polyline = polylineInstance;
+
 		listeners.forEach((listener) => googleMapsApi?.event.removeListener(listener));
 		listeners = [];
 		if (pathUpdateListener && googleMapsApi) {
@@ -110,7 +112,7 @@
 
 		eventHandlers.forEach(([eventName, callback]) => {
 			if (callback) {
-				listeners.push(polylineInstance!.addListener(eventName, callback));
+				listeners.push(polyline.addListener(eventName, callback));
 			}
 		});
 
@@ -121,7 +123,7 @@
 				listeners.push(googleMapsApi.event.addListener(polylinePath, 'insert_at', updatePath));
 				listeners.push(googleMapsApi.event.addListener(polylinePath, 'set_at', updatePath));
 				if (draggable) {
-					listeners.push(polylineInstance!.addListener('dragend', updatePath));
+					listeners.push(polyline.addListener('dragend', updatePath));
 				}
 			}
 		}

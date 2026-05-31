@@ -8,6 +8,8 @@ node_modules
 **/build
 **/.svelte-kit
 **/.sveltepress
+/test-results
+/playwright-report
 
 # Turborepo cache
 .turbo

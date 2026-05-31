@@ -68,6 +68,7 @@
 
 	function setupListeners() {
 		if (!layerInstance || !googleMapsApi) return;
+		const layer = layerInstance;
 
 		listeners.forEach((listener) => googleMapsApi?.event.removeListener(listener));
 		listeners = [];
@@ -80,7 +81,7 @@
 
 		eventHandlers.forEach(([eventName, callback]) => {
 			if (callback) {
-				listeners.push(layerInstance!.addListener(eventName, callback));
+				listeners.push(layer.addListener(eventName, callback));
 			}
 		});
 	}

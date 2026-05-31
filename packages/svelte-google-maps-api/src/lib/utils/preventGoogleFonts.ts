@@ -18,7 +18,8 @@ function isGoogleFontStyle(element: Node): boolean {
 	const styleSheetText = styleElement.styleSheet?.cssText;
 
 	if (styleSheetText && styleSheetText.replace('\r\n', '').indexOf('.gm-style') === 0) {
-		styleElement.styleSheet!.cssText = '';
+		const styleSheet = styleElement.styleSheet;
+		if (styleSheet) styleSheet.cssText = '';
 		return true;
 	}
 

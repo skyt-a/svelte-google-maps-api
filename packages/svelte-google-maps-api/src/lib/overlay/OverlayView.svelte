@@ -52,11 +52,9 @@
 		}
 
 		onAdd() {
-			console.log('[OverlayView] onAdd called');
 			const pane = this.getPanes()?.[this.paneName];
 			if (pane && this.container) {
 				pane.appendChild(this.container);
-				console.log('[OverlayView] Container added to pane:', this.paneName);
 			} else {
 				console.error('[OverlayView] Pane or container not found in onAdd.');
 			}
@@ -95,11 +93,9 @@
 		}
 
 		onRemove() {
-			console.log('[OverlayView] onRemove called');
 			if (this.container && this.container.parentNode) {
 				this.container.parentNode.removeChild(this.container);
 				this.container.style.display = 'none';
-				console.log('[OverlayView] Container removed from pane.');
 			}
 		}
 
@@ -161,19 +157,14 @@
 			);
 			overlayViewInstance.setMap(map);
 			onLoad?.(overlayViewInstance);
-			console.log('[OverlayView] Instance created and set on map.');
 		} catch (error) {
 			console.error('[OverlayView] Error creating instance:', error);
 		}
 	}
 
 	$: if (overlayViewInstance && position && googleMapsApi) {
-		console.log('[OverlayView] Position changed');
-
 		(overlayViewInstance as CustomOverlay).updatePosition(position);
 	} else if (overlayViewInstance && bounds && googleMapsApi) {
-		console.log('[OverlayView] Bounds changed');
-
 		(overlayViewInstance as CustomOverlay).updateBounds(bounds);
 	} else if (overlayViewInstance && !position && !bounds) {
 		console.warn(

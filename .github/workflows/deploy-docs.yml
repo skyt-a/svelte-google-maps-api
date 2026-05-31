@@ -43,7 +43,10 @@ jobs:
           cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
+
+      - name: Check Docs Sync
+        run: pnpm docs:sync:check
 
       - name: Build Docs
         run: pnpm build --filter=docs
@@ -54,10 +57,7 @@ jobs:
           STORYBOOK_DISABLE_TELEMETRY: '1'
 
       - name: Attach Storybook to Docs
-        run: |
-          rm -rf apps/docs/build/storybook
-          mkdir -p apps/docs/build/storybook
-          cp -R apps/storybook/storybook-static/. apps/docs/build/storybook/
+        run: pnpm docs:attach-storybook
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

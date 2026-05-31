@@ -91,6 +91,7 @@
 
 	function setupListeners() {
 		if (!rectangleInstance || !googleMapsApi) return;
+		const rectangle = rectangleInstance;
 
 		listeners.forEach((listener) => googleMapsApi?.event.removeListener(listener));
 		listeners = [];
@@ -112,7 +113,7 @@
 
 		eventHandlers.forEach(([eventName, callback]) => {
 			if (callback) {
-				listeners.push(rectangleInstance!.addListener(eventName, callback));
+				listeners.push(rectangle.addListener(eventName, callback));
 			}
 		});
 	}

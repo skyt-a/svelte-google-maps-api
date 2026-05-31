@@ -2,7 +2,7 @@
 	import { getContext, onDestroy, onMount, createEventDispatcher } from 'svelte';
 	import { BROWSER as browser } from 'esm-env';
 	import type { APIProviderContext } from '../APIProvider.svelte';
-	import { writable, type Writable } from 'svelte/store';
+	import type { Writable } from 'svelte/store';
 
 	export let options: google.maps.places.AutocompleteOptions | undefined = undefined;
 
