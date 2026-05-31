@@ -13,7 +13,6 @@
 
 	let overlayViewInstance: google.maps.OverlayView | null = null;
 	let contentWrapper: HTMLDivElement | null = null;
-	let isAdded = false;
 	let isMounted = false;
 
 	const { status, googleMapsApi } = getContext<APIProviderContext>('svelte-google-maps-api');
@@ -57,7 +56,6 @@
 			const pane = this.getPanes()?.[this.paneName];
 			if (pane && this.container) {
 				pane.appendChild(this.container);
-				isAdded = true;
 				console.log('[OverlayView] Container added to pane:', this.paneName);
 			} else {
 				console.error('[OverlayView] Pane or container not found in onAdd.');
@@ -98,7 +96,6 @@
 			console.log('[OverlayView] onRemove called');
 			if (this.container && this.container.parentNode) {
 				this.container.parentNode.removeChild(this.container);
-				isAdded = false;
 				console.log('[OverlayView] Container removed from pane.');
 			}
 		}
@@ -198,8 +195,5 @@
 <!-- This div wraps the slot content and is managed by OverlayView -->
 <!-- Initial styles might be needed to prevent flash of unstyled content -->
 <div bind:this={contentWrapper}>
-	{#if isAdded}
-		<!-- Render slot content only after onAdd has been called -->
-		<slot />
-	{/if}
+	<slot />
 </div>
