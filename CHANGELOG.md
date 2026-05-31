@@ -4,6 +4,13 @@ All notable changes to this project are documented in this file.
 
 This project follows semantic versioning while the public API stabilizes.
 
+## 0.2.3 - 2026-05-31
+
+- Added PR CI for docs synchronization, package checks, lint, tests, builds, and docs smoke tests.
+- Added OSS maintenance documents, issue templates, and a pull request template.
+- Kept component docs navigation synchronized with package exports and Storybook entries.
+- Removed runtime debug logging from library components and cleaned up lint warnings.
+
 ## 0.2.2 - 2026-05-31
 
 - Added unit test coverage for all public Svelte components using Google Maps API mocks.
