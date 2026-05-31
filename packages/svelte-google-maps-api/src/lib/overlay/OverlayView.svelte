@@ -13,7 +13,6 @@
 
 	let overlayViewInstance: google.maps.OverlayView | null = null;
 	let contentWrapper: HTMLDivElement | null = null;
-	let isAdded = false;
 	let isMounted = false;
 
 	const { status, googleMapsApi } = getContext<APIProviderContext>('svelte-google-maps-api');
@@ -57,7 +56,6 @@
 			const pane = this.getPanes()?.[this.paneName];
 			if (pane && this.container) {
 				pane.appendChild(this.container);
-				isAdded = true;
 				console.log('[OverlayView] Container added to pane:', this.paneName);
 			} else {
 				console.error('[OverlayView] Pane or container not found in onAdd.');
@@ -76,6 +74,7 @@
 					this.container.style.left = `${point.x}px`;
 					this.container.style.top = `${point.y}px`;
 					this.container.style.position = 'absolute';
+					this.container.style.display = '';
 				} else {
 					console.warn('[OverlayView] Could not get div pixel for position.');
 				}
@@ -88,6 +87,7 @@
 					this.container.style.width = `${ne.x - sw.x}px`;
 					this.container.style.height = `${sw.y - ne.y}px`;
 					this.container.style.position = 'absolute';
+					this.container.style.display = '';
 				} else {
 					console.warn('[OverlayView] Could not get div pixel for bounds.');
 				}
@@ -98,7 +98,7 @@
 			console.log('[OverlayView] onRemove called');
 			if (this.container && this.container.parentNode) {
 				this.container.parentNode.removeChild(this.container);
-				isAdded = false;
+				this.container.style.display = 'none';
 				console.log('[OverlayView] Container removed from pane.');
 			}
 		}
@@ -197,9 +197,6 @@
 
 <!-- This div wraps the slot content and is managed by OverlayView -->
 <!-- Initial styles might be needed to prevent flash of unstyled content -->
-<div bind:this={contentWrapper}>
-	{#if isAdded}
-		<!-- Render slot content only after onAdd has been called -->
-		<slot />
-	{/if}
+<div bind:this={contentWrapper} style="display: none;">
+	<slot />
 </div>

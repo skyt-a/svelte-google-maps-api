@@ -10,7 +10,8 @@
 		"build": "svelte-package -i src/lib && publint",
 		"check": "svelte-check --tsconfig ./tsconfig.json",
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
-		"format": "prettier --plugin-search-dir . --write ."
+		"format": "prettier --plugin-search-dir . --write .",
+		"test": "vitest run"
 	},
 	"exports": {
 		".": {
@@ -146,12 +147,18 @@
 	},
 	"devDependencies": {
 		"@sveltejs/package": "^2.3.11",
+		"@sveltejs/vite-plugin-svelte": "^5.0.0",
+		"@testing-library/jest-dom": "^6.6.3",
+		"@testing-library/svelte": "^5.2.4",
 		"@types/google.maps": "^3.58.1",
+		"jsdom": "^26.0.0",
 		"publint": "^0.1.9",
 		"svelte": "^5.28.2",
 		"svelte-check": "^3.4.3",
 		"tslib": "^2.4.1",
-		"typescript": "^5.0.0"
+		"typescript": "^5.0.0",
+		"vite": "^6.3.5",
+		"vitest": "^3.0.0"
 	},
 	"dependencies": {
 		"@googlemaps/markerclusterer": "^2.6.2",
