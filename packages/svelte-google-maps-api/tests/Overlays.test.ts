@@ -137,6 +137,16 @@ describe('overlay components', () => {
 		const googleMaps = installGoogleMapsMock();
 		const map = new googleMaps.classes.Map(document.createElement('div'), {});
 		const consoleLog = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+		const appendedDisplayValues: string[] = [];
+		const originalAppendChild = googleMaps.panes.floatPane.appendChild.bind(
+			googleMaps.panes.floatPane
+		);
+		const appendChild = vi
+			.spyOn(googleMaps.panes.floatPane, 'appendChild')
+			.mockImplementation((node) => {
+				appendedDisplayValues.push((node as HTMLElement).style.display);
+				return originalAppendChild(node);
+			});
 		const onLoad = vi.fn();
 		const onUnmount = vi.fn();
 
@@ -164,10 +174,13 @@ describe('overlay components', () => {
 			expect(screen.queryByTestId('slot-content')).not.toBeNull();
 			expect(googleMaps.panes.floatPane.textContent).toContain('slot content');
 		});
+		expect(appendedDisplayValues).toEqual(['none']);
+		expect(screen.getByTestId('slot-content').parentElement?.style.display).toBe('');
 
 		unmount();
 
 		expect(onUnmount).toHaveBeenCalledWith(overlay);
+		appendChild.mockRestore();
 		consoleLog.mockRestore();
 	});
 });
