@@ -97,6 +97,7 @@
 
 	function setupListeners() {
 		if (!circleInstance || !googleMapsApi) return;
+		const circle = circleInstance;
 
 		listeners.forEach((listener) => googleMapsApi?.event.removeListener(listener));
 		listeners = [];
@@ -119,7 +120,7 @@
 
 		eventHandlers.forEach(([eventName, callback]) => {
 			if (callback) {
-				listeners.push(circleInstance!.addListener(eventName, callback));
+				listeners.push(circle.addListener(eventName, callback));
 			}
 		});
 	}

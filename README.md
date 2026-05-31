@@ -12,81 +12,95 @@
 
 A declarative Svelte component library for the Google Maps JavaScript API.
 
-**Note:** This library is under active development. APIs might change.
+## Links
 
-## Features
-
-*   Declarative Svelte components for Google Maps elements (Map, Markers, InfoWindows, Shapes, Layers, etc.).
-*   TypeScript support.
-*   Context-based API loading and map instance sharing.
-*   Components for `AdvancedMarkerElement`, `MapControl`, `Autocomplete`, `OverlayView`, `StreetViewPanorama`, and more.
+- Documentation: https://skyt-a.github.io/svelte-google-maps-api/
+- Storybook: https://skyt-a.github.io/svelte-google-maps-api/storybook/
+- npm: https://www.npmjs.com/package/svelte-google-maps-api
 
 ## Installation
 
 ```bash
-pnpm install svelte-google-maps-api
-# or
+pnpm add svelte-google-maps-api
+```
+
+```bash
 npm install svelte-google-maps-api
-# or
+```
+
+```bash
 yarn add svelte-google-maps-api
 ```
 
-## Basic Usage
-
-Get your Google Maps API Key. Make sure the "Maps JavaScript API" is enabled for your key in the Google Cloud Console. You might also need to enable specific libraries (like "marker", "places", "visualization") depending on the components you use.
+## Quick Start
 
 ```svelte
-{% raw %}
 <script lang="ts">
-	import { GoogleMap } from 'svelte-google-maps-api';
-	import { APIProvider } from 'svelte-google-maps-api';
-	import { Marker } from 'svelte-google-maps-api';
+	import { APIProvider, GoogleMap, Marker } from 'svelte-google-maps-api';
 
-	let apiKey = 'YOUR_MAP_KEY';
+	const apiKey = 'YOUR_MAP_KEY';
 </script>
 
 <div style="width: 100%; height: 100vh;">
-	<APIProvider {apiKey} libraries={['marker']}>
+	<APIProvider {apiKey}>
 		<GoogleMap
 			options={{
-				center: { lat: 35.681, lng: 139.767 },
-				zoom: 14,
-				mapId: 'YOUR_MAP_ID'
+				center: { lat: 35.6812362, lng: 139.7649361 },
+				zoom: 14
 			}}
 			mapContainerStyle="width:100%;height:100%;"
 		>
-			<Marker position={{ lat: 35.681, lng: 139.767 }} />
+			<Marker position={{ lat: 35.6812362, lng: 139.7649361 }} />
 		</GoogleMap>
 	</APIProvider>
 </div>
-{% endraw %}
 ```
 
-## Documentation
+## Library Loading
 
-For detailed documentation, component references, and examples, please visit the **[Documentation Website](https://skyt-a.github.io/svelte-google-maps-api/)**
+Some components require optional Google Maps libraries:
+
+| Component                             | Required library |
+| ------------------------------------- | ---------------- |
+| `AdvancedMarker`                      | `marker`         |
+| `Autocomplete`, `StandaloneSearchBox` | `places`         |
+| `DrawingManager`                      | `drawing`        |
+| `HeatmapLayer`                        | `visualization`  |
+
+```svelte
+<APIProvider {apiKey} libraries={['marker', 'places', 'drawing', 'visualization']}>
+	<!-- map components -->
+</APIProvider>
+```
 
 ## Components
 
-This library provides the following components (and more):
+The package includes map, marker, clusterer, info window, shape, layer, places, directions, distance matrix, custom control, custom overlay, data layer, and Street View components. See the docs for full props and examples.
 
-*   `APIProvider`: Loads the Google Maps API and provides context.
-*   `GoogleMap`: Renders the map container.
-*   `Marker`: The standard Google Maps marker.
-*   `AdvancedMarker`: The newer, customizable marker element.
-*   `InfoWindow`: Displays info windows, often anchored to markers.
-*   Drawing Components: `Polyline`, `Polygon`, `Rectangle`, `Circle`.
-*   Layer Components: `HeatmapLayer`, `KmlLayer`, `TrafficLayer`, `TransitLayer`, `BicyclingLayer`, `GroundOverlay`.
-*   Controls: `MapControl` (for custom controls). Standard controls are configured via `GoogleMap` options.
-*   Places: `Autocomplete`.
-*   Overlays: `OverlayView`.
-*   Street View: `StreetViewPanorama`.
+## Development
+
+```bash
+corepack pnpm install
+corepack pnpm test
+corepack pnpm check
+corepack pnpm lint
+corepack pnpm build
+```
+
+Docs and Storybook stay synchronized with the package exports:
+
+```bash
+corepack pnpm docs:sync:check
+```
 
 ## Contributing
 
-Contributions are welcome! Please feel free to open an issue or submit a pull request.
- 
+See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Security
+
+See [SECURITY.md](SECURITY.md).
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT

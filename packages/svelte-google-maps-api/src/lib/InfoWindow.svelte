@@ -138,7 +138,6 @@
 
 	function updateOpenState() {
 		if (!infoWindowInstance || !map) return;
-		console.log('updateOpenState', internalOpenState);
 		if (internalOpenState) {
 			let openAnchor: google.maps.MVCObject | undefined = undefined;
 			if (anchor && typeof anchor === 'object' && anchor !== null) {

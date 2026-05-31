@@ -14,6 +14,11 @@
 	type APIHeatmapData =
 		| google.maps.MVCArray<google.maps.LatLng | google.maps.visualization.WeightedLocation>
 		| (google.maps.LatLng | google.maps.visualization.WeightedLocation)[];
+	type HeatmapDataItem =
+		| google.maps.visualization.WeightedLocation
+		| { location: google.maps.LatLngLiteral; weight: number }
+		| google.maps.LatLng
+		| google.maps.LatLngLiteral;
 
 	export let data: InputHeatmapData | undefined = undefined;
 	export let options: google.maps.visualization.HeatmapLayerOptions | undefined = undefined;
@@ -51,8 +56,10 @@
 		if (data && Array.isArray(data)) {
 			const processedData = data
 				.map(
-					(item: any): google.maps.LatLng | google.maps.visualization.WeightedLocation | null => {
-						if (item.location) {
+					(
+						item: HeatmapDataItem
+					): google.maps.LatLng | google.maps.visualization.WeightedLocation | null => {
+						if ('location' in item && item.location) {
 							if (item.location instanceof googleMapsApi.LatLng) {
 								return item as google.maps.visualization.WeightedLocation;
 							} else if (
@@ -66,7 +73,7 @@
 							}
 						} else if (item instanceof googleMapsApi.LatLng) {
 							return item;
-						} else if (typeof item.lat === 'number' && typeof item.lng === 'number') {
+						} else if ('lat' in item && 'lng' in item && typeof item.lat === 'number' && typeof item.lng === 'number') {
 							return new googleMapsApi.LatLng(item.lat, item.lng);
 						}
 						console.warn('[HeatmapLayer] Unknown data item format:', item);
@@ -88,8 +95,6 @@
 			radius
 		};
 
-		console.log('[HeatmapLayer] Options prepared:', heatmapOptions);
-
 		Object.keys(heatmapOptions).forEach((key) => {
 			if (heatmapOptions[key as keyof typeof heatmapOptions] === undefined) {
 				delete heatmapOptions[key as keyof typeof heatmapOptions];
@@ -98,7 +103,6 @@
 
 		try {
 			heatmapInstance = new googleMapsApi.visualization.HeatmapLayer(heatmapOptions);
-			console.log('[HeatmapLayer] Instance created:', heatmapInstance);
 			onLoad?.(heatmapInstance);
 		} catch (error) {
 			console.error('[HeatmapLayer] Error creating instance:', error);
@@ -110,8 +114,10 @@
 		if (data && googleMapsApi && Array.isArray(data)) {
 			const processedData = data
 				.map(
-					(item: any): google.maps.LatLng | google.maps.visualization.WeightedLocation | null => {
-						if (item.location) {
+					(
+						item: HeatmapDataItem
+					): google.maps.LatLng | google.maps.visualization.WeightedLocation | null => {
+						if ('location' in item && item.location) {
 							if (item.location instanceof googleMapsApi.LatLng) {
 								return item as google.maps.visualization.WeightedLocation;
 							} else if (
@@ -125,7 +131,7 @@
 							}
 						} else if (item instanceof googleMapsApi.LatLng) {
 							return item;
-						} else if (typeof item.lat === 'number' && typeof item.lng === 'number') {
+						} else if ('lat' in item && 'lng' in item && typeof item.lat === 'number' && typeof item.lng === 'number') {
 							return new googleMapsApi.LatLng(item.lat, item.lng);
 						}
 						console.warn('[HeatmapLayer] Unknown data item format during update:', item);

@@ -9,9 +9,15 @@
 		"check": "turbo run check",
 		"test": "turbo run test",
 		"lint": "turbo run lint",
+		"docs:sync": "node scripts/sync-docs.mjs",
+		"docs:sync:check": "node scripts/sync-docs.mjs --check",
+		"docs:attach-storybook": "node scripts/attach-storybook.mjs",
+		"smoke": "pnpm build --filter=docs --filter=storybook && pnpm docs:attach-storybook && playwright test",
+		"smoke:check": "playwright test",
 		"format": "turbo run format"
 	},
 	"devDependencies": {
+		"@playwright/test": "^1.60.0",
 		"@typescript-eslint/eslint-plugin": "^5.45.0",
 		"@typescript-eslint/parser": "^5.45.0",
 		"eslint": "^8.28.0",

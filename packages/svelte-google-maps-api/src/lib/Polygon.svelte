@@ -98,6 +98,7 @@
 
 	function setupListeners() {
 		if (!polygonInstance || !googleMapsApi) return;
+		const polygon = polygonInstance;
 
 		listeners.forEach((listener) => googleMapsApi?.event.removeListener(listener));
 		listeners = [];
@@ -118,7 +119,7 @@
 
 		eventHandlers.forEach(([eventName, callback]) => {
 			if (callback) {
-				listeners.push(polygonInstance!.addListener(eventName, callback));
+				listeners.push(polygon.addListener(eventName, callback));
 			}
 		});
 
@@ -131,7 +132,7 @@
 				listeners.push(googleMapsApi.event.addListener(polygonPaths, 'remove_at', updatePaths));
 				listeners.push(googleMapsApi.event.addListener(polygonPaths, 'set_at', updatePaths));
 
-				polygonPaths.forEach((path, index) => {
+				polygonPaths.forEach((path) => {
 					listeners.push(googleMapsApi.event.addListener(path, 'insert_at', updatePaths));
 					listeners.push(googleMapsApi.event.addListener(path, 'set_at', updatePaths));
 				});
@@ -139,7 +140,7 @@
 
 			if (draggable) {
 				listeners.push(
-					polygonInstance!.addListener('dragend', () => onPathsChanged(polygonInstance!.getPaths()))
+					polygon.addListener('dragend', () => onPathsChanged(polygon.getPaths()))
 				);
 			}
 		}

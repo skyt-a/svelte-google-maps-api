@@ -1,0 +1,45 @@
+name: Bug report
+description: Report a reproducible problem.
+title: '[Bug]: '
+labels:
+  - bug
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Provide a minimal Svelte/SvelteKit reproduction or a small code sample.
+      value: |
+        ```svelte
+        <!-- minimal reproduction -->
+        ```
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Package version
+      placeholder: 0.2.2
+    validations:
+      required: true
+  - type: input
+    id: svelte-version
+    attributes:
+      label: Svelte version
+      placeholder: 5.x
+    validations:
+      required: true
+  - type: textarea
+    id: browser
+    attributes:
+      label: Browser and environment
+      description: Include browser, OS, SvelteKit version, and relevant Google Maps libraries.
+    validations:
+      required: true
