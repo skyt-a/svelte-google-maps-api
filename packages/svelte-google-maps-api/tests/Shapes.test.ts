@@ -4,198 +4,107 @@ import Circle from '../src/lib/Circle.svelte';
 import Polygon from '../src/lib/Polygon.svelte';
 import Polyline from '../src/lib/Polyline.svelte';
 import Rectangle from '../src/lib/Rectangle.svelte';
-import MapContextHarness from './fixtures/MapContextHarness.svelte';
-import { createGoogleMapsMock } from './googleMapsMock';
+import MapHarness from './fixtures/MapHarness.svelte';
+import { installGoogleMapsMock, MockLatLng } from './googleMapsMock';
 
-describe('shape components', () => {
-	it('creates Polyline, registers path listeners, and clears it on unmount', async () => {
-		const googleMaps = createGoogleMapsMock();
-		const map = new googleMaps.classes.Map(document.createElement('div'), {});
-		const onClick = vi.fn();
+const path = [
+	{ lat: 0, lng: 0 },
+	{ lat: 1, lng: 1 }
+];
+
+describe('Polyline', () => {
+	it('draws the path with style props and reports edits', async () => {
+		const mock = installGoogleMapsMock();
 		const onPathChanged = vi.fn();
-		const onLoad = vi.fn();
-		const onUnmount = vi.fn();
-		const path = [
-			{ lat: 35, lng: 139 },
-			{ lat: 36, lng: 140 }
-		];
-
-		const { unmount } = render(MapContextHarness, {
+		const onClick = vi.fn();
+		const { unmount } = render(MapHarness, {
 			props: {
 				component: Polyline,
-				googleMapsApi: googleMaps.maps as unknown as typeof google.maps,
-				map: map as unknown as google.maps.Map,
-				props: {
-					path,
-					strokeColor: '#ff0000',
-					onClick,
-					onPathChanged,
-					onLoad,
-					onUnmount
-				}
+				props: { path, strokeColor: '#f00', editable: true, onPathChanged, onClick }
 			}
 		});
 
-		await waitFor(() => {
-			expect(googleMaps.classes.Polyline.instances).toHaveLength(1);
-		});
+		await waitFor(() => expect(mock.classes.Polyline.instances).toHaveLength(1));
+		const polyline = mock.classes.Polyline.instances[0];
 
-		const polyline = googleMaps.classes.Polyline.instances[0];
+		expect(polyline.map).toBe(mock.classes.Map.instances[0]);
+		expect(polyline.options).toMatchObject({ strokeColor: '#f00', editable: true });
+		expect(
+			polyline
+				.getPath()
+				.getArray()
+				.map((point) => point.toJSON())
+		).toEqual(path);
 
-		expect(polyline.options).toMatchObject({
-			map,
-			path,
-			strokeColor: '#ff0000'
-		});
-		expect(onLoad).toHaveBeenCalledWith(polyline);
-		expect(polyline.addListener).toHaveBeenCalledWith('click', onClick);
-		expect(googleMaps.event.addListener).toHaveBeenCalledWith(
-			polyline.pathArray,
-			'insert_at',
-			expect.any(Function)
-		);
+		polyline.getPath().push(new MockLatLng(2, 2));
+		expect(onPathChanged).toHaveBeenLastCalledWith([...path, { lat: 2, lng: 2 }]);
+
+		polyline.trigger('click', { latLng: null });
+		expect(onClick).toHaveBeenCalled();
 
 		unmount();
-
-		expect(polyline.setMap).toHaveBeenCalledWith(null);
-		expect(onUnmount).toHaveBeenCalledWith(polyline);
+		expect(polyline.map).toBeNull();
 	});
+});
 
-	it('creates Polygon, registers path listeners, and clears it on unmount', async () => {
-		const googleMaps = createGoogleMapsMock();
-		const map = new googleMaps.classes.Map(document.createElement('div'), {});
-		const onClick = vi.fn();
+describe('Polygon', () => {
+	it('accepts a single ring and reports edits as rings', async () => {
+		const mock = installGoogleMapsMock();
 		const onPathsChanged = vi.fn();
-		const onLoad = vi.fn();
-		const onUnmount = vi.fn();
-		const paths = [[{ lat: 35, lng: 139 }], [{ lat: 36, lng: 140 }]];
-
-		const { unmount } = render(MapContextHarness, {
-			props: {
-				component: Polygon,
-				googleMapsApi: googleMaps.maps as unknown as typeof google.maps,
-				map: map as unknown as google.maps.Map,
-				props: {
-					paths,
-					fillColor: '#00ff00',
-					onClick,
-					onPathsChanged,
-					onLoad,
-					onUnmount
-				}
-			}
+		render(MapHarness, {
+			props: { component: Polygon, props: { paths: path, fillColor: '#0f0', onPathsChanged } }
 		});
 
-		await waitFor(() => {
-			expect(googleMaps.classes.Polygon.instances).toHaveLength(1);
-		});
+		await waitFor(() => expect(mock.classes.Polygon.instances).toHaveLength(1));
+		const polygon = mock.classes.Polygon.instances[0];
 
-		const polygon = googleMaps.classes.Polygon.instances[0];
+		expect(polygon.options).toMatchObject({ fillColor: '#0f0' });
+		expect(polygon.getPaths().getLength()).toBe(1);
 
-		expect(polygon.options).toMatchObject({
-			map,
-			paths,
-			fillColor: '#00ff00'
-		});
-		expect(onLoad).toHaveBeenCalledWith(polygon);
-		expect(polygon.addListener).toHaveBeenCalledWith('click', onClick);
-		expect(googleMaps.event.addListener).toHaveBeenCalledWith(
-			polygon.pathsArray,
-			'insert_at',
-			expect.any(Function)
-		);
-
-		unmount();
-
-		expect(polygon.setMap).toHaveBeenCalledWith(null);
-		expect(onUnmount).toHaveBeenCalledWith(polygon);
+		polygon.getPaths().getAt(0).setAt(0, new MockLatLng(5, 5));
+		expect(onPathsChanged).toHaveBeenLastCalledWith([[{ lat: 5, lng: 5 }, path[1]]]);
 	});
+});
 
-	it('creates Circle with geometry options and clears it on unmount', async () => {
-		const googleMaps = createGoogleMapsMock();
-		const map = new googleMaps.classes.Map(document.createElement('div'), {});
+describe('Circle', () => {
+	it('creates the circle and reports center and radius changes', async () => {
+		const mock = installGoogleMapsMock();
 		const onCenterChanged = vi.fn();
-		const onLoad = vi.fn();
-		const onUnmount = vi.fn();
-		const center = { lat: 35, lng: 139 };
-
-		const { unmount } = render(MapContextHarness, {
+		const onRadiusChanged = vi.fn();
+		render(MapHarness, {
 			props: {
 				component: Circle,
-				googleMapsApi: googleMaps.maps as unknown as typeof google.maps,
-				map: map as unknown as google.maps.Map,
-				props: {
-					center,
-					radius: 1000,
-					fillOpacity: 0.5,
-					onCenterChanged,
-					onLoad,
-					onUnmount
-				}
+				props: { center: { lat: 1, lng: 2 }, radius: 100, onCenterChanged, onRadiusChanged }
 			}
 		});
 
-		await waitFor(() => {
-			expect(googleMaps.classes.Circle.instances).toHaveLength(1);
-		});
+		await waitFor(() => expect(mock.classes.Circle.instances).toHaveLength(1));
+		const circle = mock.classes.Circle.instances[0];
 
-		const circle = googleMaps.classes.Circle.instances[0];
+		expect(circle.getCenter()?.toJSON()).toEqual({ lat: 1, lng: 2 });
+		expect(circle.getRadius()).toBe(100);
 
-		expect(circle.options).toMatchObject({
-			map,
-			center,
-			radius: 1000,
-			fillOpacity: 0.5
-		});
-		expect(circle.addListener).toHaveBeenCalledWith('center_changed', onCenterChanged);
-		expect(onLoad).toHaveBeenCalledWith(circle);
-
-		unmount();
-
-		expect(circle.setMap).toHaveBeenCalledWith(null);
-		expect(onUnmount).toHaveBeenCalledWith(circle);
+		circle.setRadius(250);
+		circle.setCenter({ lat: 3, lng: 4 });
+		expect(onRadiusChanged).toHaveBeenLastCalledWith(250);
+		expect(onCenterChanged).toHaveBeenLastCalledWith({ lat: 3, lng: 4 });
 	});
+});
 
-	it('creates Rectangle with bounds options and clears it on unmount', async () => {
-		const googleMaps = createGoogleMapsMock();
-		const map = new googleMaps.classes.Map(document.createElement('div'), {});
+describe('Rectangle', () => {
+	it('creates the rectangle and reports bounds changes', async () => {
+		const mock = installGoogleMapsMock();
 		const onBoundsChanged = vi.fn();
-		const onLoad = vi.fn();
-		const onUnmount = vi.fn();
-		const bounds = { north: 36, south: 35, east: 140, west: 139 };
+		const bounds = { north: 1, south: 0, east: 1, west: 0 };
+		render(MapHarness, { props: { component: Rectangle, props: { bounds, onBoundsChanged } } });
 
-		const { unmount } = render(MapContextHarness, {
-			props: {
-				component: Rectangle,
-				googleMapsApi: googleMaps.maps as unknown as typeof google.maps,
-				map: map as unknown as google.maps.Map,
-				props: {
-					bounds,
-					editable: true,
-					onBoundsChanged,
-					onLoad,
-					onUnmount
-				}
-			}
-		});
+		await waitFor(() => expect(mock.classes.Rectangle.instances).toHaveLength(1));
+		const rectangle = mock.classes.Rectangle.instances[0];
 
-		await waitFor(() => {
-			expect(googleMaps.classes.Rectangle.instances).toHaveLength(1);
-		});
+		expect(rectangle.getBounds()?.toJSON()).toEqual(bounds);
 
-		const rectangle = googleMaps.classes.Rectangle.instances[0];
-
-		expect(rectangle.options).toMatchObject({
-			map,
-			bounds,
-			editable: true
-		});
-		expect(rectangle.addListener).toHaveBeenCalledWith('bounds_changed', onBoundsChanged);
-		expect(onLoad).toHaveBeenCalledWith(rectangle);
-
-		unmount();
-
-		expect(rectangle.setMap).toHaveBeenCalledWith(null);
-		expect(onUnmount).toHaveBeenCalledWith(rectangle);
+		const next = { north: 2, south: 1, east: 2, west: 1 };
+		rectangle.setBounds(next);
+		expect(onBoundsChanged).toHaveBeenLastCalledWith(next);
 	});
 });

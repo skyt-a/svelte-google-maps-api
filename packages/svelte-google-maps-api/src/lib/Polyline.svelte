@@ -1,151 +1,140 @@
 <script lang="ts">
-	import { getContext, onDestroy } from 'svelte';
-	import { BROWSER as browser } from 'esm-env';
-	import type { APIProviderContext } from './APIProvider.svelte';
+	import { onMount } from 'svelte';
+	import { getAPIContext, getMap } from './internal/context.svelte.js';
+	import {
+		addListeners,
+		definedOnly,
+		mvcArrayToPath,
+		pathEquals,
+		watchMvcArray
+	} from './internal/utils.js';
 
-	export let path:
-		| google.maps.MVCArray<google.maps.LatLng>
-		| (google.maps.LatLng | google.maps.LatLngLiteral)[]
-		| undefined = undefined;
-	export let options: google.maps.PolylineOptions | undefined = undefined;
-	export let draggable: boolean | undefined = undefined;
-	export let editable: boolean | undefined = undefined;
-	export let visible: boolean | undefined = undefined;
-	export let strokeColor: string | undefined = undefined;
-	export let strokeOpacity: number | undefined = undefined;
-	export let strokeWeight: number | undefined = undefined;
-	export let zIndex: number | undefined = undefined;
+	type PolyMouseHandler = (event: google.maps.PolyMouseEvent) => void;
+	type MapMouseHandler = (event: google.maps.MapMouseEvent) => void;
 
-	export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onPathChanged:
-		| ((newPath: google.maps.MVCArray<google.maps.LatLng>) => void)
-		| undefined = undefined;
-	export let onLoad: ((polyline: google.maps.Polyline) => void) | undefined = undefined;
-	export let onUnmount: ((polyline: google.maps.Polyline) => void) | undefined = undefined;
+	interface Props {
+		/** Vertices of the line. With `editable` or `draggable`, use `bind:path` to track edits. */
+		path?: google.maps.LatLngLiteral[];
+		strokeColor?: string;
+		strokeOpacity?: number;
+		strokeWeight?: number;
+		geodesic?: boolean;
+		clickable?: boolean;
+		draggable?: boolean;
+		editable?: boolean;
+		visible?: boolean;
+		zIndex?: number;
+		icons?: google.maps.IconSequence[];
+		/** Other `google.maps.PolylineOptions`. */
+		options?: google.maps.PolylineOptions;
+		/** The `google.maps.Polyline` instance. Read it with `bind:polyline`. */
+		polyline?: google.maps.Polyline | null;
+		onClick?: PolyMouseHandler;
+		onDblClick?: PolyMouseHandler;
+		onContextMenu?: PolyMouseHandler;
+		onMouseDown?: PolyMouseHandler;
+		onMouseUp?: PolyMouseHandler;
+		onMouseOver?: PolyMouseHandler;
+		onMouseOut?: PolyMouseHandler;
+		onMouseMove?: PolyMouseHandler;
+		onDragStart?: MapMouseHandler;
+		onDrag?: MapMouseHandler;
+		onDragEnd?: MapMouseHandler;
+		/** Called after the user edits or drags the line. */
+		onPathChanged?: (path: google.maps.LatLngLiteral[]) => void;
+		onLoad?: (polyline: google.maps.Polyline) => void;
+	}
 
-	let polylineInstance: google.maps.Polyline | null = null;
-	let listeners: google.maps.MapsEventListener[] = [];
-	let pathUpdateListener: google.maps.MapsEventListener | null = null;
+	let {
+		path = $bindable(),
+		strokeColor,
+		strokeOpacity,
+		strokeWeight,
+		geodesic,
+		clickable,
+		draggable,
+		editable,
+		visible,
+		zIndex,
+		icons,
+		options,
+		polyline = $bindable(null),
+		onClick,
+		onDblClick,
+		onContextMenu,
+		onMouseDown,
+		onMouseUp,
+		onMouseOver,
+		onMouseOut,
+		onMouseMove,
+		onDragStart,
+		onDrag,
+		onDragEnd,
+		onPathChanged,
+		onLoad
+	}: Props = $props();
 
-	const { status, googleMapsApi } = getContext<APIProviderContext>('svelte-google-maps-api');
-	const map = getContext<google.maps.Map>('map');
+	const api = getAPIContext('Polyline');
+	const map = getMap('Polyline');
+	const { Polyline } = api.requireLibrary('maps');
+	const instance = new Polyline({ path: path ?? [] });
 
-	function initializePolyline() {
-		if (!browser || $status !== 'loaded' || !googleMapsApi || !map || polylineInstance) return;
+	onMount(() => {
+		instance.setMap(map);
+		polyline = instance;
+		onLoad?.(instance);
 
-		const polylineOptions: google.maps.PolylineOptions = {
-			...(options ?? {}),
-			map,
-			path,
-			draggable,
-			editable,
-			visible,
-			strokeColor,
-			strokeOpacity,
-			strokeWeight,
-			zIndex
+		return () => {
+			api.requireLibrary('core').event.clearInstanceListeners(instance);
+			instance.setMap(null);
 		};
-
-		Object.keys(polylineOptions).forEach((key) => {
-			if (polylineOptions[key as keyof typeof polylineOptions] === undefined) {
-				delete polylineOptions[key as keyof typeof polylineOptions];
-			}
-		});
-
-		try {
-			polylineInstance = new googleMapsApi.Polyline(polylineOptions);
-			onLoad?.(polylineInstance);
-			setupListeners();
-		} catch (error) {
-			console.error('[Polyline] Error creating instance:', error);
-		}
-	}
-
-	$: if (polylineInstance && path) {
-		polylineInstance.setPath(path);
-	}
-	$: if (polylineInstance && options) {
-		polylineInstance.setOptions(options);
-	} else if (polylineInstance) {
-		if (draggable !== undefined) polylineInstance.setDraggable(draggable);
-		if (editable !== undefined) polylineInstance.setEditable(editable);
-		if (visible !== undefined) polylineInstance.setVisible(visible);
-		if (strokeColor !== undefined) polylineInstance.setOptions({ strokeColor });
-		if (strokeOpacity !== undefined) polylineInstance.setOptions({ strokeOpacity });
-		if (strokeWeight !== undefined) polylineInstance.setOptions({ strokeWeight });
-		if (zIndex !== undefined) polylineInstance.setOptions({ zIndex });
-	}
-
-	function setupListeners() {
-		if (!polylineInstance || !googleMapsApi) return;
-		const polyline = polylineInstance;
-
-		listeners.forEach((listener) => googleMapsApi?.event.removeListener(listener));
-		listeners = [];
-		if (pathUpdateListener && googleMapsApi) {
-			googleMapsApi.event.removeListener(pathUpdateListener);
-			pathUpdateListener = null;
-		}
-		const eventHandlers = [
-			['click', onClick],
-			['dblclick', onDblClick],
-			['drag', onDrag],
-			['dragend', onDragEnd],
-			['dragstart', onDragStart],
-			['mousedown', onMouseDown],
-			['mousemove', onMouseMove],
-			['mouseout', onMouseOut],
-			['mouseover', onMouseOver],
-			['mouseup', onMouseUp],
-			['rightclick', onRightClick]
-		] as const;
-
-		eventHandlers.forEach(([eventName, callback]) => {
-			if (callback) {
-				listeners.push(polyline.addListener(eventName, callback));
-			}
-		});
-
-		if (onPathChanged) {
-			const polylinePath = polylineInstance.getPath();
-			if (polylinePath) {
-				const updatePath = () => onPathChanged(polylinePath);
-				listeners.push(googleMapsApi.event.addListener(polylinePath, 'insert_at', updatePath));
-				listeners.push(googleMapsApi.event.addListener(polylinePath, 'set_at', updatePath));
-				if (draggable) {
-					listeners.push(polyline.addListener('dragend', updatePath));
-				}
-			}
-		}
-	}
-
-	$: if (polylineInstance && googleMapsApi && browser) {
-		setupListeners();
-	}
-
-	onDestroy(() => {
-		if (polylineInstance) {
-			onUnmount?.(polylineInstance);
-			listeners.forEach((listener) => googleMapsApi?.event.removeListener(listener));
-			if (pathUpdateListener && googleMapsApi) {
-				googleMapsApi.event.removeListener(pathUpdateListener);
-			}
-			polylineInstance.setMap(null);
-			polylineInstance = null;
-		}
 	});
 
-	$: if ($status === 'loaded' && map && !polylineInstance) {
-		initializePolyline();
-	}
+	$effect(() => {
+		instance.setOptions({
+			...options,
+			...definedOnly({
+				strokeColor,
+				strokeOpacity,
+				strokeWeight,
+				geodesic,
+				clickable,
+				draggable,
+				editable,
+				visible,
+				zIndex,
+				icons
+			})
+		});
+	});
+
+	$effect(() => {
+		const next = path;
+		if (next && !pathEquals(mvcArrayToPath(instance.getPath()), next)) {
+			instance.setPath(next);
+		}
+
+		const mvcPath = instance.getPath();
+		return watchMvcArray(mvcPath, () => {
+			const updated = mvcArrayToPath(mvcPath);
+			path = updated;
+			onPathChanged?.(updated);
+		});
+	});
+
+	$effect(() => {
+		return addListeners(instance, {
+			click: onClick,
+			dblclick: onDblClick,
+			contextmenu: onContextMenu,
+			mousedown: onMouseDown,
+			mouseup: onMouseUp,
+			mouseover: onMouseOver,
+			mouseout: onMouseOut,
+			mousemove: onMouseMove,
+			dragstart: onDragStart,
+			drag: onDrag,
+			dragend: onDragEnd
+		});
+	});
 </script>

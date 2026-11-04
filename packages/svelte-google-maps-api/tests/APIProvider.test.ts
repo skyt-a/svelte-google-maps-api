@@ -1,68 +1,62 @@
 import { render, screen, waitFor } from '@testing-library/svelte';
 import { describe, expect, it, vi } from 'vitest';
-import APIProviderHarness from './fixtures/APIProviderHarness.svelte';
-import { createGoogleMapsMock } from './googleMapsMock';
+import { SCRIPT_ID } from '../src/lib/internal/loader.js';
+import HookConsumer from './fixtures/HookConsumer.svelte';
+import ProviderHarness from './fixtures/ProviderHarness.svelte';
+import ProviderSnippetsHarness from './fixtures/ProviderSnippetsHarness.svelte';
+import { installGoogleMapsMock } from './googleMapsMock';
 
 describe('APIProvider', () => {
-	it('renders the error slot and calls onError when no credential is provided', async () => {
-		const onError = vi.fn();
-		const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+	it('shows the loading snippet until the script loads, then preloads libraries', async () => {
+		const onLoad = vi.fn();
+		render(ProviderSnippetsHarness, { props: { apiKey: 'KEY', onLoad } });
 
-		render(APIProviderHarness, {
-			props: {
-				onError
-			}
-		});
+		expect(screen.getByText('loading map')).toBeInTheDocument();
+		expect(screen.queryByText('children')).not.toBeInTheDocument();
 
-		await waitFor(() => {
-			expect(screen.getByTestId('error').textContent).toBe(
-				'apiKey or googleMapsClientId is required'
-			);
-		});
-		expect(onError).toHaveBeenCalledWith(expect.any(Error));
-		expect(consoleError).toHaveBeenCalled();
+		const script = document.getElementById(SCRIPT_ID) as HTMLScriptElement;
+		const url = new URL(script.src);
+		expect(url.searchParams.get('libraries')).toBe('places');
+		expect(url.searchParams.get('language')).toBe('ja');
 
-		consoleError.mockRestore();
+		const mock = installGoogleMapsMock();
+		(window as unknown as Record<string, () => void>)[url.searchParams.get('callback') as string]();
+
+		await waitFor(() => expect(screen.getByText('children')).toBeInTheDocument());
+		await waitFor(() => expect(onLoad).toHaveBeenCalledTimes(1));
+		expect(mock.importLibrary.mock.calls.map(([name]) => name).sort()).toEqual([
+			'core',
+			'maps',
+			'places'
+		]);
 	});
 
-	it('creates the Google Maps script with sorted libraries and loads the default slot', async () => {
-		const googleMaps = createGoogleMapsMock();
-		const onLoad = vi.fn();
+	it('renders the error snippet and calls onError when the script fails', async () => {
+		const onError = vi.fn();
+		render(ProviderSnippetsHarness, { props: { apiKey: 'KEY', onError } });
 
-		render(APIProviderHarness, {
-			props: {
-				apiKey: 'test-key',
-				libraries: ['places', 'marker'],
-				language: 'ja',
-				region: 'JP',
-				id: 'maps-script',
-				onLoad
-			}
-		});
+		const script = document.getElementById(SCRIPT_ID) as HTMLScriptElement;
+		script.onerror?.(new Event('error'));
 
-		expect(screen.getByTestId('loading')).not.toBeNull();
+		await waitFor(() =>
+			expect(screen.getByText(/custom error: Failed to load/)).toBeInTheDocument()
+		);
+		expect(onError).toHaveBeenCalledWith(expect.any(Error));
+	});
 
-		const script = document.getElementById('maps-script') as HTMLScriptElement;
-		const src = new URL(script.src);
+	it('fails fast without an API key', async () => {
+		const onError = vi.fn();
+		render(ProviderSnippetsHarness, { props: { apiKey: '', onError } });
 
-		expect(src.searchParams.get('key')).toBe('test-key');
-		expect(src.searchParams.get('libraries')).toBe('marker,places');
-		expect(src.searchParams.get('language')).toBe('ja');
-		expect(src.searchParams.get('region')).toBe('JP');
-		expect(src.searchParams.get('callback')).toBe('__svelteGoogleMapApiCallback__');
+		await waitFor(() => expect(screen.getByText(/apiKey is required/)).toBeInTheDocument());
+		expect(document.getElementById(SCRIPT_ID)).toBeNull();
+	});
 
-		(window as typeof window & { google: { maps: typeof google.maps } }).google = {
-			maps: googleMaps.maps as unknown as typeof google.maps
-		};
-		(
-			window as typeof window & { __svelteGoogleMapApiCallback__: () => void }
-		).__svelteGoogleMapApiCallback__();
+	it('exposes loading status and libraries through hooks', async () => {
+		installGoogleMapsMock();
+		render(ProviderHarness, { props: { component: HookConsumer } });
 
-		await waitFor(() => {
-			expect(screen.getByTestId('loaded')).not.toBeNull();
-		});
-		expect(googleMaps.importLibrary).toHaveBeenCalledWith('marker');
-		expect(googleMaps.importLibrary).toHaveBeenCalledWith('places');
-		expect(onLoad).toHaveBeenCalledTimes(1);
+		await waitFor(() => expect(screen.getByTestId('places')).toHaveTextContent('places ready'));
+		expect(screen.getByTestId('status')).toHaveTextContent('loaded');
 	});
 });

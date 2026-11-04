@@ -1,146 +1,154 @@
 <script lang="ts">
-	import { getContext, onDestroy } from 'svelte';
-	import { BROWSER as browser } from 'esm-env';
-	import type { APIProviderContext } from './APIProvider.svelte';
+	import { onMount, untrack } from 'svelte';
+	import { getAPIContext, getMap } from './internal/context.svelte.js';
+	import { addListeners, definedOnly, latLngEquals, toLatLngLiteral } from './internal/utils.js';
 
-	export let center: google.maps.LatLng | google.maps.LatLngLiteral | undefined = undefined;
-	export let radius: number | undefined = undefined;
-	export let options: google.maps.CircleOptions | undefined = undefined;
-	export let draggable: boolean | undefined = undefined;
-	export let editable: boolean | undefined = undefined;
-	export let visible: boolean | undefined = undefined;
+	type MapMouseHandler = (event: google.maps.MapMouseEvent) => void;
 
-	export let fillColor: string | undefined = undefined;
-	export let fillOpacity: number | undefined = undefined;
-	export let strokeColor: string | undefined = undefined;
-	export let strokeOpacity: number | undefined = undefined;
-	export let strokeWeight: number | undefined = undefined;
-	export let zIndex: number | undefined = undefined;
+	interface Props {
+		/** Circle center. With `editable` or `draggable`, use `bind:center`. */
+		center?: google.maps.LatLngLiteral | google.maps.LatLng;
+		/** Radius in meters. With `editable`, use `bind:radius`. */
+		radius?: number;
+		strokeColor?: string;
+		strokeOpacity?: number;
+		strokeWeight?: number;
+		strokePosition?: google.maps.StrokePosition;
+		fillColor?: string;
+		fillOpacity?: number;
+		clickable?: boolean;
+		draggable?: boolean;
+		editable?: boolean;
+		visible?: boolean;
+		zIndex?: number;
+		/** Other `google.maps.CircleOptions`. */
+		options?: google.maps.CircleOptions;
+		/** The `google.maps.Circle` instance. Read it with `bind:circle`. */
+		circle?: google.maps.Circle | null;
+		onClick?: MapMouseHandler;
+		onDblClick?: MapMouseHandler;
+		onContextMenu?: MapMouseHandler;
+		onMouseDown?: MapMouseHandler;
+		onMouseUp?: MapMouseHandler;
+		onMouseOver?: MapMouseHandler;
+		onMouseOut?: MapMouseHandler;
+		onMouseMove?: MapMouseHandler;
+		onDragStart?: MapMouseHandler;
+		onDrag?: MapMouseHandler;
+		onDragEnd?: MapMouseHandler;
+		onCenterChanged?: (center: google.maps.LatLngLiteral) => void;
+		onRadiusChanged?: (radius: number) => void;
+		onLoad?: (circle: google.maps.Circle) => void;
+	}
 
-	export let onCenterChanged: (() => void) | undefined = undefined;
-	export let onRadiusChanged: (() => void) | undefined = undefined;
-	export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onLoad: ((circle: google.maps.Circle) => void) | undefined = undefined;
-	export let onUnmount: ((circle: google.maps.Circle) => void) | undefined = undefined;
+	let {
+		center = $bindable(),
+		radius = $bindable(),
+		strokeColor,
+		strokeOpacity,
+		strokeWeight,
+		strokePosition,
+		fillColor,
+		fillOpacity,
+		clickable,
+		draggable,
+		editable,
+		visible,
+		zIndex,
+		options,
+		circle = $bindable(null),
+		onClick,
+		onDblClick,
+		onContextMenu,
+		onMouseDown,
+		onMouseUp,
+		onMouseOver,
+		onMouseOut,
+		onMouseMove,
+		onDragStart,
+		onDrag,
+		onDragEnd,
+		onCenterChanged,
+		onRadiusChanged,
+		onLoad
+	}: Props = $props();
 
-	let circleInstance: google.maps.Circle | null = null;
-	let listeners: google.maps.MapsEventListener[] = [];
+	const api = getAPIContext('Circle');
+	const map = getMap('Circle');
+	const { Circle } = api.requireLibrary('maps');
+	const instance = new Circle(
+		untrack(() => definedOnly({ center: center ?? undefined, radius: radius ?? undefined }))
+	);
 
-	const { status, googleMapsApi } = getContext<APIProviderContext>('svelte-google-maps-api');
-	const map = getContext<google.maps.Map>('map');
+	onMount(() => {
+		instance.setMap(map);
+		circle = instance;
+		onLoad?.(instance);
 
-	function initializeCircle() {
-		if (!browser || $status !== 'loaded' || !googleMapsApi || !map || circleInstance) return;
-
-		const circleOptions: google.maps.CircleOptions = {
-			...(options ?? {}),
-			map,
-			center,
-			radius,
-			draggable,
-			editable,
-			visible,
-			fillColor,
-			fillOpacity,
-			strokeColor,
-			strokeOpacity,
-			strokeWeight,
-			zIndex
+		return () => {
+			api.requireLibrary('core').event.clearInstanceListeners(instance);
+			instance.setMap(null);
 		};
-
-		Object.keys(circleOptions).forEach((key) => {
-			if (circleOptions[key as keyof typeof circleOptions] === undefined) {
-				delete circleOptions[key as keyof typeof circleOptions];
-			}
-		});
-
-		try {
-			circleInstance = new googleMapsApi.Circle(circleOptions);
-			onLoad?.(circleInstance);
-			setupListeners();
-		} catch (error) {
-			console.error('[Circle] Error creating instance:', error);
-		}
-	}
-
-	$: if (circleInstance && center) {
-		circleInstance.setCenter(center);
-	}
-	$: if (circleInstance && radius !== undefined) {
-		circleInstance.setRadius(radius);
-	}
-	$: if (circleInstance && options) {
-		circleInstance.setOptions(options);
-	} else if (circleInstance) {
-		if (draggable !== undefined) circleInstance.setDraggable(draggable);
-		if (editable !== undefined) circleInstance.setEditable(editable);
-		if (visible !== undefined) circleInstance.setVisible(visible);
-		const styleOpts: google.maps.CircleOptions = {};
-		if (fillColor !== undefined) styleOpts.fillColor = fillColor;
-		if (fillOpacity !== undefined) styleOpts.fillOpacity = fillOpacity;
-		if (strokeColor !== undefined) styleOpts.strokeColor = strokeColor;
-		if (strokeOpacity !== undefined) styleOpts.strokeOpacity = strokeOpacity;
-		if (strokeWeight !== undefined) styleOpts.strokeWeight = strokeWeight;
-		if (zIndex !== undefined) styleOpts.zIndex = zIndex;
-		if (Object.keys(styleOpts).length > 0) circleInstance.setOptions(styleOpts);
-	}
-
-	function setupListeners() {
-		if (!circleInstance || !googleMapsApi) return;
-		const circle = circleInstance;
-
-		listeners.forEach((listener) => googleMapsApi?.event.removeListener(listener));
-		listeners = [];
-
-		const eventHandlers = [
-			['center_changed', onCenterChanged],
-			['radius_changed', onRadiusChanged],
-			['click', onClick],
-			['dblclick', onDblClick],
-			['drag', onDrag],
-			['dragend', onDragEnd],
-			['dragstart', onDragStart],
-			['mousedown', onMouseDown],
-			['mousemove', onMouseMove],
-			['mouseout', onMouseOut],
-			['mouseover', onMouseOver],
-			['mouseup', onMouseUp],
-			['rightclick', onRightClick]
-		] as const;
-
-		eventHandlers.forEach(([eventName, callback]) => {
-			if (callback) {
-				listeners.push(circle.addListener(eventName, callback));
-			}
-		});
-	}
-
-	$: if (circleInstance && googleMapsApi && browser) {
-		setupListeners();
-	}
-
-	onDestroy(() => {
-		if (circleInstance) {
-			onUnmount?.(circleInstance);
-			listeners.forEach((listener) => googleMapsApi?.event.removeListener(listener));
-			circleInstance.setMap(null);
-			circleInstance = null;
-		}
 	});
 
-	$: if ($status === 'loaded' && map && !circleInstance) {
-		initializeCircle();
-	}
-</script>
+	$effect(() => {
+		instance.setOptions({
+			...options,
+			...definedOnly({
+				strokeColor,
+				strokeOpacity,
+				strokeWeight,
+				strokePosition,
+				fillColor,
+				fillOpacity,
+				clickable,
+				draggable,
+				editable,
+				visible,
+				zIndex
+			})
+		});
+	});
 
-<!-- Circle does not render any DOM element itself -->
+	$effect(() => {
+		const next = center;
+		if (next && !latLngEquals(instance.getCenter(), next)) instance.setCenter(next);
+	});
+
+	$effect(() => {
+		const next = radius;
+		if (next !== undefined && instance.getRadius() !== next) instance.setRadius(next);
+	});
+
+	$effect(() => {
+		return addListeners(instance, {
+			center_changed: () => {
+				const next = toLatLngLiteral(instance.getCenter());
+				if (!next) return;
+				if (!latLngEquals(next, center)) center = next;
+				onCenterChanged?.(next);
+			},
+			radius_changed: () => {
+				const next = instance.getRadius();
+				if (next !== radius) radius = next;
+				onRadiusChanged?.(next);
+			}
+		});
+	});
+
+	$effect(() => {
+		return addListeners(instance, {
+			click: onClick,
+			dblclick: onDblClick,
+			contextmenu: onContextMenu,
+			mousedown: onMouseDown,
+			mouseup: onMouseUp,
+			mouseover: onMouseOver,
+			mouseout: onMouseOut,
+			mousemove: onMouseMove,
+			dragstart: onDragStart,
+			drag: onDrag,
+			dragend: onDragEnd
+		});
+	});
+</script>

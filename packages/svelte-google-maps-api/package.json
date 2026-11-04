@@ -1,7 +1,7 @@
 {
 	"name": "svelte-google-maps-api",
 	"version": "0.2.3",
-	"description": "A Svelte component library for integrating Google Maps JavaScript API into Svelte applications",
+	"description": "Svelte 5 components for the Google Maps JavaScript API: maps, Advanced Markers, Places, Routes and more",
 	"svelte": "./dist/index.js",
 	"module": "./dist/index.js",
 	"types": "./dist/index.d.ts",
@@ -9,8 +9,8 @@
 	"scripts": {
 		"build": "svelte-package -i src/lib && publint",
 		"check": "svelte-check --tsconfig ./tsconfig.json",
-		"lint": "prettier --plugin-search-dir . --check . && eslint .",
-		"format": "prettier --plugin-search-dir . --write .",
+		"lint": "prettier --check . && eslint .",
+		"format": "prettier --write .",
 		"test": "vitest run"
 	},
 	"exports": {
@@ -23,9 +23,21 @@
 			"types": "./dist/APIProvider.svelte.d.ts",
 			"svelte": "./dist/APIProvider.svelte"
 		},
+		"./GoogleMap.svelte": {
+			"types": "./dist/GoogleMap.svelte.d.ts",
+			"svelte": "./dist/GoogleMap.svelte"
+		},
 		"./AdvancedMarker.svelte": {
 			"types": "./dist/AdvancedMarker.svelte.d.ts",
 			"svelte": "./dist/AdvancedMarker.svelte"
+		},
+		"./Pin.svelte": {
+			"types": "./dist/Pin.svelte.d.ts",
+			"svelte": "./dist/Pin.svelte"
+		},
+		"./MarkerClusterer.svelte": {
+			"types": "./dist/MarkerClusterer.svelte.d.ts",
+			"svelte": "./dist/MarkerClusterer.svelte"
 		},
 		"./InfoWindow.svelte": {
 			"types": "./dist/InfoWindow.svelte.d.ts",
@@ -47,25 +59,13 @@
 			"types": "./dist/Rectangle.svelte.d.ts",
 			"svelte": "./dist/Rectangle.svelte"
 		},
-		"./HeatmapLayer.svelte": {
-			"types": "./dist/HeatmapLayer.svelte.d.ts",
-			"svelte": "./dist/HeatmapLayer.svelte"
-		},
 		"./GroundOverlay.svelte": {
 			"types": "./dist/GroundOverlay.svelte.d.ts",
 			"svelte": "./dist/GroundOverlay.svelte"
 		},
-		"./DirectionsRenderer.svelte": {
-			"types": "./dist/DirectionsRenderer.svelte.d.ts",
-			"svelte": "./dist/DirectionsRenderer.svelte"
-		},
-		"./DrawingManager.svelte": {
-			"types": "./dist/DrawingManager.svelte.d.ts",
-			"svelte": "./dist/DrawingManager.svelte"
-		},
-		"./MapControl.svelte": {
-			"types": "./dist/controls/MapControl.svelte.d.ts",
-			"svelte": "./dist/controls/MapControl.svelte"
+		"./Data.svelte": {
+			"types": "./dist/Data.svelte.d.ts",
+			"svelte": "./dist/Data.svelte"
 		},
 		"./TrafficLayer.svelte": {
 			"types": "./dist/layers/TrafficLayer.svelte.d.ts",
@@ -79,61 +79,25 @@
 			"types": "./dist/layers/BicyclingLayer.svelte.d.ts",
 			"svelte": "./dist/layers/BicyclingLayer.svelte"
 		},
-		"./KmlLayer.svelte": {
-			"types": "./dist/layers/KmlLayer.svelte.d.ts",
-			"svelte": "./dist/layers/KmlLayer.svelte"
-		},
-		"./Autocomplete.svelte": {
-			"types": "./dist/places/Autocomplete.svelte.d.ts",
-			"svelte": "./dist/places/Autocomplete.svelte"
+		"./MapControl.svelte": {
+			"types": "./dist/controls/MapControl.svelte.d.ts",
+			"svelte": "./dist/controls/MapControl.svelte"
 		},
 		"./OverlayView.svelte": {
 			"types": "./dist/overlay/OverlayView.svelte.d.ts",
 			"svelte": "./dist/overlay/OverlayView.svelte"
 		},
+		"./PlaceAutocomplete.svelte": {
+			"types": "./dist/places/PlaceAutocomplete.svelte.d.ts",
+			"svelte": "./dist/places/PlaceAutocomplete.svelte"
+		},
+		"./RouteRenderer.svelte": {
+			"types": "./dist/routes/RouteRenderer.svelte.d.ts",
+			"svelte": "./dist/routes/RouteRenderer.svelte"
+		},
 		"./StreetViewPanorama.svelte": {
 			"types": "./dist/street-view/StreetViewPanorama.svelte.d.ts",
 			"svelte": "./dist/street-view/StreetViewPanorama.svelte"
-		},
-		"./GoogleMap.svelte": {
-			"types": "./dist/GoogleMap.svelte.d.ts",
-			"svelte": "./dist/GoogleMap.svelte"
-		},
-		"./Marker.svelte": {
-			"types": "./dist/Marker.svelte.d.ts",
-			"svelte": "./dist/Marker.svelte"
-		},
-		"./MarkerClusterer.svelte": {
-			"types": "./dist/MarkerClusterer.svelte.d.ts",
-			"svelte": "./dist/MarkerClusterer.svelte"
-		},
-		"./GoogleMarkerClusterer.svelte": {
-			"types": "./dist/GoogleMarkerClusterer.svelte.d.ts",
-			"svelte": "./dist/GoogleMarkerClusterer.svelte"
-		},
-		"./InfoBox.svelte": {
-			"types": "./dist/InfoBox.svelte.d.ts",
-			"svelte": "./dist/InfoBox.svelte"
-		},
-		"./Data.svelte": {
-			"types": "./dist/Data.svelte.d.ts",
-			"svelte": "./dist/Data.svelte"
-		},
-		"./DirectionsService.svelte": {
-			"types": "./dist/DirectionsService.svelte.d.ts",
-			"svelte": "./dist/DirectionsService.svelte"
-		},
-		"./DistanceMatrixService.svelte": {
-			"types": "./dist/DistanceMatrixService.svelte.d.ts",
-			"svelte": "./dist/DistanceMatrixService.svelte"
-		},
-		"./StandaloneSearchBox.svelte": {
-			"types": "./dist/places/StandaloneSearchBox.svelte.d.ts",
-			"svelte": "./dist/places/StandaloneSearchBox.svelte"
-		},
-		"./StreetViewService.svelte": {
-			"types": "./dist/street-view/StreetViewService.svelte.d.ts",
-			"svelte": "./dist/street-view/StreetViewService.svelte"
 		}
 	},
 	"files": [
@@ -150,35 +114,30 @@
 		"@sveltejs/vite-plugin-svelte": "^5.0.0",
 		"@testing-library/jest-dom": "^6.6.3",
 		"@testing-library/svelte": "^5.2.4",
-		"@types/google.maps": "^3.58.1",
+		"@types/google.maps": "^3.66.9",
 		"jsdom": "^26.0.0",
 		"publint": "^0.1.9",
-		"svelte": "^5.28.2",
-		"svelte-check": "^3.4.3",
+		"svelte": "^5.57.3",
+		"svelte-check": "^4.7.8",
 		"tslib": "^2.4.1",
 		"typescript": "^5.0.0",
 		"vite": "^6.3.5",
 		"vitest": "^3.0.0"
 	},
 	"dependencies": {
-		"@googlemaps/markerclusterer": "^2.6.2",
-		"esm-env": "^1.0.0"
+		"@googlemaps/markerclusterer": "^2.6.2"
 	},
 	"keywords": [
-		"Svelte",
-		"SvelteKit",
-		"Google",
-		"Google Maps",
-		"google maps",
+		"svelte",
+		"svelte5",
+		"sveltekit",
 		"google-maps",
-		"@google-maps",
-		"google-maps-api",
-		"@google-maps-api",
-		"Map",
-		"Maps",
-		"API",
-		"GoogleMap",
-		"Typescript"
+		"google maps",
+		"maps",
+		"advanced-markers",
+		"places",
+		"routes",
+		"typescript"
 	],
 	"repository": {
 		"type": "git",

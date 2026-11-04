@@ -1,222 +1,122 @@
-<script context="module" lang="ts">
-	import type { Library } from './types/googleMap.js';
-
-	type LoadStatus = 'loading' | 'loaded' | 'error';
-
-	export interface APIProviderContext {
-		status: Writable<LoadStatus>;
-		googleMapsApi: typeof google.maps | null;
-		error: Error | null;
-	}
-</script>
-
 <script lang="ts">
-	import { BROWSER as browser } from 'esm-env';
-	import { setContext, onDestroy } from 'svelte';
-	import { writable, type Writable } from 'svelte/store';
+	import { onMount, type Snippet } from 'svelte';
+	import { APIContext, setAPIContext } from './internal/context.svelte.js';
+	import { loadMapsApi } from './internal/loader.js';
 	import { preventGoogleFonts } from './utils/preventGoogleFonts.js';
+	import type { Library } from './types.js';
 
-	export let apiKey = '';
-	export let googleMapsApiKey: string | undefined = undefined;
-	export let googleMapsClientId: string | undefined = undefined;
-	export let libraries: Library[] = [];
-	export let language: string | undefined = undefined;
-	export let region: string | undefined = undefined;
-	export let version: string | undefined = 'weekly';
-	export let channel: string | undefined = undefined;
-	export let mapIds: string[] | undefined = undefined;
-	export let authReferrerPolicy: 'origin' | undefined = undefined;
-	export let apiUrl: string = 'https://maps.googleapis.com';
-	export let solutionChannel: string | undefined = undefined;
-	export let id: string = 'svelte-google-maps-api-script';
-	export let nonce: string | undefined = undefined;
-	export let preventGoogleFontsLoading: boolean = false;
-	export let onLoad: (() => void) | undefined = undefined;
-	export let onError: ((error: Error) => void) | undefined = undefined;
-	export let onUnmount: (() => void) | undefined = undefined;
-
-	let googleMapsApi: typeof google.maps | null = null;
-	let error: Error | null = null;
-
-	const statusStore = writable<LoadStatus>('loading');
-
-	const CALLBACK_NAME = '__svelteGoogleMapApiCallback__';
-
-	let scriptElement: HTMLScriptElement | null = null;
-	let loadRequestId = 0;
-	let loadedLibrariesSignature = '';
-	let isDestroyed = false;
-	type CallbackWindow = Window & Record<string, (() => void) | undefined>;
-
-	function getLibrariesSignature(librariesToLoad: Library[]) {
-		return [...new Set(librariesToLoad)].sort().join(',');
+	interface Props {
+		/** Google Maps Platform API key. */
+		apiKey: string;
+		/** Maps JavaScript API version or channel (`weekly`, `quarterly`, `beta`, `3.66`, ...). */
+		version?: string;
+		/** Libraries to preload. Components load the libraries they need on demand. */
+		libraries?: Library[];
+		language?: string;
+		region?: string;
+		authReferrerPolicy?: 'origin';
+		channel?: string;
+		solutionChannel?: string;
+		mapIds?: string[];
+		/** Base URL of the Maps JavaScript API. */
+		apiUrl?: string;
+		/** CSP nonce for the injected script tag. */
+		nonce?: string;
+		/** Stops the API from injecting Google Fonts (Roboto / Google Sans Text). */
+		preventGoogleFontsLoading?: boolean;
+		onLoad?: () => void;
+		onError?: (error: Error) => void;
+		children?: Snippet;
+		/** Rendered while the API loads. */
+		loading?: Snippet;
+		/** Rendered when the API fails to load. */
+		error?: Snippet<[Error]>;
 	}
 
-	function normalizeError(loadError: unknown) {
-		return loadError instanceof Error ? loadError : new Error(String(loadError));
-	}
+	let {
+		apiKey,
+		version = 'weekly',
+		libraries = [],
+		language,
+		region,
+		authReferrerPolicy,
+		channel,
+		solutionChannel,
+		mapIds,
+		apiUrl,
+		nonce,
+		preventGoogleFontsLoading = false,
+		onLoad,
+		onError,
+		children,
+		loading,
+		error: errorSnippet
+	}: Props = $props();
 
-	async function importRequestedLibraries(gmaps: typeof google.maps) {
-		const librariesToLoad = [...new Set(libraries)].sort();
+	const context = setAPIContext(new APIContext());
 
-		if (librariesToLoad.length === 0) return;
-		if (typeof gmaps.importLibrary !== 'function') return;
+	onMount(() => {
+		let cancelled = false;
 
-		await Promise.all(librariesToLoad.map((library) => gmaps.importLibrary(library)));
-	}
+		const fail = (reason: unknown) => {
+			if (cancelled) return;
+			const error = reason instanceof Error ? reason : new Error(String(reason));
+			context.markError(error);
+			onError?.(error);
+		};
 
-	async function completeLoad(gmaps: typeof google.maps) {
-		const requestId = ++loadRequestId;
-		const requestedLibrariesSignature = getLibrariesSignature(libraries);
-
-		statusStore.set('loading');
-		error = null;
-
-		try {
-			await importRequestedLibraries(gmaps);
-		} catch (loadError) {
-			if (requestId !== loadRequestId || isDestroyed) return;
-
-			const nextError = normalizeError(loadError);
-			console.error('svelte-google-maps-api: Failed to load Google Maps libraries.', nextError);
-			statusStore.set('error');
-			error = nextError;
-			onError?.(nextError);
+		if (!apiKey) {
+			fail(new Error('svelte-google-maps-api: apiKey is required for <APIProvider>.'));
 			return;
 		}
 
-		if (requestId !== loadRequestId || isDestroyed) return;
+		if (preventGoogleFontsLoading) preventGoogleFonts();
 
-		googleMapsApi = gmaps;
-		loadedLibrariesSignature = requestedLibrariesSignature;
-		statusStore.set('loaded');
-		onLoad?.();
-	}
+		loadMapsApi({
+			apiKey,
+			version,
+			libraries,
+			language,
+			region,
+			authReferrerPolicy,
+			channel,
+			solutionChannel,
+			mapIds,
+			apiUrl,
+			nonce
+		})
+			.then(() => {
+				if (cancelled) return;
+				// The loader is ready; unblock importLibrary() before preloading.
+				context.markLoaded();
+				const preload = new Set<Library>(['core', 'maps', ...libraries]);
+				return Promise.all([...preload].map((name) => context.importLibrary(name)));
+			})
+			.then(() => {
+				if (cancelled) return;
+				onLoad?.();
+			})
+			.catch(fail);
 
-	$: if (browser && !document.getElementById(id)) {
-		const resolvedApiKey = googleMapsApiKey ?? apiKey;
-
-		if (resolvedApiKey && googleMapsClientId) {
-			const apiKeyError = new Error(
-				'Specify either apiKey/googleMapsApiKey or googleMapsClientId, not both'
-			);
-			console.error(`svelte-google-maps-api: ${apiKeyError.message}`);
-			statusStore.set('error');
-			error = apiKeyError;
-			onError?.(apiKeyError);
-		} else if (!resolvedApiKey && !googleMapsClientId) {
-			console.error(
-				'svelte-google-maps-api: apiKey or googleMapsClientId is required for APIProvider'
-			);
-			statusStore.set('error');
-			error = new Error('apiKey or googleMapsClientId is required');
-			onError?.(error);
-		} else {
-			statusStore.set('loading');
-			error = null;
-
-			const callbackWindow = window as unknown as CallbackWindow;
-
-			callbackWindow[CALLBACK_NAME] = () => {
-				completeLoad(window.google.maps).finally(() => {
-					try {
-						delete callbackWindow[CALLBACK_NAME];
-					} catch (e) {
-						callbackWindow[CALLBACK_NAME] = undefined;
-					}
-				});
-			};
-
-			const script = document.createElement('script');
-			script.id = id;
-			script.type = 'text/javascript';
-			if (nonce) script.nonce = nonce;
-			const params = new URLSearchParams();
-			if (resolvedApiKey) {
-				params.set('key', resolvedApiKey);
-			} else if (googleMapsClientId) {
-				params.set('client', googleMapsClientId);
-			}
-			params.set('callback', CALLBACK_NAME);
-			params.set('loading', 'async');
-			if (libraries.length > 0) {
-				params.set('libraries', [...libraries].sort().join(','));
-			}
-			if (language) params.set('language', language);
-			if (region) params.set('region', region);
-			if (version) params.set('v', version);
-			if (channel) params.set('channel', channel);
-			if (mapIds?.length) params.set('map_ids', mapIds.join(','));
-			if (authReferrerPolicy) params.set('auth_referrer_policy', authReferrerPolicy);
-			if (solutionChannel) params.set('solution_channel', solutionChannel);
-
-			script.src = `${apiUrl.replace(/\/$/, '')}/maps/api/js?${params.toString()}`;
-			script.async = true;
-			script.defer = true;
-			script.onerror = (event: Event | string) => {
-				console.error('svelte-google-maps-api: Failed to load Google Maps API script.', event);
-				statusStore.set('error');
-				error = new Error(`Failed to load Google Maps script: ${event.toString()}`);
-				onError?.(error);
-
-				try {
-					delete callbackWindow[CALLBACK_NAME];
-				} catch (e) {
-					callbackWindow[CALLBACK_NAME] = undefined;
-				}
-				if (scriptElement) document.head.removeChild(scriptElement);
-				scriptElement = null;
-			};
-
-			scriptElement = script;
-			if (preventGoogleFontsLoading) {
-				preventGoogleFonts();
-			}
-			document.head.appendChild(scriptElement);
-		}
-	} else if (browser && document.getElementById(id) && window.google && window.google.maps) {
-		const requestedLibrariesSignature = getLibrariesSignature(libraries);
-
-		if (!googleMapsApi || requestedLibrariesSignature !== loadedLibrariesSignature) {
-			completeLoad(window.google.maps);
-		}
-	}
-
-	$: setContext<APIProviderContext>('svelte-google-maps-api', {
-		status: statusStore,
-		googleMapsApi,
-		error
+		return () => {
+			cancelled = true;
+		};
 	});
 
-	onDestroy(() => {
-		if (browser) {
-			isDestroyed = true;
-			loadRequestId += 1;
-
-			const callbackWindow = window as unknown as CallbackWindow;
-			if (typeof callbackWindow[CALLBACK_NAME] !== 'undefined') {
-				try {
-					delete callbackWindow[CALLBACK_NAME];
-				} catch (e) {
-					callbackWindow[CALLBACK_NAME] = undefined;
-				}
-			}
-			onUnmount?.();
-		}
-	});
+	// Children render only after the core and maps libraries are available.
+	const ready = $derived(
+		context.status === 'loaded' && Boolean(context.libraries.core && context.libraries.maps)
+	);
 </script>
 
-{#if $statusStore === 'loading'}
-	<slot name="loading">
-		<!-- Default loading state -->
-		<!-- You can provide custom loading UI via <div slot="loading">...</div> -->
-	</slot>
-{:else if $statusStore === 'loaded'}
-	<slot />
-{:else if $statusStore === 'error'}
-	<slot name="error" {error}>
-		<!-- Default error state -->
-		<p style="color: red;">Failed to load Google Maps: {error?.message ?? 'Unknown error'}</p>
-		<!-- You can provide custom error UI via <div slot="error" let:error>...</div> -->
-	</slot>
+{#if context.status === 'error' && context.error}
+	{#if errorSnippet}
+		{@render errorSnippet(context.error)}
+	{:else}
+		<p role="alert">Failed to load Google Maps: {context.error.message}</p>
+	{/if}
+{:else if ready}
+	{@render children?.()}
+{:else}
+	{@render loading?.()}
 {/if}

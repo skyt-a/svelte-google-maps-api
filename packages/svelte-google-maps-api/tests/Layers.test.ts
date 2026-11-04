@@ -1,167 +1,89 @@
 import { render, waitFor } from '@testing-library/svelte';
 import { describe, expect, it, vi } from 'vitest';
+import Data from '../src/lib/Data.svelte';
+import GroundOverlay from '../src/lib/GroundOverlay.svelte';
 import BicyclingLayer from '../src/lib/layers/BicyclingLayer.svelte';
-import HeatmapLayer from '../src/lib/HeatmapLayer.svelte';
-import KmlLayer from '../src/lib/layers/KmlLayer.svelte';
 import TrafficLayer from '../src/lib/layers/TrafficLayer.svelte';
 import TransitLayer from '../src/lib/layers/TransitLayer.svelte';
-import MapContextHarness from './fixtures/MapContextHarness.svelte';
-import { createGoogleMapsMock } from './googleMapsMock';
+import MapHarness from './fixtures/MapHarness.svelte';
+import { installGoogleMapsMock } from './googleMapsMock';
 
-describe('map layer components', () => {
-	it('creates TrafficLayer with the map and clears it on unmount', async () => {
-		const googleMaps = createGoogleMapsMock();
-		const map = new googleMaps.classes.Map(document.createElement('div'), {});
+describe('map layers', () => {
+	it.each([
+		['TrafficLayer', TrafficLayer],
+		['TransitLayer', TransitLayer],
+		['BicyclingLayer', BicyclingLayer]
+	])('%s attaches to the map and detaches on unmount', async (_name, component) => {
+		const mock = installGoogleMapsMock();
 		const onLoad = vi.fn();
-		const onUnmount = vi.fn();
+		const { unmount } = render(MapHarness, { props: { component, props: { onLoad } } });
 
-		const { unmount } = render(MapContextHarness, {
-			props: {
-				component: TrafficLayer,
-				googleMapsApi: googleMaps.maps as unknown as typeof google.maps,
-				map: map as unknown as google.maps.Map,
-				props: {
-					onLoad,
-					onUnmount
-				}
-			}
-		});
+		await waitFor(() => expect(mock.classes.Layer.instances).toHaveLength(1));
+		const layer = mock.classes.Layer.instances[0];
 
-		await waitFor(() => {
-			expect(googleMaps.classes.TrafficLayer.instances).toHaveLength(1);
-		});
-
-		const layer = googleMaps.classes.TrafficLayer.instances[0];
-
-		expect(layer.map).toBe(map);
+		expect(layer.map).toBe(mock.classes.Map.instances[0]);
 		expect(onLoad).toHaveBeenCalledWith(layer);
 
 		unmount();
-
-		expect(layer.setMap).toHaveBeenCalledWith(null);
-		expect(onUnmount).toHaveBeenCalledWith(layer);
+		expect(layer.map).toBeNull();
 	});
+});
 
-	it('attaches BicyclingLayer and TransitLayer to the map', async () => {
-		const googleMaps = createGoogleMapsMock();
-		const map = new googleMaps.classes.Map(document.createElement('div'), {});
-
-		const bicycling = render(MapContextHarness, {
+describe('GroundOverlay', () => {
+	it('creates the overlay and updates opacity', async () => {
+		const mock = installGoogleMapsMock();
+		const bounds = { north: 1, south: 0, east: 1, west: 0 };
+		render(MapHarness, {
 			props: {
-				component: BicyclingLayer,
-				googleMapsApi: googleMaps.maps as unknown as typeof google.maps,
-				map: map as unknown as google.maps.Map
-			}
-		});
-		const transit = render(MapContextHarness, {
-			props: {
-				component: TransitLayer,
-				googleMapsApi: googleMaps.maps as unknown as typeof google.maps,
-				map: map as unknown as google.maps.Map
+				component: GroundOverlay,
+				props: { url: 'https://example.com/a.png', bounds, opacity: 0.5 }
 			}
 		});
 
-		await waitFor(() => {
-			expect(googleMaps.classes.BicyclingLayer.instances).toHaveLength(1);
-			expect(googleMaps.classes.TransitLayer.instances).toHaveLength(1);
-		});
+		await waitFor(() => expect(mock.classes.GroundOverlay.instances).toHaveLength(1));
+		const overlay = mock.classes.GroundOverlay.instances[0];
 
-		const bicyclingLayer = googleMaps.classes.BicyclingLayer.instances[0];
-		const transitLayer = googleMaps.classes.TransitLayer.instances[0];
-
-		expect(bicyclingLayer.setMap).toHaveBeenCalledWith(map);
-		expect(transitLayer.setMap).toHaveBeenCalledWith(map);
-
-		bicycling.unmount();
-		transit.unmount();
-
-		expect(bicyclingLayer.setMap).toHaveBeenLastCalledWith(null);
-		expect(transitLayer.setMap).toHaveBeenLastCalledWith(null);
+		expect(overlay.url).toBe('https://example.com/a.png');
+		expect(overlay.bounds).toEqual(bounds);
+		expect(overlay.opacity).toBe(0.5);
+		expect(overlay.map).toBe(mock.classes.Map.instances[0]);
 	});
+});
 
-	it('creates KmlLayer with options, wires events, and clears it on unmount', async () => {
-		const googleMaps = createGoogleMapsMock();
-		const map = new googleMaps.classes.Map(document.createElement('div'), {});
-		const onClick = vi.fn();
-		const onLoad = vi.fn();
-		const onUnmount = vi.fn();
-
-		const { unmount } = render(MapContextHarness, {
+describe('Data', () => {
+	it('adds GeoJSON, applies style and removes features on unmount', async () => {
+		const mock = installGoogleMapsMock();
+		const style = { fillColor: '#123456' };
+		const { unmount } = render(MapHarness, {
 			props: {
-				component: KmlLayer,
-				googleMapsApi: googleMaps.maps as unknown as typeof google.maps,
-				map: map as unknown as google.maps.Map,
-				props: {
-					url: 'https://example.com/layer.kml',
-					preserveViewport: true,
-					onClick,
-					onLoad,
-					onUnmount
-				}
+				component: Data,
+				props: { geoJson: { type: 'FeatureCollection', features: [] }, style }
 			}
 		});
 
-		await waitFor(() => {
-			expect(googleMaps.classes.KmlLayer.instances).toHaveLength(1);
-		});
+		await waitFor(() => expect(mock.classes.Data.instances).toHaveLength(1));
+		const data = mock.classes.Data.instances[0];
 
-		const layer = googleMaps.classes.KmlLayer.instances[0];
-
-		expect(layer.options).toMatchObject({
-			map,
-			url: 'https://example.com/layer.kml',
-			preserveViewport: true
-		});
-		expect(layer.addListener).toHaveBeenCalledWith('click', onClick);
-		expect(onLoad).toHaveBeenCalledWith(layer);
+		expect(data.map).toBe(mock.classes.Map.instances[0]);
+		expect(data.style).toEqual(style);
+		expect(data.features.size).toBe(1);
 
 		unmount();
-
-		expect(layer.setMap).toHaveBeenCalledWith(null);
-		expect(onUnmount).toHaveBeenCalledWith(layer);
+		expect(data.features.size).toBe(0);
+		expect(data.map).toBeNull();
 	});
 
-	it('creates HeatmapLayer, converts literal data, and clears it on unmount', async () => {
-		const googleMaps = createGoogleMapsMock();
-		const map = new googleMaps.classes.Map(document.createElement('div'), {});
-		const onLoad = vi.fn();
-		const onUnmount = vi.fn();
-		const consoleLog = vi.spyOn(console, 'log').mockImplementation(() => undefined);
-		const data = [
-			{ lat: 35, lng: 139 },
-			{ location: { lat: 36, lng: 140 }, weight: 2 }
-		];
-
-		const { unmount } = render(MapContextHarness, {
-			props: {
-				component: HeatmapLayer,
-				googleMapsApi: googleMaps.maps as unknown as typeof google.maps,
-				map: map as unknown as google.maps.Map,
-				props: {
-					data,
-					opacity: 0.6,
-					onLoad,
-					onUnmount
-				}
-			}
+	it('loads GeoJSON from a URL', async () => {
+		const mock = installGoogleMapsMock();
+		render(MapHarness, {
+			props: { component: Data, props: { url: 'https://example.com/data.json' } }
 		});
 
-		await waitFor(() => {
-			expect(googleMaps.classes.HeatmapLayer.instances).toHaveLength(1);
-		});
+		await waitFor(() => expect(mock.classes.Data.instances).toHaveLength(1));
+		const data = mock.classes.Data.instances[0];
 
-		const layer = googleMaps.classes.HeatmapLayer.instances[0];
-
-		expect(layer.options.map).toBe(map);
-		expect(layer.options.opacity).toBe(0.6);
-		expect(layer.data).toHaveLength(2);
-		expect(layer.data[0]).toBeInstanceOf(googleMaps.classes.LatLng);
-		expect(onLoad).toHaveBeenCalledWith(layer);
-
-		unmount();
-
-		expect(layer.setMap).toHaveBeenCalledWith(null);
-		expect(onUnmount).toHaveBeenCalledWith(layer);
-		consoleLog.mockRestore();
+		expect(data.loadCallbacks).toHaveLength(1);
+		data.loadCallbacks[0]([{ id: 'a' }]);
+		expect(data.features.size).toBe(1);
 	});
 });

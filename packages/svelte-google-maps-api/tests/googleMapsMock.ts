@@ -1,731 +1,654 @@
 import { vi } from 'vitest';
 
-type Listener = {
-	instance?: unknown;
-	eventName: string;
-	handler: (...args: unknown[]) => unknown;
-	remove: ReturnType<typeof vi.fn>;
-};
+type Handler = (...args: unknown[]) => unknown;
+type LatLngLike = { lat: number | (() => number); lng: number | (() => number) };
 
-function createListener(
-	instance: unknown,
-	eventName: string,
-	handler: (...args: unknown[]) => unknown
-) {
-	return {
-		instance,
-		eventName,
-		handler,
-		remove: vi.fn()
-	};
+export class MockMVCObject {
+	listeners = new Map<string, Set<Handler>>();
+
+	addListener(eventName: string, handler: Handler) {
+		const handlers = this.listeners.get(eventName) ?? new Set<Handler>();
+		handlers.add(handler);
+		this.listeners.set(eventName, handlers);
+		return { remove: () => handlers.delete(handler) };
+	}
+
+	trigger(eventName: string, ...args: unknown[]) {
+		this.listeners.get(eventName)?.forEach((handler) => handler(...args));
+	}
+
+	listenerCount(eventName?: string) {
+		if (eventName) return this.listeners.get(eventName)?.size ?? 0;
+		return [...this.listeners.values()].reduce((total, handlers) => total + handlers.size, 0);
+	}
 }
 
-function removeUndefinedValues(options: Record<string, unknown>) {
-	return Object.fromEntries(Object.entries(options).filter(([, value]) => value !== undefined));
+export class MockLatLng {
+	#lat: number;
+	#lng: number;
+
+	constructor(latOrLiteral: number | LatLngLike, lng?: number) {
+		if (typeof latOrLiteral === 'number') {
+			this.#lat = latOrLiteral;
+			this.#lng = lng ?? 0;
+		} else {
+			this.#lat = read(latOrLiteral.lat);
+			this.#lng = read(latOrLiteral.lng);
+		}
+	}
+
+	lat() {
+		return this.#lat;
+	}
+
+	lng() {
+		return this.#lng;
+	}
+
+	toJSON() {
+		return { lat: this.#lat, lng: this.#lng };
+	}
 }
 
-class MockMVCArray<T = unknown> {
-	static instances: MockMVCArray[] = [];
+function read(value: number | (() => number)) {
+	return typeof value === 'function' ? value() : value;
+}
 
+function toLatLng(value: LatLngLike) {
+	return value instanceof MockLatLng ? value : new MockLatLng(value);
+}
+
+type BoundsLiteral = { north: number; south: number; east: number; west: number };
+
+export class MockLatLngBounds {
+	literal: BoundsLiteral;
+
+	constructor(literal: BoundsLiteral | MockLatLngBounds) {
+		this.literal = literal instanceof MockLatLngBounds ? literal.literal : literal;
+	}
+
+	getSouthWest() {
+		return new MockLatLng(this.literal.south, this.literal.west);
+	}
+
+	getNorthEast() {
+		return new MockLatLng(this.literal.north, this.literal.east);
+	}
+
+	toJSON() {
+		return this.literal;
+	}
+}
+
+export class MockMVCArray<T = unknown> extends MockMVCObject {
 	items: T[];
 
 	constructor(items: T[] = []) {
-		this.items = items;
-		MockMVCArray.instances.push(this);
+		super();
+		this.items = [...items];
 	}
 
-	push(item: T) {
-		this.items.push(item);
-		return this.items.length;
-	}
-
-	getLength() {
-		return this.items.length;
+	getArray() {
+		return this.items;
 	}
 
 	getAt(index: number) {
 		return this.items[index];
 	}
 
-	removeAt(index: number) {
-		return this.items.splice(index, 1)[0];
+	getLength() {
+		return this.items.length;
 	}
 
-	forEach(callback: (item: T, index: number) => void) {
-		this.items.forEach(callback);
+	push(item: T) {
+		this.items.push(item);
+		this.trigger('insert_at', this.items.length - 1);
+		return this.items.length;
+	}
+
+	setAt(index: number, item: T) {
+		const previous = this.items[index];
+		this.items[index] = item;
+		this.trigger('set_at', index, previous);
+	}
+
+	removeAt(index: number) {
+		const [removed] = this.items.splice(index, 1);
+		this.trigger('remove_at', index, removed);
+		return removed;
 	}
 }
 
-export function createGoogleMapsMock() {
-	const listeners: Listener[] = [];
-	const panes = {
-		floatPane: document.createElement('div'),
-		mapPane: document.createElement('div'),
-		markerLayer: document.createElement('div'),
-		overlayLayer: document.createElement('div'),
-		overlayMouseTarget: document.createElement('div')
-	};
+export const ControlPosition = {
+	TOP_LEFT: 1,
+	TOP_CENTER: 2,
+	TOP_RIGHT: 3,
+	BLOCK_START_INLINE_END: 25
+} as const;
 
-	Object.values(panes).forEach((pane) => document.body.appendChild(pane));
+class MockMap extends MockMVCObject {
+	static instances: MockMap[] = [];
 
-	const event = {
-		addListener: vi.fn(
-			(instance: unknown, eventName: string, handler: (...args: unknown[]) => unknown) => {
-				const listener = createListener(instance, eventName, handler);
-				listeners.push(listener);
-				return listener;
-			}
-		),
-		removeListener: vi.fn((listener: Listener) => {
-			listener.remove();
-		}),
-		clearInstanceListeners: vi.fn(),
-		trigger: vi.fn((instance: unknown, eventName: string, ...args: unknown[]) => {
-			listeners
-				.filter((listener) => listener.instance === instance && listener.eventName === eventName)
-				.forEach((listener) => listener.handler(...args));
-		})
-	};
+	element: HTMLElement;
+	options: Record<string, unknown>;
+	center: MockLatLng | undefined;
+	zoom: number | undefined;
+	heading = 0;
+	tilt = 0;
+	controls: Record<number, MockMVCArray<HTMLElement>> = {};
+	fitBounds = vi.fn();
 
-	function addInstanceListener(
-		instance: unknown,
-		eventName: string,
-		handler: (...args: unknown[]) => unknown
+	constructor(element: HTMLElement, options: Record<string, unknown> = {}) {
+		super();
+		this.element = element;
+		this.options = { ...options };
+		this.center = options.center ? toLatLng(options.center as LatLngLike) : undefined;
+		this.zoom = (options.zoom as number | null) ?? undefined;
+		Object.values(ControlPosition).forEach((position) => {
+			this.controls[position] = new MockMVCArray<HTMLElement>();
+		});
+		MockMap.instances.push(this);
+	}
+
+	setOptions(options: Record<string, unknown>) {
+		Object.assign(this.options, options);
+	}
+
+	getCenter() {
+		return this.center;
+	}
+
+	setCenter(center: LatLngLike) {
+		this.center = toLatLng(center);
+		this.trigger('center_changed');
+	}
+
+	getZoom() {
+		return this.zoom;
+	}
+
+	setZoom(zoom: number) {
+		this.zoom = zoom;
+		this.trigger('zoom_changed');
+	}
+
+	getHeading() {
+		return this.heading;
+	}
+
+	setHeading(heading: number) {
+		this.heading = heading;
+		this.trigger('heading_changed');
+	}
+
+	getTilt() {
+		return this.tilt;
+	}
+
+	setTilt(tilt: number) {
+		this.tilt = tilt;
+		this.trigger('tilt_changed');
+	}
+
+	getBounds() {
+		return new MockLatLngBounds({ north: 1, south: 0, east: 1, west: 0 });
+	}
+}
+
+class MockInfoWindow extends MockMVCObject {
+	static instances: MockInfoWindow[] = [];
+
+	content: unknown = null;
+	headerContent: unknown = null;
+	options: Record<string, unknown> = {};
+	position: unknown = null;
+	isOpen = false;
+	openOptions: unknown = null;
+
+	constructor() {
+		super();
+		MockInfoWindow.instances.push(this);
+	}
+
+	setContent(content: unknown) {
+		this.content = content;
+	}
+
+	setHeaderContent(content: unknown) {
+		this.headerContent = content;
+	}
+
+	setOptions(options: Record<string, unknown>) {
+		Object.assign(this.options, options);
+	}
+
+	setPosition(position: unknown) {
+		this.position = position;
+	}
+
+	open = vi.fn((options: unknown) => {
+		this.isOpen = true;
+		this.openOptions = options;
+	});
+
+	close = vi.fn(() => {
+		if (!this.isOpen) return;
+		this.isOpen = false;
+		this.trigger('close');
+	});
+}
+
+class MockShape extends MockMVCObject {
+	map: unknown = null;
+	options: Record<string, unknown> = {};
+
+	setMap(map: unknown) {
+		this.map = map;
+	}
+
+	setOptions(options: Record<string, unknown>) {
+		Object.assign(this.options, options);
+	}
+}
+
+class MockPolyline extends MockShape {
+	static instances: MockPolyline[] = [];
+	path = new MockMVCArray<MockLatLng>();
+
+	constructor(options: { path?: LatLngLike[] } = {}) {
+		super();
+		if (options.path) this.setPath(options.path);
+		MockPolyline.instances.push(this);
+	}
+
+	getPath() {
+		return this.path;
+	}
+
+	setPath(path: LatLngLike[]) {
+		this.path = new MockMVCArray(path.map(toLatLng));
+	}
+}
+
+class MockPolygon extends MockShape {
+	static instances: MockPolygon[] = [];
+	paths = new MockMVCArray<MockMVCArray<MockLatLng>>();
+
+	constructor(options: { paths?: LatLngLike[] | LatLngLike[][] } = {}) {
+		super();
+		if (options.paths) this.setPaths(options.paths);
+		MockPolygon.instances.push(this);
+	}
+
+	getPaths() {
+		return this.paths;
+	}
+
+	setPaths(paths: LatLngLike[] | LatLngLike[][]) {
+		const rings = (paths.length && Array.isArray(paths[0]) ? paths : [paths]) as LatLngLike[][];
+		this.paths = new MockMVCArray(rings.map((ring) => new MockMVCArray(ring.map(toLatLng))));
+	}
+}
+
+class MockCircle extends MockShape {
+	static instances: MockCircle[] = [];
+	center: MockLatLng | undefined;
+	radius = 0;
+
+	constructor(options: { center?: LatLngLike; radius?: number } = {}) {
+		super();
+		if (options.center) this.center = toLatLng(options.center);
+		if (options.radius !== undefined) this.radius = options.radius;
+		MockCircle.instances.push(this);
+	}
+
+	getCenter() {
+		return this.center;
+	}
+
+	setCenter(center: LatLngLike) {
+		this.center = toLatLng(center);
+		this.trigger('center_changed');
+	}
+
+	getRadius() {
+		return this.radius;
+	}
+
+	setRadius(radius: number) {
+		this.radius = radius;
+		this.trigger('radius_changed');
+	}
+}
+
+class MockRectangle extends MockShape {
+	static instances: MockRectangle[] = [];
+	bounds: MockLatLngBounds | undefined;
+
+	constructor(options: { bounds?: BoundsLiteral } = {}) {
+		super();
+		if (options.bounds) this.bounds = new MockLatLngBounds(options.bounds);
+		MockRectangle.instances.push(this);
+	}
+
+	getBounds() {
+		return this.bounds;
+	}
+
+	setBounds(bounds: BoundsLiteral) {
+		this.bounds = new MockLatLngBounds(bounds);
+		this.trigger('bounds_changed');
+	}
+}
+
+class MockGroundOverlay extends MockShape {
+	static instances: MockGroundOverlay[] = [];
+	opacity: number | undefined;
+
+	constructor(
+		public url: string,
+		public bounds: unknown,
+		public overlayOptions: { opacity?: number; clickable?: boolean } = {}
 	) {
-		const listener = createListener(instance, eventName, handler);
-		listeners.push(listener);
-		return listener;
+		super();
+		this.opacity = overlayOptions.opacity;
+		MockGroundOverlay.instances.push(this);
 	}
 
-	class MockLatLng {
-		latValue: number;
-		lngValue: number;
+	setOpacity(opacity: number) {
+		this.opacity = opacity;
+	}
+}
 
-		constructor(lat: number, lng: number) {
-			this.latValue = lat;
-			this.lngValue = lng;
-		}
+class MockData extends MockShape {
+	static instances: MockData[] = [];
+	style: unknown = null;
+	features = new Set<object>();
+	loadCallbacks: Array<(features: object[]) => void> = [];
 
-		lat() {
-			return this.latValue;
-		}
-
-		lng() {
-			return this.lngValue;
-		}
-
-		toJSON() {
-			return {
-				lat: this.latValue,
-				lng: this.lngValue
-			};
-		}
+	constructor(options: { map?: unknown } = {}) {
+		super();
+		this.map = options.map ?? null;
+		MockData.instances.push(this);
 	}
 
-	class MockLatLngBounds {
-		value: unknown;
-
-		constructor(value?: unknown) {
-			this.value = value;
-		}
-
-		getSouthWest() {
-			return new MockLatLng(10, 20);
-		}
-
-		getNorthEast() {
-			return new MockLatLng(30, 50);
-		}
-
-		toJSON() {
-			return this.value ?? { south: 10, west: 20, north: 30, east: 50 };
-		}
+	setStyle(style: unknown) {
+		this.style = style;
 	}
 
-	class MockSize {
-		width: number;
-		height: number;
-
-		constructor(width: number, height: number) {
-			this.width = width;
-			this.height = height;
-		}
+	addGeoJson() {
+		const feature = { id: this.features.size };
+		this.features.add(feature);
+		return [feature];
 	}
 
-	class MockPoint {
-		x: number;
-		y: number;
-
-		constructor(x: number, y: number) {
-			this.x = x;
-			this.y = y;
-		}
-	}
-
-	class MockOverlayView {
-		static instances: MockOverlayView[] = [];
-
-		map: unknown = null;
-
-		constructor() {
-			MockOverlayView.instances.push(this);
-		}
-
-		onAdd() {
-			return undefined;
-		}
-
-		draw() {
-			return undefined;
-		}
-
-		onRemove() {
-			return undefined;
-		}
-
-		setMap(map: unknown) {
-			this.map = map;
-			if (map) {
-				this.onAdd();
-				this.draw();
-			} else {
-				this.onRemove();
-			}
-		}
-
-		getPanes() {
-			return panes;
-		}
-
-		getProjection() {
-			return {
-				fromLatLngToDivPixel: (latLng: unknown) => {
-					if (latLng instanceof MockLatLng) {
-						return new MockPoint(latLng.lng(), latLng.lat());
-					}
-					return new MockPoint(25, 35);
-				}
-			};
-		}
-	}
-
-	class MockMap {
-		static instances: MockMap[] = [];
-
-		element: HTMLElement;
-		options: Record<string, unknown>;
-		controls: Record<number, MockMVCArray<Node>>;
-		setOptions = vi.fn((options: Record<string, unknown>) => {
-			this.options = {
-				...this.options,
-				...options
-			};
+	loadGeoJson(_url: string, _options: unknown, callback: (features: object[]) => void) {
+		this.loadCallbacks.push((features) => {
+			features.forEach((feature) => this.features.add(feature));
+			callback(features);
 		});
+	}
 
-		constructor(element: HTMLElement, options: Record<string, unknown>) {
-			this.element = element;
-			this.options = options;
-			this.controls = {
-				1: new MockMVCArray<Node>(),
-				2: new MockMVCArray<Node>(),
-				3: new MockMVCArray<Node>()
-			};
-			MockMap.instances.push(this);
+	remove(feature: object) {
+		this.features.delete(feature);
+	}
+}
+
+class MockLayer extends MockShape {
+	static instances: MockLayer[] = [];
+
+	constructor(options: Record<string, unknown> = {}) {
+		super();
+		this.options = { ...options };
+		MockLayer.instances.push(this);
+	}
+}
+
+const panes = () => ({
+	floatPane: document.createElement('div'),
+	mapPane: document.createElement('div'),
+	markerLayer: document.createElement('div'),
+	overlayLayer: document.createElement('div'),
+	overlayMouseTarget: document.createElement('div')
+});
+
+class MockOverlayView extends MockMVCObject {
+	static panes = panes();
+	map: unknown = null;
+
+	// Overridden by the component under test.
+	onAdd(): void {
+		return undefined;
+	}
+
+	draw(): void {
+		return undefined;
+	}
+
+	onRemove(): void {
+		return undefined;
+	}
+
+	setMap(map: unknown) {
+		const previous = this.map;
+		this.map = map;
+		if (map && !previous) {
+			this.onAdd();
+			this.draw();
+		} else if (!map && previous) {
+			this.onRemove();
 		}
 	}
 
-	class MockMapObject {
-		static instances: MockMapObject[] = [];
-
-		options: Record<string, unknown>;
-		map: unknown;
-		addListener = vi.fn((eventName: string, handler: (...args: unknown[]) => unknown) =>
-			addInstanceListener(this, eventName, handler)
-		);
-		setMap = vi.fn((map: unknown) => {
-			this.map = map;
-		});
-		setOptions = vi.fn((options: Record<string, unknown>) => {
-			this.options = {
-				...this.options,
-				...options
-			};
-		});
-
-		constructor(options: Record<string, unknown> = {}) {
-			this.options = removeUndefinedValues(options);
-			this.map = options.map;
-			MockMapObject.instances.push(this);
-		}
+	getMap() {
+		return this.map;
 	}
 
-	function createMapObjectClass(name: string) {
-		return class extends MockMapObject {
-			static instances: MockMapObject[] = [];
+	getPanes() {
+		return this.map ? MockOverlayView.panes : null;
+	}
 
-			constructor(options: Record<string, unknown> = {}) {
-				super(options);
-				(this.constructor as typeof MockMapObject).instances.push(this);
-			}
-
-			static get displayName() {
-				return name;
-			}
+	getProjection() {
+		return {
+			fromLatLngToDivPixel: (latLng: MockLatLng) => ({ x: latLng.lng() * 10, y: latLng.lat() * 10 })
 		};
 	}
+}
 
-	class MockMarker extends createMapObjectClass('Marker') {
-		position: unknown;
-		setPosition = vi.fn((position: unknown) => {
-			this.position = position;
-		});
+class MockStreetViewPanorama extends MockMVCObject {
+	static instances: MockStreetViewPanorama[] = [];
+	position: MockLatLng | undefined;
+	pov = { heading: 0, pitch: 0 };
+	zoom = 1;
+	visible = true;
+	options: Record<string, unknown>;
 
-		constructor(options: Record<string, unknown>) {
-			super(options);
-			this.position = options.position;
-		}
+	constructor(
+		public element: HTMLElement,
+		options: Record<string, unknown> = {}
+	) {
+		super();
+		this.options = { ...options };
+		if (options.position) this.position = toLatLng(options.position as LatLngLike);
+		if (options.pov) this.pov = options.pov as { heading: number; pitch: number };
+		MockStreetViewPanorama.instances.push(this);
 	}
 
-	class MockPolyline extends createMapObjectClass('Polyline') {
-		path: unknown;
-		pathArray = new MockMVCArray();
-		setPath = vi.fn((path: unknown) => {
-			this.path = path;
-		});
-		setDraggable = vi.fn();
-		setEditable = vi.fn();
-		setVisible = vi.fn();
-		getPath = vi.fn(() => this.pathArray);
-
-		constructor(options: Record<string, unknown>) {
-			super(options);
-			this.path = options.path;
-		}
+	setOptions(options: Record<string, unknown>) {
+		Object.assign(this.options, options);
 	}
 
-	class MockPolygon extends createMapObjectClass('Polygon') {
-		paths: unknown;
-		pathsArray = new MockMVCArray([new MockMVCArray()]);
-		setPaths = vi.fn((paths: unknown) => {
-			this.paths = paths;
-		});
-		setDraggable = vi.fn();
-		setEditable = vi.fn();
-		setVisible = vi.fn();
-		getPaths = vi.fn(() => this.pathsArray);
-
-		constructor(options: Record<string, unknown>) {
-			super(options);
-			this.paths = options.paths;
-		}
+	getPosition() {
+		return this.position;
 	}
 
-	class MockCircle extends createMapObjectClass('Circle') {
-		center: unknown;
-		radius: unknown;
-		setCenter = vi.fn((center: unknown) => {
-			this.center = center;
-		});
-		setRadius = vi.fn((radius: unknown) => {
-			this.radius = radius;
-		});
-		setDraggable = vi.fn();
-		setEditable = vi.fn();
-		setVisible = vi.fn();
-
-		constructor(options: Record<string, unknown>) {
-			super(options);
-			this.center = options.center;
-			this.radius = options.radius;
-		}
+	setPosition(position: LatLngLike) {
+		this.position = toLatLng(position);
+		this.trigger('position_changed');
 	}
 
-	class MockRectangle extends createMapObjectClass('Rectangle') {
-		bounds: unknown;
-		setBounds = vi.fn((bounds: unknown) => {
-			this.bounds = bounds;
-		});
-		setDraggable = vi.fn();
-		setEditable = vi.fn();
-		setVisible = vi.fn();
-
-		constructor(options: Record<string, unknown>) {
-			super(options);
-			this.bounds = options.bounds;
-		}
+	getPov() {
+		return this.pov;
 	}
 
-	class MockInfoWindow extends createMapObjectClass('InfoWindow') {
-		isClosed = false;
-		position: unknown;
-		zIndex: number | undefined;
-		open = vi.fn();
-		close = vi.fn(() => {
-			this.isClosed = true;
-		});
-		setPosition = vi.fn((position: unknown) => {
-			this.position = position;
-		});
-		setZIndex = vi.fn((zIndex: number) => {
-			this.zIndex = zIndex;
-		});
-
-		constructor(options: Record<string, unknown>) {
-			super(options);
-			this.position = options.position;
-			this.zIndex = options.zIndex as number | undefined;
-		}
+	setPov(pov: { heading: number; pitch: number }) {
+		this.pov = pov;
+		this.trigger('pov_changed');
 	}
 
-	class MockAdvancedMarkerElement {
-		static instances: MockAdvancedMarkerElement[] = [];
-
-		map: unknown;
-		position: unknown;
-		title: string | undefined;
-		zIndex: number | undefined;
-		gmpDraggable: boolean | undefined;
-		content: unknown;
-		options: Record<string, unknown>;
-		addListener = vi.fn((eventName: string, handler: (...args: unknown[]) => unknown) =>
-			addInstanceListener(this, eventName, handler)
-		);
-
-		constructor(options: Record<string, unknown>) {
-			this.options = removeUndefinedValues(options);
-			this.map = options.map;
-			this.position = options.position;
-			this.title = options.title as string | undefined;
-			this.zIndex = options.zIndex as number | undefined;
-			this.gmpDraggable = options.gmpDraggable as boolean | undefined;
-			this.content = options.content;
-			MockAdvancedMarkerElement.instances.push(this);
-		}
+	getZoom() {
+		return this.zoom;
 	}
 
-	class MockGroundOverlay {
-		static instances: MockGroundOverlay[] = [];
-
-		url: string;
-		bounds: unknown;
-		options: Record<string, unknown>;
-		map: unknown;
-		opacity: number | undefined;
-		addListener = vi.fn((eventName: string, handler: (...args: unknown[]) => unknown) =>
-			addInstanceListener(this, eventName, handler)
-		);
-		setMap = vi.fn((map: unknown) => {
-			this.map = map;
-		});
-		setOpacity = vi.fn((opacity: number) => {
-			this.opacity = opacity;
-		});
-		getUrl = vi.fn(() => this.url);
-
-		constructor(url: string, bounds: unknown, options: Record<string, unknown>) {
-			this.url = url;
-			this.bounds = bounds;
-			this.options = removeUndefinedValues(options);
-			this.map = options.map;
-			this.opacity = options.opacity as number | undefined;
-			MockGroundOverlay.instances.push(this);
-		}
+	setZoom(zoom: number) {
+		this.zoom = zoom;
+		this.trigger('zoom_changed');
 	}
 
-	class MockLayer extends MockMapObject {
-		static instances: MockLayer[] = [];
-
-		constructor(options: Record<string, unknown> = {}) {
-			super(options);
-			MockLayer.instances.push(this);
-		}
+	setVisible(visible: boolean) {
+		this.visible = visible;
 	}
 
-	class MockTrafficLayer extends MockLayer {
-		static instances: MockTrafficLayer[] = [];
-
-		constructor(options: Record<string, unknown> = {}) {
-			super(options);
-			MockTrafficLayer.instances.push(this);
-		}
+	getPano() {
+		return 'pano-id';
 	}
 
-	class MockBicyclingLayer extends MockLayer {
-		static instances: MockBicyclingLayer[] = [];
-
-		constructor() {
-			super();
-			MockBicyclingLayer.instances.push(this);
-		}
+	getStatus() {
+		return 'OK';
 	}
+}
 
-	class MockTransitLayer extends MockLayer {
-		static instances: MockTransitLayer[] = [];
+export class MockAdvancedMarkerElement extends HTMLElement {
+	static instances: MockAdvancedMarkerElement[] = [];
 
-		constructor() {
-			super();
-			MockTransitLayer.instances.push(this);
-		}
+	map: unknown = null;
+	position: unknown = null;
+	zIndex: unknown = null;
+	gmpDraggable = false;
+	gmpClickable = false;
+	collisionBehavior: unknown = null;
+	anchorLeft = '-50%';
+	anchorTop = '-100%';
+
+	constructor(options: Record<string, unknown> = {}) {
+		super();
+		Object.assign(this, options);
+		MockAdvancedMarkerElement.instances.push(this);
 	}
+}
 
-	class MockKmlLayer extends MockLayer {
-		static instances: MockKmlLayer[] = [];
+export class MockPinElement extends HTMLElement {
+	static instances: MockPinElement[] = [];
 
-		url: string | undefined;
-		getUrl = vi.fn(() => this.url);
+	background: unknown = null;
+	borderColor: unknown = null;
+	glyphColor: unknown = null;
+	glyphText: unknown = null;
+	glyphSrc: unknown = null;
+	scale: unknown = null;
 
-		constructor(options: Record<string, unknown> = {}) {
-			super(options);
-			this.url = options.url as string | undefined;
-			MockKmlLayer.instances.push(this);
-		}
+	constructor() {
+		super();
+		MockPinElement.instances.push(this);
 	}
+}
 
-	class MockHeatmapLayer extends MockLayer {
-		static instances: MockHeatmapLayer[] = [];
+export class MockPlaceAutocompleteElement extends HTMLElement {
+	static instances: MockPlaceAutocompleteElement[] = [];
 
-		data: unknown;
-		setData = vi.fn((data: unknown) => {
-			this.data = data;
-		});
-
-		constructor(options: Record<string, unknown>) {
-			super(options);
-			this.data = options.data;
-			MockHeatmapLayer.instances.push(this);
-		}
+	constructor(options: Record<string, unknown> = {}) {
+		super();
+		Object.assign(this, options);
+		MockPlaceAutocompleteElement.instances.push(this);
 	}
+}
 
-	class MockDirectionsRenderer extends MockMapObject {
-		static instances: MockDirectionsRenderer[] = [];
+customElements.define('mock-advanced-marker', MockAdvancedMarkerElement);
+customElements.define('mock-pin', MockPinElement);
+customElements.define('mock-place-autocomplete', MockPlaceAutocompleteElement);
 
-		setDirections = vi.fn();
-		setRouteIndex = vi.fn();
-		setPanel = vi.fn();
+const classes = {
+	Map: MockMap,
+	InfoWindow: MockInfoWindow,
+	Polyline: MockPolyline,
+	Polygon: MockPolygon,
+	Circle: MockCircle,
+	Rectangle: MockRectangle,
+	GroundOverlay: MockGroundOverlay,
+	Data: MockData,
+	Layer: MockLayer,
+	OverlayView: MockOverlayView,
+	StreetViewPanorama: MockStreetViewPanorama,
+	AdvancedMarkerElement: MockAdvancedMarkerElement,
+	PinElement: MockPinElement,
+	PlaceAutocompleteElement: MockPlaceAutocompleteElement
+};
 
-		constructor(options: Record<string, unknown>) {
-			super(options);
-			MockDirectionsRenderer.instances.push(this);
-		}
-	}
+/** Installs a fresh `window.google.maps` mock and returns handles for assertions. */
+export function installGoogleMapsMock() {
+	Object.values(classes).forEach((MockClass) => {
+		if ('instances' in MockClass) (MockClass as { instances: unknown[] }).instances = [];
+	});
+	MockOverlayView.panes = panes();
 
-	class MockDrawingManager extends MockMapObject {
-		static instances: MockDrawingManager[] = [];
-
-		drawingMode: unknown;
-		setDrawingMode = vi.fn((drawingMode: unknown) => {
-			this.drawingMode = drawingMode;
-		});
-
-		constructor(options: Record<string, unknown>) {
-			super(options);
-			this.drawingMode = options.drawingMode;
-			MockDrawingManager.instances.push(this);
-		}
-	}
-
-	class MockData extends MockMapObject {
-		static instances: MockData[] = [];
-
-		setControlPosition = vi.fn();
-		setControls = vi.fn();
-		setDrawingMode = vi.fn();
-		setStyle = vi.fn();
-
-		constructor(options: Record<string, unknown>) {
-			super(options);
-			MockData.instances.push(this);
-		}
-	}
-
-	class MockDirectionsService {
-		static instances: MockDirectionsService[] = [];
-
-		route = vi.fn();
-
-		constructor() {
-			MockDirectionsService.instances.push(this);
-		}
-	}
-
-	class MockDistanceMatrixService {
-		static instances: MockDistanceMatrixService[] = [];
-
-		getDistanceMatrix = vi.fn();
-
-		constructor() {
-			MockDistanceMatrixService.instances.push(this);
-		}
-	}
-
-	class MockStreetViewService {
-		static instances: MockStreetViewService[] = [];
-
-		constructor() {
-			MockStreetViewService.instances.push(this);
-		}
-	}
-
-	class MockStreetViewPanorama extends MockMapObject {
-		static instances: MockStreetViewPanorama[] = [];
-
-		element: HTMLElement;
-		setPosition = vi.fn();
-		setPov = vi.fn();
-		setZoom = vi.fn();
-		setPano = vi.fn();
-		setVisible = vi.fn();
-
-		constructor(element: HTMLElement, options: Record<string, unknown>) {
-			super(options);
-			this.element = element;
-			MockStreetViewPanorama.instances.push(this);
-		}
-	}
-
-	class MockAutocomplete {
-		static instances: MockAutocomplete[] = [];
-
-		input: HTMLInputElement;
-		options: Record<string, unknown>;
-		place: { name: string } = { name: 'Tokyo Station' };
-		addListener = vi.fn((eventName: string, handler: (...args: unknown[]) => unknown) =>
-			addInstanceListener(this, eventName, handler)
-		);
-		getPlace = vi.fn(() => this.place);
-		setOptions = vi.fn((options: Record<string, unknown>) => {
-			this.options = {
-				...this.options,
-				...options
-			};
-		});
-
-		constructor(input: HTMLInputElement, options: Record<string, unknown>) {
-			this.input = input;
-			this.options = removeUndefinedValues(options);
-			MockAutocomplete.instances.push(this);
-		}
-	}
-
-	class MockSearchBox {
-		static instances: MockSearchBox[] = [];
-
-		input: HTMLInputElement;
-		options: Record<string, unknown> | undefined;
-		bounds: unknown;
-		places: Array<{ name: string }> = [{ name: 'Tokyo Station' }];
-		addListener = vi.fn((eventName: string, handler: (...args: unknown[]) => unknown) =>
-			addInstanceListener(this, eventName, handler)
-		);
-		getPlaces = vi.fn(() => this.places);
-		setBounds = vi.fn((bounds: unknown) => {
-			this.bounds = bounds;
-		});
-
-		constructor(input: HTMLInputElement, options?: Record<string, unknown>) {
-			this.input = input;
-			this.options = options;
-			MockSearchBox.instances.push(this);
-		}
-	}
-
-	const importLibrary = vi.fn(() => Promise.resolve({}));
-
-	const maps = {
-		Map: MockMap,
-		Marker: MockMarker,
-		Polyline: MockPolyline,
-		Polygon: MockPolygon,
-		Circle: MockCircle,
-		Rectangle: MockRectangle,
-		InfoWindow: MockInfoWindow,
-		GroundOverlay: MockGroundOverlay,
-		DirectionsRenderer: MockDirectionsRenderer,
-		DirectionsService: MockDirectionsService,
-		DistanceMatrixService: MockDistanceMatrixService,
-		Data: MockData,
-		KmlLayer: MockKmlLayer,
-		TrafficLayer: MockTrafficLayer,
-		BicyclingLayer: MockBicyclingLayer,
-		TransitLayer: MockTransitLayer,
-		StreetViewPanorama: MockStreetViewPanorama,
-		StreetViewService: MockStreetViewService,
-		OverlayView: MockOverlayView,
-		LatLng: MockLatLng,
-		LatLngBounds: MockLatLngBounds,
-		Size: MockSize,
-		Point: MockPoint,
-		MVCArray: MockMVCArray,
-		ControlPosition: {
-			TOP_LEFT: 1,
-			TOP_CENTER: 2,
-			TOP_RIGHT: 3
-		},
-		drawing: {
-			DrawingManager: MockDrawingManager,
-			OverlayType: {
-				MARKER: 'marker',
-				CIRCLE: 'circle'
-			}
-		},
-		marker: {
-			AdvancedMarkerElement: MockAdvancedMarkerElement
-		},
-		visualization: {
-			HeatmapLayer: MockHeatmapLayer
-		},
-		places: {
-			Autocomplete: MockAutocomplete,
-			SearchBox: MockSearchBox
-		},
-		event,
-		importLibrary
+	const event = {
+		clearInstanceListeners: vi.fn((instance: MockMVCObject) => instance.listeners?.clear()),
+		addListener: (instance: MockMVCObject, eventName: string, handler: Handler) =>
+			instance.addListener(eventName, handler),
+		trigger: (instance: MockMVCObject, eventName: string, ...args: unknown[]) =>
+			instance.trigger(eventName, ...args)
 	};
 
-	return {
-		maps,
-		event,
-		importLibrary,
-		listeners,
-		panes,
-		classes: {
+	const libraries: Record<string, Record<string, unknown>> = {
+		core: {
+			event,
+			LatLng: MockLatLng,
+			LatLngBounds: MockLatLngBounds,
+			MVCArray: MockMVCArray,
+			ControlPosition,
+			Size: class {
+				constructor(
+					public width: number,
+					public height: number
+				) {}
+			}
+		},
+		maps: {
 			Map: MockMap,
-			Marker: MockMarker,
-			AdvancedMarkerElement: MockAdvancedMarkerElement,
+			InfoWindow: MockInfoWindow,
 			Polyline: MockPolyline,
 			Polygon: MockPolygon,
 			Circle: MockCircle,
 			Rectangle: MockRectangle,
-			InfoWindow: MockInfoWindow,
 			GroundOverlay: MockGroundOverlay,
-			TrafficLayer: MockTrafficLayer,
-			BicyclingLayer: MockBicyclingLayer,
-			TransitLayer: MockTransitLayer,
-			KmlLayer: MockKmlLayer,
-			HeatmapLayer: MockHeatmapLayer,
-			DirectionsRenderer: MockDirectionsRenderer,
-			DirectionsService: MockDirectionsService,
-			DistanceMatrixService: MockDistanceMatrixService,
-			DrawingManager: MockDrawingManager,
 			Data: MockData,
-			Autocomplete: MockAutocomplete,
-			SearchBox: MockSearchBox,
-			OverlayView: MockOverlayView,
-			StreetViewPanorama: MockStreetViewPanorama,
-			StreetViewService: MockStreetViewService,
-			LatLng: MockLatLng,
-			LatLngBounds: MockLatLngBounds,
-			Size: MockSize,
-			Point: MockPoint,
-			MVCArray: MockMVCArray
-		}
+			TrafficLayer: class extends MockLayer {},
+			TransitLayer: class extends MockLayer {},
+			BicyclingLayer: class extends MockLayer {},
+			OverlayView: MockOverlayView
+		},
+		marker: {
+			AdvancedMarkerElement: MockAdvancedMarkerElement,
+			PinElement: MockPinElement
+		},
+		places: {
+			PlaceAutocompleteElement: MockPlaceAutocompleteElement
+		},
+		streetView: {
+			StreetViewPanorama: MockStreetViewPanorama
+		},
+		routes: {}
 	};
-}
 
-export function installGoogleMapsMock() {
-	const googleMaps = createGoogleMapsMock();
-	(window as typeof window & { google: { maps: typeof google.maps } }).google = {
-		maps: googleMaps.maps as unknown as typeof google.maps
+	const importLibrary = vi.fn(async (name: string) => {
+		const library = libraries[name];
+		if (!library) throw new Error(`Unknown library: ${name}`);
+		return library;
+	});
+
+	(window as unknown as { google: unknown }).google = {
+		maps: { importLibrary, event, OverlayView: MockOverlayView }
 	};
-	return googleMaps;
+
+	return { classes, libraries, importLibrary, event };
 }

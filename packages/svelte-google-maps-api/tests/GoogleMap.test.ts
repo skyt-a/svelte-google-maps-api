@@ -1,45 +1,60 @@
-import { render, screen, waitFor } from '@testing-library/svelte';
+import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { describe, expect, it, vi } from 'vitest';
-import GoogleMap from '../src/lib/GoogleMap.svelte';
-import MapContextHarness from './fixtures/MapContextHarness.svelte';
-import { createGoogleMapsMock } from './googleMapsMock';
+import CameraHarness from './fixtures/CameraHarness.svelte';
+import { installGoogleMapsMock } from './googleMapsMock';
 
 describe('GoogleMap', () => {
-	it('creates a map, wires events, and cleans up on unmount', async () => {
-		const googleMaps = createGoogleMapsMock();
-		const onLoad = vi.fn();
-		const onUnmount = vi.fn();
+	it('creates the map with camera props and creation-only options', async () => {
+		const mock = installGoogleMapsMock();
+		render(CameraHarness);
+
+		await waitFor(() => expect(mock.classes.Map.instances).toHaveLength(1));
+		const map = mock.classes.Map.instances[0];
+
+		expect(map.element).toHaveClass('test-map');
+		expect(map.options).toMatchObject({ mapId: 'DEMO_MAP_ID', zoom: 10 });
+		expect(map.getCenter()?.toJSON()).toEqual({ lat: 35, lng: 139 });
+	});
+
+	it('pushes prop changes to the map', async () => {
+		const mock = installGoogleMapsMock();
+		render(CameraHarness);
+		await waitFor(() => expect(mock.classes.Map.instances).toHaveLength(1));
+		const map = mock.classes.Map.instances[0];
+
+		await fireEvent.click(screen.getByText('move'));
+		await fireEvent.click(screen.getByText('zoom'));
+
+		expect(map.getCenter()?.toJSON()).toEqual({ lat: 1, lng: 2 });
+		expect(map.getZoom()).toBe(4);
+	});
+
+	it('writes user camera changes back through bind:center and bind:zoom', async () => {
+		const mock = installGoogleMapsMock();
+		const onCenter = vi.fn();
+		const onZoom = vi.fn();
+		render(CameraHarness, { props: { onCenter, onZoom } });
+		await waitFor(() => expect(mock.classes.Map.instances).toHaveLength(1));
+		const map = mock.classes.Map.instances[0];
+
+		map.setCenter({ lat: 10, lng: 20 });
+		map.setZoom(15);
+
+		await waitFor(() => expect(onCenter).toHaveBeenLastCalledWith({ lat: 10, lng: 20 }));
+		await waitFor(() => expect(onZoom).toHaveBeenLastCalledWith(15));
+	});
+
+	it('forwards map events and removes listeners on unmount', async () => {
+		const mock = installGoogleMapsMock();
 		const onClick = vi.fn();
-		const initialOptions = { center: { lat: 35, lng: 139 }, zoom: 10 };
+		const { unmount } = render(CameraHarness, { props: { onClick } });
+		await waitFor(() => expect(mock.classes.Map.instances).toHaveLength(1));
+		const map = mock.classes.Map.instances[0];
 
-		const { unmount } = render(MapContextHarness, {
-			props: {
-				component: GoogleMap,
-				googleMapsApi: googleMaps.maps as unknown as typeof google.maps,
-				props: {
-					options: initialOptions,
-					onLoad,
-					onUnmount,
-					onClick,
-					mapContainerStyle: 'height: 320px; width: 640px;'
-				}
-			}
-		});
-
-		await waitFor(() => {
-			expect(googleMaps.classes.Map.instances).toHaveLength(1);
-		});
-
-		const map = googleMaps.classes.Map.instances[0];
-
-		expect(onLoad).toHaveBeenCalledWith(map);
-		expect(map.options).toEqual(initialOptions);
-		expect(screen.getByTestId('slot-content')).not.toBeNull();
-		expect(googleMaps.event.addListener).toHaveBeenCalledWith(map, 'click', onClick);
+		map.trigger('click', { latLng: null });
+		expect(onClick).toHaveBeenCalledWith({ latLng: null });
 
 		unmount();
-
-		expect(onUnmount).toHaveBeenCalledWith(map);
-		expect(googleMaps.event.clearInstanceListeners).toHaveBeenCalledWith(map);
+		expect(mock.event.clearInstanceListeners).toHaveBeenCalledWith(map);
 	});
 });

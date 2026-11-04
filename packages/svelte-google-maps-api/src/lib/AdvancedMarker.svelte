@@ -1,153 +1,168 @@
 <script lang="ts">
-	import { getContext, onDestroy, tick } from 'svelte';
-	import { BROWSER as browser } from 'esm-env';
-	import type { APIProviderContext } from './APIProvider.svelte';
-	import type { ClusterableMarker, MarkerClustererContext } from './types/markerClusterer.js';
+	import { onMount, type Snippet } from 'svelte';
+	import {
+		getAPIContext,
+		getClustererContext,
+		getMap,
+		MarkerContext,
+		setMarkerContext
+	} from './internal/context.svelte.js';
+	import { hasRenderableContent, toLatLngLiteral } from './internal/utils.js';
+	import type { LatLngInput } from './types.js';
 
-	export let position: google.maps.LatLng | google.maps.LatLngLiteral | undefined = undefined;
-	export let title: string | undefined = undefined;
-	export let zIndex: number | undefined = undefined;
-	export let element: HTMLElement | undefined = undefined;
-	export let gmpDraggable: boolean | undefined = undefined;
-	export let options: Partial<google.maps.marker.AdvancedMarkerElementOptions> | undefined =
-		undefined;
+	type Marker = google.maps.marker.AdvancedMarkerElement;
 
-	export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onLoad: ((marker: google.maps.marker.AdvancedMarkerElement) => void) | undefined =
-		undefined;
-	export let onUnmount: ((marker: google.maps.marker.AdvancedMarkerElement) => void) | undefined =
-		undefined;
+	interface Props {
+		/** Marker position. With `draggable`, use `bind:position` to track drags. */
+		position?: LatLngInput | null;
+		title?: string;
+		zIndex?: number | null;
+		draggable?: boolean;
+		/** Defaults to `true` when `onClick` is set. */
+		clickable?: boolean;
+		collisionBehavior?: google.maps.CollisionBehaviorString;
+		/** CSS length-percentage to move the anchor point horizontally. Default `-50%`. */
+		anchorLeft?: string;
+		/** CSS length-percentage to move the anchor point vertically. Default `-100%`. */
+		anchorTop?: string;
+		/** The `AdvancedMarkerElement` instance. Read it with `bind:marker`. */
+		marker?: Marker | null;
+		onClick?: (event: google.maps.marker.AdvancedMarkerClickEvent) => void;
+		onDragStart?: (position: google.maps.LatLngLiteral | null) => void;
+		onDrag?: (position: google.maps.LatLngLiteral | null) => void;
+		onDragEnd?: (position: google.maps.LatLngLiteral | null) => void;
+		onLoad?: (marker: Marker) => void;
+		/** Custom marker content. Use `<Pin>` to customise the default pin instead. */
+		children?: Snippet;
+	}
 
-	let markerInstance: google.maps.marker.AdvancedMarkerElement | null = null;
-	let isClustered = false;
-	let contentWrapper: HTMLDivElement | null = null;
-	let clickListener: google.maps.MapsEventListener | null = null;
-	let dragListener: google.maps.MapsEventListener | null = null;
-	let dragEndListener: google.maps.MapsEventListener | null = null;
-	let dragStartListener: google.maps.MapsEventListener | null = null;
+	let {
+		position = $bindable(),
+		title,
+		zIndex,
+		draggable = false,
+		clickable,
+		collisionBehavior,
+		anchorLeft,
+		anchorTop,
+		marker = $bindable(null),
+		onClick,
+		onDragStart,
+		onDrag,
+		onDragEnd,
+		onLoad,
+		children
+	}: Props = $props();
 
-	const { status, googleMapsApi } = getContext<APIProviderContext>('svelte-google-maps-api');
-	const map = getContext<google.maps.Map>('map');
-	const markerClusterer = getContext<MarkerClustererContext | undefined>('markerClusterer');
+	const api = getAPIContext('AdvancedMarker');
+	const map = getMap('AdvancedMarker');
+	const clusterer = getClustererContext();
+	const context = setMarkerContext(new MarkerContext());
+	let content: HTMLDivElement;
 
-	onDestroy(() => {
-		if (markerInstance) {
-			onUnmount?.(markerInstance);
+	onMount(() => {
+		let instance: Marker | null = null;
+		let disposed = false;
 
-			if (googleMapsApi) {
-				googleMapsApi.event.clearInstanceListeners(markerInstance);
-			}
-			if (isClustered && markerClusterer) {
-				markerClusterer.removeMarker(markerInstance as ClusterableMarker);
+		api
+			.importLibrary('marker')
+			.then(({ AdvancedMarkerElement }) => {
+				if (disposed) return;
+
+				instance = new AdvancedMarkerElement({
+					position: position ?? null,
+					title: title ?? '',
+					zIndex: zIndex ?? null,
+					gmpDraggable: draggable,
+					gmpClickable: clickable ?? Boolean(onClick),
+					collisionBehavior: collisionBehavior ?? null,
+					...(anchorLeft !== undefined ? { anchorLeft } : {}),
+					...(anchorTop !== undefined ? { anchorTop } : {})
+				});
+
+				if (hasRenderableContent(content)) instance.append(content);
+
+				if (clusterer) {
+					clusterer.addMarker(instance);
+				} else {
+					instance.map = map;
+				}
+
+				context.marker = instance;
+				marker = instance;
+				onLoad?.(instance);
+			})
+			.catch((error: unknown) => {
+				console.error('svelte-google-maps-api: Failed to create AdvancedMarker.', error);
+			});
+
+		return () => {
+			disposed = true;
+			if (!instance) return;
+			if (clusterer) {
+				clusterer.removeMarker(instance);
 			} else {
-				markerInstance.map = null;
+				instance.map = null;
 			}
-			markerInstance = null;
-			isClustered = false;
-		}
+			content.remove();
+			context.marker = null;
+		};
 	});
 
-	async function initializeMarker() {
-		if (!browser || $status !== 'loaded' || !googleMapsApi || !map || markerInstance) {
-			return;
-		}
+	$effect(() => {
+		const instance = context.marker;
+		if (instance) instance.position = position ?? null;
+	});
 
-		if (!googleMapsApi.marker || !googleMapsApi.marker.AdvancedMarkerElement) {
-			console.error(
-				'svelte-google-maps-api: AdvancedMarker requires the "marker" library to be loaded. Please include "marker" in the libraries prop of APIProvider.'
-			);
-			return;
-		}
+	$effect(() => {
+		const instance = context.marker;
+		if (instance) instance.title = title ?? '';
+	});
 
-		let markerContent: HTMLElement | null = null;
-		if (element) {
-			markerContent = element;
-		} else if (contentWrapper && contentWrapper.childNodes.length > 0) {
-			markerContent = contentWrapper;
-		}
+	$effect(() => {
+		const instance = context.marker;
+		if (instance) instance.zIndex = zIndex ?? null;
+	});
 
-		const markerOptions: google.maps.marker.AdvancedMarkerElementOptions = {
-			...(options ?? {}),
-			...(markerClusterer ? {} : { map }),
-			position: position ?? options?.position,
-			title: title ?? options?.title,
-			zIndex: zIndex ?? options?.zIndex,
-			content: markerContent ?? options?.content,
-			gmpDraggable: gmpDraggable ?? options?.gmpDraggable
+	$effect(() => {
+		const instance = context.marker;
+		if (!instance) return;
+		instance.gmpDraggable = draggable;
+		instance.gmpClickable = clickable ?? Boolean(onClick);
+		instance.collisionBehavior = collisionBehavior ?? null;
+		if (anchorLeft !== undefined) instance.anchorLeft = anchorLeft;
+		if (anchorTop !== undefined) instance.anchorTop = anchorTop;
+	});
+
+	$effect(() => {
+		const instance = context.marker;
+		if (!instance) return;
+
+		const currentPosition = () => toLatLngLiteral(instance.position);
+		const handleClick = (event: Event) =>
+			onClick?.(event as google.maps.marker.AdvancedMarkerClickEvent);
+		const handleDragStart = () => onDragStart?.(currentPosition());
+		const handleDrag = () => onDrag?.(currentPosition());
+		const handleDragEnd = () => {
+			const next = currentPosition();
+			if (next) position = next;
+			onDragEnd?.(next);
 		};
 
-		try {
-			markerInstance = new googleMapsApi.marker.AdvancedMarkerElement(markerOptions);
-			if (markerClusterer) {
-				markerClusterer.addMarker(markerInstance as ClusterableMarker);
-				isClustered = true;
-			}
-			onLoad?.(markerInstance);
-		} catch (error) {
-			console.error('[AdvancedMarker] Error creating instance:', error);
-			return;
-		}
+		instance.addEventListener('gmp-click', handleClick);
+		instance.addEventListener('gmp-dragstart', handleDragStart);
+		instance.addEventListener('gmp-drag', handleDrag);
+		instance.addEventListener('gmp-dragend', handleDragEnd);
 
-		setupListeners();
-	}
-
-	$: if (markerInstance && position) {
-		markerInstance.position = position;
-	}
-	$: if (markerInstance && title !== undefined) {
-		markerInstance.title = title;
-	}
-	$: if (markerInstance && zIndex !== undefined) {
-		markerInstance.zIndex = zIndex;
-	}
-	$: if (markerInstance && gmpDraggable !== undefined) {
-		markerInstance.gmpDraggable = gmpDraggable;
-	}
-
-	function setupListeners() {
-		if (!markerInstance || !googleMapsApi) return;
-
-		if (clickListener) googleMapsApi.event.removeListener(clickListener);
-		if (dragListener) googleMapsApi.event.removeListener(dragListener);
-		if (dragEndListener) googleMapsApi.event.removeListener(dragEndListener);
-		if (dragStartListener) googleMapsApi.event.removeListener(dragStartListener);
-
-		if (onClick) {
-			clickListener = markerInstance.addListener('click', onClick);
-		}
-		if (onDrag) {
-			dragListener = markerInstance.addListener('gmp-drag', onDrag);
-		}
-		if (onDragEnd) {
-			dragEndListener = markerInstance.addListener('gmp-dragend', onDragEnd);
-		}
-		if (onDragStart) {
-			dragStartListener = markerInstance.addListener('gmp-dragstart', onDragStart);
-		}
-	}
-
-	$: if (markerInstance && googleMapsApi && browser) {
-		setupListeners();
-	}
-
-	$: if ($status === 'loaded' && map && !markerInstance) {
-		tick().then(initializeMarker);
-	}
-
-	export function getMarkerInstance(): google.maps.marker.AdvancedMarkerElement | null {
-		return markerInstance;
-	}
+		return () => {
+			instance.removeEventListener('gmp-click', handleClick);
+			instance.removeEventListener('gmp-dragstart', handleDragStart);
+			instance.removeEventListener('gmp-drag', handleDrag);
+			instance.removeEventListener('gmp-dragend', handleDragEnd);
+		};
+	});
 </script>
 
-<!-- Wrapper for slot content, only rendered if no element prop is provided -->
-{#if !element}
-	<div bind:this={contentWrapper}>
-		<slot />
-	</div>
-{/if}
-
-<!-- This component doesn't render directly to the DOM where it's used,
-     it controls the AdvancedMarkerElement on the map -->
+<div hidden>
+	<div bind:this={content}>{@render children?.()}</div>
+</div>
