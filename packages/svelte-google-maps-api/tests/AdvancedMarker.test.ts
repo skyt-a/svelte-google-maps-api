@@ -31,6 +31,21 @@ describe('AdvancedMarker', () => {
 		expect(marker.querySelector('.custom-marker')).toHaveTextContent('Custom');
 	});
 
+	it('attaches children rendered after creation and restores the pin when they go away', async () => {
+		const mock = installGoogleMapsMock();
+		render(MarkerHarness, { props: { variant: 'delayed' } });
+
+		await waitFor(() => expect(mock.classes.AdvancedMarkerElement.instances).toHaveLength(1));
+		const marker = mock.classes.AdvancedMarkerElement.instances[0];
+		expect(marker.childElementCount).toBe(0);
+
+		await fireEvent.click(screen.getByText('content'));
+		await waitFor(() => expect(marker.querySelector('.late-content')).toHaveTextContent('Late'));
+
+		await fireEvent.click(screen.getByText('content'));
+		await waitFor(() => expect(marker.childElementCount).toBe(0));
+	});
+
 	it('handles gmp-click and writes drag results back to bind:position', async () => {
 		const mock = installGoogleMapsMock();
 		const onClick = vi.fn();

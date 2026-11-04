@@ -6,7 +6,7 @@
 	import InfoWindow from '../../src/lib/InfoWindow.svelte';
 
 	interface Props {
-		variant?: 'default' | 'content' | 'pin' | 'infoWindow';
+		variant?: 'default' | 'content' | 'pin' | 'infoWindow' | 'delayed';
 		draggable?: boolean;
 		title?: string;
 		onClick?: () => void;
@@ -26,6 +26,7 @@
 	let marker = $state<google.maps.marker.AdvancedMarkerElement | null>(null);
 	let open = $state(true);
 	let glyph = $state('A');
+	let showContent = $state(false);
 
 	$effect(() => onPosition?.($state.snapshot(position)));
 	$effect(() => onOpen?.(open));
@@ -33,12 +34,17 @@
 
 <button type="button" onclick={() => (glyph = 'B')}>glyph</button>
 <button type="button" onclick={() => (open = !open)}>toggle</button>
+<button type="button" onclick={() => (showContent = !showContent)}>content</button>
 
 <APIProvider apiKey="test-key">
 	<GoogleMap center={{ lat: 35, lng: 139 }} zoom={10} mapId="DEMO_MAP_ID">
 		{#if variant === 'content'}
 			<AdvancedMarker bind:position {title} {draggable} {onClick}>
 				<div class="custom-marker">Custom</div>
+			</AdvancedMarker>
+		{:else if variant === 'delayed'}
+			<AdvancedMarker bind:position {title}>
+				{#if showContent}<div class="late-content">Late</div>{/if}
 			</AdvancedMarker>
 		{:else if variant === 'pin'}
 			<AdvancedMarker bind:position {title}>

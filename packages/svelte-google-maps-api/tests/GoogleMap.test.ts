@@ -29,6 +29,20 @@ describe('GoogleMap', () => {
 		expect(map.getZoom()).toBe(4);
 	});
 
+	it('applies center and zoom changed in the same update', async () => {
+		const mock = installGoogleMapsMock();
+		const onZoom = vi.fn();
+		render(CameraHarness, { props: { onZoom } });
+		await waitFor(() => expect(mock.classes.Map.instances).toHaveLength(1));
+		const map = mock.classes.Map.instances[0];
+
+		await fireEvent.click(screen.getByText('both'));
+
+		expect(map.getCenter()?.toJSON()).toEqual({ lat: 5, lng: 6 });
+		expect(map.getZoom()).toBe(7);
+		expect(onZoom).toHaveBeenLastCalledWith(7);
+	});
+
 	it('writes user camera changes back through bind:center and bind:zoom', async () => {
 		const mock = installGoogleMapsMock();
 		const onCenter = vi.fn();

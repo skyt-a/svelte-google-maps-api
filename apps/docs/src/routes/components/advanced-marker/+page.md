@@ -87,5 +87,5 @@ title: AdvancedMarker
 ## Notes
 
 - The map needs a `mapId` (use `DEMO_MAP_ID` for testing).
-- Children are checked once when the marker is created: if they render any element or text, they replace the default pin. Content that only appears later (for example behind an `if` block that was false at creation) is not picked up; keep a wrapper element rendered instead.
+- Children replace the default pin whenever they render an element or text. Content that appears later (for example behind an `if` block) is attached then, and the default pin returns when the children render nothing.
 - Inside `MarkerClusterer`, the marker is added to the clusterer instead of directly to the map.

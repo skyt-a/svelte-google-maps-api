@@ -58,11 +58,25 @@
 	const map = getMap('AdvancedMarker');
 	const clusterer = getClustererContext();
 	const context = setMarkerContext(new MarkerContext());
+	let holder: HTMLDivElement;
 	let content: HTMLDivElement;
 
 	onMount(() => {
 		let instance: Marker | null = null;
 		let disposed = false;
+
+		// Children replace the default pin only while they render something, so content that
+		// appears later (e.g. inside {#if}) is attached then, and the pin returns when it empties.
+		const syncContent = () => {
+			if (!instance) return;
+			if (hasRenderableContent(content)) {
+				if (content.parentNode !== instance) instance.append(content);
+			} else if (content.parentNode === instance) {
+				holder.append(content);
+			}
+		};
+		const observer = new MutationObserver(syncContent);
+		observer.observe(content, { childList: true, subtree: true, characterData: true });
 
 		api
 			.importLibrary('marker')
@@ -80,7 +94,7 @@
 					...(anchorTop !== undefined ? { anchorTop } : {})
 				});
 
-				if (hasRenderableContent(content)) instance.append(content);
+				syncContent();
 
 				if (clusterer) {
 					clusterer.addMarker(instance);
@@ -98,6 +112,7 @@
 
 		return () => {
 			disposed = true;
+			observer.disconnect();
 			if (!instance) return;
 			if (clusterer) {
 				clusterer.removeMarker(instance);
@@ -163,6 +178,6 @@
 	});
 </script>
 
-<div hidden>
+<div hidden bind:this={holder}>
 	<div bind:this={content}>{@render children?.()}</div>
 </div>

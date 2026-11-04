@@ -18,6 +18,13 @@
 
 <button type="button" onclick={() => (center = { lat: 1, lng: 2 })}>move</button>
 <button type="button" onclick={() => (zoom = 4)}>zoom</button>
+<button
+	type="button"
+	onclick={() => {
+		center = { lat: 5, lng: 6 };
+		zoom = 7;
+	}}>both</button
+>
 
 <APIProvider apiKey="test-key">
 	<GoogleMap bind:center bind:zoom mapId="DEMO_MAP_ID" {onClick} class="test-map" />

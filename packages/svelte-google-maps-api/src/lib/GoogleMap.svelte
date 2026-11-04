@@ -144,34 +144,41 @@
 		const instance = context.map;
 		if (!instance) return;
 
-		const syncCamera = () => {
+		// Each event syncs only its own value. These events fire synchronously while the
+		// prop -> map effects run, so writing every camera value here would overwrite props
+		// (e.g. a new zoom) that were changed in the same update but not yet applied.
+		const notifyCamera = () => {
 			const nextCenter = toLatLngLiteral(instance.getCenter());
-			const nextZoom = instance.getZoom();
-			const nextHeading = instance.getHeading();
-			const nextTilt = instance.getTilt();
-
-			if (nextCenter && !latLngEquals(nextCenter, center)) center = nextCenter;
-			if (nextZoom !== undefined && nextZoom !== zoom) zoom = nextZoom;
-			if (nextHeading !== undefined && nextHeading !== heading) {
-				heading = nextHeading;
-			}
-			if (nextTilt !== undefined && nextTilt !== tilt) tilt = nextTilt;
-
-			if (onCameraChanged && nextCenter) {
-				onCameraChanged({
-					center: nextCenter,
-					zoom: nextZoom ?? 0,
-					heading: nextHeading ?? 0,
-					tilt: nextTilt ?? 0
-				});
-			}
+			if (!onCameraChanged || !nextCenter) return;
+			onCameraChanged({
+				center: nextCenter,
+				zoom: instance.getZoom() ?? 0,
+				heading: instance.getHeading() ?? 0,
+				tilt: instance.getTilt() ?? 0
+			});
 		};
 
 		return addListeners(instance, {
-			center_changed: syncCamera,
-			zoom_changed: syncCamera,
-			heading_changed: syncCamera,
-			tilt_changed: syncCamera
+			center_changed: () => {
+				const next = toLatLngLiteral(instance.getCenter());
+				if (next && !latLngEquals(next, center)) center = next;
+				notifyCamera();
+			},
+			zoom_changed: () => {
+				const next = instance.getZoom();
+				if (next !== undefined && next !== zoom) zoom = next;
+				notifyCamera();
+			},
+			heading_changed: () => {
+				const next = instance.getHeading();
+				if (next !== undefined && next !== heading) heading = next;
+				notifyCamera();
+			},
+			tilt_changed: () => {
+				const next = instance.getTilt();
+				if (next !== undefined && next !== tilt) tilt = next;
+				notifyCamera();
+			}
 		});
 	});
 
