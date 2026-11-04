@@ -23,7 +23,7 @@ describe('APIProvider', () => {
 		(window as unknown as Record<string, () => void>)[url.searchParams.get('callback') as string]();
 
 		await waitFor(() => expect(screen.getByText('children')).toBeInTheDocument());
-		await waitFor(() => expect(onLoad).toHaveBeenCalledTimes(1));
+		expect(onLoad).toHaveBeenCalledTimes(1);
 		expect(mock.importLibrary.mock.calls.map(([name]) => name).sort()).toEqual([
 			'core',
 			'maps',

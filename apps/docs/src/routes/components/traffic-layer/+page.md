@@ -5,44 +5,43 @@ title: TrafficLayer
 ## Storybook
 
 [Open the TrafficLayer story](https://skyt-a.github.io/svelte-google-maps-api/storybook/?path=/story/components-trafficlayer--basic)
-A component to display the traffic layer on the map.
 
-Must be used within a `<GoogleMap>` component.
-
-```svelte
-<script lang="ts">
-  import { APIProvider, GoogleMap, TrafficLayer } from 'svelte-google-maps-api';
-  import { GOOGLE_MAPS_API_KEY } from '$env/static/private';
-  import { writable } from 'svelte/store';
-
-  const showTraffic = writable(true);
-</script>
-
-<APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
-  <GoogleMap initialCenter={{ lat: 35.681, lng: 139.767 }} initialZoom={13}>
-    {#if $showTraffic}
-      <TrafficLayer />
-    {/if}
-  </GoogleMap>
-</APIProvider>
-
-<label>
-  <input type="checkbox" bind:checked={$showTraffic} />
-  Show Traffic
-</label>
-```
+`TrafficLayer` shows real-time traffic conditions with `google.maps.TrafficLayer`. Render it inside `GoogleMap` to show the layer and remove it to hide the layer.
 
 ## Props
 
-This component does not have any configurable props. The layer's visibility is controlled by mounting/unmounting the component.
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| autoRefresh | `boolean` | `true` | Refresh traffic data automatically. |
 
-## Events
+### Event Props
 
-| Event       | Type                                                  | Description                                         |
-| :---------- | :---------------------------------------------------- | :-------------------------------------------------- |
-| `onLoad`    | `((layer: google.maps.TrafficLayer) => void) \| undefined` | Fired when the layer is loaded. Receives the instance. |
-| `onUnmount` | `((layer: google.maps.TrafficLayer) => void) \| undefined` | Fired when the component is destroyed. Receives the instance. |
+| Prop | Type | Description |
+|------|------|-------------|
+| onLoad | `(layer: google.maps.TrafficLayer) => void` | Called once after the layer is added to the map. |
 
-## Binding
+## Usage
 
-This component does not support the `bind:` directive. 
+```svelte
+<script lang="ts">
+	import { APIProvider, GoogleMap, TrafficLayer } from 'svelte-google-maps-api';
+
+	let visible = $state(true);
+</script>
+
+<label><input type="checkbox" bind:checked={visible} /> Show layer</label>
+
+<div style="height: 400px;">
+	<APIProvider apiKey="YOUR_API_KEY">
+		<GoogleMap center={{ lat: 35.6812, lng: 139.7671 }} zoom={13}>
+			{#if visible}
+				<TrafficLayer autoRefresh />
+			{/if}
+		</GoogleMap>
+	</APIProvider>
+</div>
+```
+
+## Notes
+
+- Traffic data is not available in every region.

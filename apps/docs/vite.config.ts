@@ -6,7 +6,6 @@ import { componentItems } from './src/lib/component-nav.js';
 const navComponentItems = componentItems.map(({ title, to }) => ({ title, to }));
 
 export default defineConfig({
-	// base パスは GitHub Pages 用なのでそのままで良いか確認が必要
 	base: '/svelte-google-maps-api/',
 	plugins: [
 		sveltepress({
@@ -28,7 +27,10 @@ export default defineConfig({
 					'/guide/': [
 						{
 							title: 'Guide',
-							items: [{ title: 'Getting Started', to: '/guide/getting-started' }]
+							items: [
+								{ title: 'Getting Started', to: '/guide/getting-started' },
+								{ title: 'Migrating to 0.3', to: '/guide/migration' }
+							]
 						}
 					],
 					'/components/': [
@@ -48,5 +50,4 @@ export default defineConfig({
 			}
 		})
 	]
-	// ssr と build.rollupOptions は Turborepo が解決するため削除
 });

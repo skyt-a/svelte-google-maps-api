@@ -1,92 +1,77 @@
 # Svelte Google Maps API
 
-A declarative Svelte component library for the Google Maps JavaScript API.
+Svelte 5 components for the Google Maps JavaScript API, built on the current Maps APIs: Advanced Markers, Places API (New) and the Routes library.
 
 ## Installation
 
 ```bash
 pnpm add svelte-google-maps-api
-```
-
-```bash
+# or
 npm install svelte-google-maps-api
 ```
 
-```bash
-yarn add svelte-google-maps-api
-```
+Requires Svelte 5.
 
 ## Quick Start
 
-Enable the Maps JavaScript API in Google Cloud Console and pass your API key to `APIProvider`.
+Enable the **Maps JavaScript API** for your key. Advanced Markers need a Map ID. `DEMO_MAP_ID` works for development.
 
 ```svelte
 <script lang="ts">
-	import { APIProvider, GoogleMap, Marker } from 'svelte-google-maps-api';
+	import { APIProvider, GoogleMap, AdvancedMarker, Pin } from 'svelte-google-maps-api';
 
-	const apiKey = 'YOUR_MAP_KEY';
+	const apiKey = 'YOUR_API_KEY';
+	let center = $state({ lat: 35.6812362, lng: 139.7649361 });
+	let zoom = $state(13);
 </script>
 
-<div style="width: 100%; height: 100vh;">
+<div style="height: 100vh">
 	<APIProvider {apiKey}>
-		<GoogleMap
-			options={{
-				center: { lat: 35.6812362, lng: 139.7649361 },
-				zoom: 14
-			}}
-			mapContainerStyle="width:100%;height:100%;"
-		>
-			<Marker position={{ lat: 35.6812362, lng: 139.7649361 }} />
+		<GoogleMap bind:center bind:zoom mapId="DEMO_MAP_ID">
+			<AdvancedMarker position={{ lat: 35.6812362, lng: 139.7649361 }} title="Tokyo Station">
+				<Pin background="#0f766e" glyphText="T" glyphColor="white" />
+			</AdvancedMarker>
 		</GoogleMap>
 	</APIProvider>
 </div>
 ```
 
-## Loading Google Maps Libraries
-
-Some components require optional Google Maps libraries. Pass them through `APIProvider`.
-
-```svelte
-<APIProvider {apiKey} libraries={['marker', 'places', 'drawing', 'visualization']}>
-	<!-- map components -->
-</APIProvider>
-```
-
-| Component             | Required library | Notes                                                                                                     |
-| --------------------- | ---------------- | --------------------------------------------------------------------------------------------------------- |
-| `AdvancedMarker`      | `marker`         | Advanced markers may require a map ID for full styling and cloud-based map features.                      |
-| `Autocomplete`        | `places`         | Wraps `google.maps.places.Autocomplete`.                                                                  |
-| `StandaloneSearchBox` | `places`         | Wraps `google.maps.places.SearchBox`.                                                                     |
-| `DrawingManager`      | `drawing`        | The Google Maps Drawing Library is deprecated upstream; use a supported Maps API version while available. |
-| `HeatmapLayer`        | `visualization`  | Wraps `google.maps.visualization.HeatmapLayer`.                                                           |
+Components load the Maps libraries they need (`marker`, `places`, `streetView`, ...) on demand. Pass `libraries` to `APIProvider` only to preload them.
 
 ## Components
 
-| Component                                                                                     | Purpose                                                 |
-| --------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| `APIProvider`                                                                                 | Loads the Maps JavaScript API and provides context.     |
-| `GoogleMap`                                                                                   | Creates and provides a map instance.                    |
-| `Marker`                                                                                      | Standard Google Maps marker.                            |
-| `AdvancedMarker`                                                                              | Advanced marker element with slot content support.      |
-| `MarkerClusterer`                                                                             | Marker clustering wrapper with `onClick` compatibility. |
-| `GoogleMarkerClusterer`                                                                       | Marker clustering wrapper exposing `onClusterClick`.    |
-| `InfoWindow`                                                                                  | Google Maps info window.                                |
-| `InfoBox`                                                                                     | Custom overlay info box.                                |
-| `Polyline`, `Polygon`, `Circle`, `Rectangle`                                                  | Shape overlays.                                         |
-| `Data`                                                                                        | Google Maps data layer.                                 |
-| `DrawingManager`                                                                              | Drawing tools where the upstream library is available.  |
-| `DirectionsRenderer`, `DirectionsService`, `DistanceMatrixService`                            | Directions and distance services.                       |
-| `HeatmapLayer`, `KmlLayer`, `TrafficLayer`, `TransitLayer`, `BicyclingLayer`, `GroundOverlay` | Map layers and image overlays.                          |
-| `MapControl`                                                                                  | Custom control placement.                               |
-| `Autocomplete`, `StandaloneSearchBox`                                                         | Places input helpers.                                   |
-| `OverlayView`                                                                                 | Custom positioned overlay content.                      |
-| `StreetViewPanorama`, `StreetViewService`                                                     | Street View UI and service helpers.                     |
+| Component                                        | Purpose                                                                      |
+| ------------------------------------------------ | ---------------------------------------------------------------------------- |
+| `APIProvider`                                    | Loads the Maps JavaScript API once. Provides `loading` / `error` snippets.   |
+| `GoogleMap`                                      | The map. `bind:center`, `bind:zoom`, `bind:heading`, `bind:tilt`.            |
+| `AdvancedMarker`                                 | `AdvancedMarkerElement` with HTML children and `bind:position` for dragging. |
+| `Pin`                                            | Customises the default marker pin (`PinElement`).                            |
+| `MarkerClusterer`                                | Clusters child `AdvancedMarker`s with `@googlemaps/markerclusterer`.         |
+| `InfoWindow`                                     | Info window anchored to a marker or a position, with `bind:open`.            |
+| `Polyline`, `Polygon`, `Circle`, `Rectangle`     | Shapes. Editable geometry is bindable.                                       |
+| `GroundOverlay`, `Data`                          | Image overlays and GeoJSON data layers.                                      |
+| `TrafficLayer`, `TransitLayer`, `BicyclingLayer` | Built-in map layers.                                                         |
+| `MapControl`                                     | Renders children as a custom map control.                                    |
+| `OverlayView`                                    | Renders children at a geographic position or over bounds.                    |
+| `PlaceAutocomplete`                              | `PlaceAutocompleteElement` (Places API New) that returns a `Place`.          |
+| `RouteRenderer`                                  | Draws a `google.maps.routes.Route` with polylines and waypoint markers.      |
+| `StreetViewPanorama`                             | Street View panorama with bindable position and point of view.               |
+
+## Helpers
+
+Call these during component initialisation:
+
+- `useMap()` returns `{ current }` with the nearest `google.maps.Map`.
+- `useMapsLibrary(name)` returns `{ current }` with a typed library, e.g. `useMapsLibrary('routes')`.
+- `useAPILoadingStatus()` returns `{ status, error }`.
+
+## Upgrading from 0.2
+
+0.3 removes the components built on deprecated or discontinued Google APIs. These are `Marker`, `DrawingManager`, `HeatmapLayer`, `KmlLayer`, `Autocomplete`, `StandaloneSearchBox`, the Directions and Distance Matrix services, `InfoBox` and `StreetViewService`. 0.3 also replaces the Svelte 4 slot API with runes and snippets. See the [migration guide](https://skyt-a.github.io/svelte-google-maps-api/guide/migration/).
 
 ## SvelteKit and SSR
 
-Render map components only in the browser. `APIProvider` loads the Google Maps script on the client, and child components wait for that context before creating Google Maps objects.
-
-For SvelteKit routes that render on the server, keep API keys in public environment variables only when they are meant to be exposed to browsers:
+Google Maps objects are only created in the browser after mount. During SSR, `APIProvider` renders its `loading` snippet. Use a public, HTTP-referrer-restricted browser key:
 
 ```svelte
 <script lang="ts">
@@ -95,22 +80,19 @@ For SvelteKit routes that render on the server, keep API keys in public environm
 </script>
 
 <APIProvider apiKey={PUBLIC_GOOGLE_MAPS_API_KEY}>
-	<GoogleMap options={{ center: { lat: 35.6812362, lng: 139.7649361 }, zoom: 12 }} />
+	<GoogleMap center={{ lat: 35.68, lng: 139.76 }} zoom={12} />
 </APIProvider>
 ```
 
-Restrict browser API keys in Google Cloud Console by HTTP referrer and only enable the APIs needed by your app.
-
 ## Troubleshooting
 
-| Symptom                          | Check                                                                                                |
-| -------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| The map does not render          | Confirm the Maps JavaScript API is enabled and the API key is allowed for your domain.               |
-| `AdvancedMarker` does not render | Add `libraries={['marker']}` and configure a map ID when using cloud-styled maps.                    |
-| Places components do not work    | Add `libraries={['places']}` and enable the Places API.                                              |
-| `HeatmapLayer` is unavailable    | Add `libraries={['visualization']}`.                                                                 |
-| `DrawingManager` is unavailable  | The upstream Drawing Library is deprecated; pin a supported API version where it is still available. |
-| Storybook asks for an API key    | Enter a restricted browser key in the Storybook API key field for local visual testing.              |
+| Symptom                                  | Check                                                                                  |
+| ---------------------------------------- | -------------------------------------------------------------------------------------- |
+| The map is blank                         | The container needs a height. Confirm the Maps JavaScript API is enabled for your key. |
+| `AdvancedMarker` does not render         | Set `mapId` on `GoogleMap`.                                                            |
+| `PlaceAutocomplete` shows no results     | Enable **Places API (New)** for your key.                                              |
+| `computeRoutes` fails                    | Enable **Routes API** for your key.                                                    |
+| A warning says the API is already loaded | The API loads once per page. Use the same `APIProvider` options everywhere.            |
 
 ## Documentation
 

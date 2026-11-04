@@ -6,111 +6,86 @@ title: AdvancedMarker
 
 [Open the AdvancedMarker story](https://skyt-a.github.io/svelte-google-maps-api/storybook/?path=/story/components-advancedmarker--basic)
 
-The `AdvancedMarker` component creates and manages advanced markers on the map, allowing for custom HTML content.
+`AdvancedMarker` places a `google.maps.marker.AdvancedMarkerElement` on the map. It shows the default red pin, a customised pin via `Pin`, or any HTML you pass as children.
 
 ## Props
 
-| Prop         | Type                                                       | Default | Description                             |
-| ------------ | ---------------------------------------------------------- | ------- | --------------------------------------- |
-| position     | google.maps.LatLng \| google.maps.LatLngLiteral            |         | Geographical coordinates for the marker |
-| title        | string                                                     |         | Rollover and accessibility text         |
-| zIndex       | number                                                     |         | Marker stacking order                   |
-| element      | HTMLElement                                                |         | Custom marker element                   |
-| gmpDraggable | boolean                                                    |         | Enables dragging                        |
-| options      | google.maps.marker.AdvancedMarkerElementOptions            |         | Advanced marker configuration options   |
-| onLoad       | (marker: google.maps.marker.AdvancedMarkerElement) => void |         | Callback when marker is loaded          |
-| onUnmount    | (marker: google.maps.marker.AdvancedMarkerElement) => void |         | Callback before marker is destroyed     |
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| position | `LatLngInput \| null` | | Marker position. Bindable: with `draggable`, use `bind:position` to track drags. |
+| title | `string` | | Tooltip and accessible name. |
+| zIndex | `number \| null` | | Stacking order. |
+| draggable | `boolean` | `false` | Lets the user drag the marker (`gmpDraggable`). |
+| clickable | `boolean` | `true` when `onClick` is set | Makes the marker clickable (`gmpClickable`). |
+| collisionBehavior | `google.maps.CollisionBehaviorString` | | How the marker behaves when it collides with others. |
+| anchorLeft | `string` | `-50%` (API default) | CSS length-percentage that moves the anchor point horizontally. |
+| anchorTop | `string` | `-100%` (API default) | CSS length-percentage that moves the anchor point vertically. |
+| marker | `google.maps.marker.AdvancedMarkerElement \| null` | `null` | The marker instance. Bindable: read it with `bind:marker` (for example to anchor an `InfoWindow`). |
+| children | `Snippet` | | Custom marker content, or a `Pin`. |
 
-### Event Handler Props
+`LatLngInput` is `google.maps.LatLng \| google.maps.LatLngLiteral \| google.maps.LatLngAltitude \| google.maps.LatLngAltitudeLiteral`.
 
-| Prop        | Type                                   | Description              |
-| ----------- | -------------------------------------- | ------------------------ |
-| onClick     | (e: google.maps.MapMouseEvent) => void | Click event handler      |
-| onDrag      | (e: google.maps.MapMouseEvent) => void | Drag event handler       |
-| onDragEnd   | (e: google.maps.MapMouseEvent) => void | Drag end event handler   |
-| onDragStart | (e: google.maps.MapMouseEvent) => void | Drag start event handler |
+### Event Props
+
+| Prop | Type | Description |
+|------|------|-------------|
+| onClick | `(event: google.maps.marker.AdvancedMarkerClickEvent) => void` | `gmp-click` |
+| onDragStart | `(position: google.maps.LatLngLiteral \| null) => void` | `gmp-dragstart` |
+| onDrag | `(position: google.maps.LatLngLiteral \| null) => void` | `gmp-drag` |
+| onDragEnd | `(position: google.maps.LatLngLiteral \| null) => void` | `gmp-dragend`. Also updates `bind:position`. |
+| onLoad | `(marker: google.maps.marker.AdvancedMarkerElement) => void` | Called once after the marker is created. |
 
 ## Usage
 
 ```svelte
-<script>
-	import { APIProvider, GoogleMap, AdvancedMarker } from 'svelte-google-maps-api';
+<script lang="ts">
+	import { APIProvider, GoogleMap, AdvancedMarker, Pin } from 'svelte-google-maps-api';
 
-	const apiKey = 'YOUR_API_KEY';
-	const mapOptions = {
-		center: { lat: 35.6812362, lng: 139.7649361 },
-		zoom: 12,
-		mapId: 'DEMO_MAP_ID'
-	};
-
-	const position = { lat: 35.6812362, lng: 139.7649361 };
-
-	function handleMarkerClick() {
-		alert('Advanced Marker clicked!');
-	}
+	let position = $state({ lat: 35.6812, lng: 139.7671 });
 </script>
 
-<div style="height: 400px; width: 100%;">
-	<APIProvider {apiKey} libraries={['marker']} mapIds={['DEMO_MAP_ID']}>
-		<GoogleMap id="map" options={mapOptions} mapContainerStyle="width: 100%; height: 100%;">
-			<AdvancedMarker {position} title="Tokyo" gmpDraggable onClick={handleMarkerClick} />
-		</GoogleMap>
-	</APIProvider>
-</div>
-```
+<div style="height: 400px;">
+	<APIProvider apiKey="YOUR_API_KEY">
+		<GoogleMap center={{ lat: 35.6812, lng: 139.7671 }} zoom={13} mapId="DEMO_MAP_ID">
+			<!-- Default pin, draggable -->
+			<AdvancedMarker bind:position draggable title="Drag me" />
 
-## Custom Content
+			<!-- Customised pin -->
+			<AdvancedMarker position={{ lat: 35.6586, lng: 139.7454 }} title="Tokyo Tower">
+				<Pin background="#0f766e" borderColor="#134e4a" glyphColor="white" glyphText="T" />
+			</AdvancedMarker>
 
-One of the main advantages of `AdvancedMarker` is the ability to use custom HTML content:
-
-```svelte
-<script>
-	import { APIProvider, GoogleMap, AdvancedMarker } from 'svelte-google-maps-api';
-
-	const apiKey = 'YOUR_API_KEY';
-	const mapOptions = {
-		center: { lat: 35.6812362, lng: 139.7649361 },
-		zoom: 12,
-		mapId: 'DEMO_MAP_ID'
-	};
-
-	const position = { lat: 35.6812362, lng: 139.7649361 };
-</script>
-
-<div style="height: 400px; width: 100%;">
-	<APIProvider {apiKey} libraries={['marker']} mapIds={['DEMO_MAP_ID']}>
-		<GoogleMap id="map" options={mapOptions} mapContainerStyle="width: 100%; height: 100%;">
-			<AdvancedMarker {position} title="Tokyo">
-				<div class="custom-marker">Tokyo</div>
+			<!-- Custom HTML -->
+			<AdvancedMarker
+				position={{ lat: 35.71, lng: 139.8107 }}
+				onClick={() => alert('Skytree')}
+			>
+				<div class="badge">Skytree</div>
 			</AdvancedMarker>
 		</GoogleMap>
 	</APIProvider>
 </div>
 
 <style>
-	.custom-marker {
-		background: #4285f4;
-		border-radius: 4px;
-		color: white;
-		font-weight: bold;
-		padding: 8px 12px;
+	.badge {
+		background: white;
+		border-radius: 999px;
+		padding: 4px 10px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 	}
 </style>
 ```
 
-## Context
+## Migrating from Marker
 
-The `AdvancedMarker` component consumes the context set by `GoogleMap` to access the map instance:
+`Marker` (built on `google.maps.Marker`, deprecated since February 2024) was removed. Replace it with `AdvancedMarker`:
 
-```javascript
-const map = getContext('map');
-```
+- Set a `mapId` on `GoogleMap`; Advanced Markers do not render without one.
+- `options.draggable` becomes `draggable`, and `options.label` / `options.icon` become a `Pin` (`glyphText`, `background`, ...) or custom HTML children.
+- `onClick` receives an `AdvancedMarkerClickEvent` instead of a `MapMouseEvent`. Drag handlers receive the new position.
 
 ## Notes
 
-- The `AdvancedMarker` component must be a child of the `GoogleMap` component.
-- It requires the Google Maps "marker" library to be loaded.
-- The map must use a `mapId`; `DEMO_MAP_ID` is suitable for local testing.
-- It allows for custom HTML content, making it more flexible than the standard `Marker` component.
-- Event listeners are automatically cleaned up when the component is destroyed.
-- The marker is automatically removed from the map when the component is unmounted.
+- The map needs a `mapId` (use `DEMO_MAP_ID` for testing).
+- Children are checked once when the marker is created: if they render any element or text, they replace the default pin. Content that only appears later (for example behind an `if` block that was false at creation) is not picked up; keep a wrapper element rendered instead.
+- Inside `MarkerClusterer`, the marker is added to the clusterer instead of directly to the map.

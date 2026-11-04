@@ -16,14 +16,14 @@ export const componentItems = [
 		storyId: 'components-googlemap--basic'
 	},
 	{
-		title: 'Marker',
-		to: '/components/marker/',
-		storyId: 'components-marker--basic'
-	},
-	{
 		title: 'AdvancedMarker',
 		to: '/components/advanced-marker/',
 		storyId: 'components-advancedmarker--basic'
+	},
+	{
+		title: 'Pin',
+		to: '/components/pin/',
+		storyId: 'components-pin--basic'
 	},
 	{
 		title: 'MarkerClusterer',
@@ -31,19 +31,9 @@ export const componentItems = [
 		storyId: 'components-markerclusterer--basic'
 	},
 	{
-		title: 'GoogleMarkerClusterer',
-		to: '/components/google-marker-clusterer/',
-		storyId: 'components-googlemarkerclusterer--basic'
-	},
-	{
 		title: 'InfoWindow',
 		to: '/components/info-window/',
 		storyId: 'components-infowindow--basic'
-	},
-	{
-		title: 'InfoBox',
-		to: '/components/info-box/',
-		storyId: 'components-infobox--basic'
 	},
 	{
 		title: 'Polyline',
@@ -66,39 +56,14 @@ export const componentItems = [
 		storyId: 'components-rectangle--basic'
 	},
 	{
+		title: 'GroundOverlay',
+		to: '/components/ground-overlay/',
+		storyId: 'components-groundoverlay--basic'
+	},
+	{
 		title: 'Data',
 		to: '/components/data/',
 		storyId: 'components-data--basic'
-	},
-	{
-		title: 'DrawingManager',
-		to: '/components/drawing-manager/',
-		storyId: 'components-drawingmanager--basic'
-	},
-	{
-		title: 'DirectionsRenderer',
-		to: '/components/directions-renderer/',
-		storyId: 'components-directionsrenderer--basic'
-	},
-	{
-		title: 'DirectionsService',
-		to: '/components/directions-service/',
-		storyId: 'components-directionsservice--basic'
-	},
-	{
-		title: 'DistanceMatrixService',
-		to: '/components/distance-matrix-service/',
-		storyId: 'components-distancematrixservice--basic'
-	},
-	{
-		title: 'HeatmapLayer',
-		to: '/components/heatmap-layer/',
-		storyId: 'components-heatmaplayer--basic'
-	},
-	{
-		title: 'KmlLayer',
-		to: '/components/kml-layer/',
-		storyId: 'components-kmllayer--basic'
 	},
 	{
 		title: 'TrafficLayer',
@@ -116,24 +81,9 @@ export const componentItems = [
 		storyId: 'components-bicyclinglayer--basic'
 	},
 	{
-		title: 'GroundOverlay',
-		to: '/components/ground-overlay/',
-		storyId: 'components-groundoverlay--basic'
-	},
-	{
 		title: 'MapControl',
 		to: '/components/map-control/',
 		storyId: 'components-mapcontrol--basic'
-	},
-	{
-		title: 'Autocomplete',
-		to: '/components/autocomplete/',
-		storyId: 'components-autocomplete--basic'
-	},
-	{
-		title: 'StandaloneSearchBox',
-		to: '/components/standalone-search-box/',
-		storyId: 'components-standalonesearchbox--basic'
 	},
 	{
 		title: 'OverlayView',
@@ -141,13 +91,18 @@ export const componentItems = [
 		storyId: 'components-overlayview--basic'
 	},
 	{
+		title: 'PlaceAutocomplete',
+		to: '/components/place-autocomplete/',
+		storyId: 'components-placeautocomplete--basic'
+	},
+	{
+		title: 'RouteRenderer',
+		to: '/components/route-renderer/',
+		storyId: 'components-routerenderer--basic'
+	},
+	{
 		title: 'StreetViewPanorama',
 		to: '/components/street-view-panorama/',
 		storyId: 'components-streetviewpanorama--basic'
-	},
-	{
-		title: 'StreetViewService',
-		to: '/components/street-view-service/',
-		storyId: 'components-streetviewservice--basic'
 	}
 ] as const satisfies readonly ComponentNavItem[];

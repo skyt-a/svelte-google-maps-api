@@ -10,7 +10,13 @@
 		"resolveJsonModule": true,
 		"isolatedModules": true,
 		"sourceMap": true,
-		"types": ["@types/google.maps", "node"]
+		"types": [
+			"google.maps",
+			"vite/client"
+		]
 	},
-	"include": [".storybook/**/*", "src/**/*"]
+	"include": [
+		".storybook/**/*",
+		"src/**/*"
+	]
 }

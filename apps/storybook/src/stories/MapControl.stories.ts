@@ -5,7 +5,9 @@ import ComponentStory from './ComponentStory.svelte';
 const meta = {
 	title: 'Components/MapControl',
 	component: MapControl,
-	tags: ['autodocs']
+	tags: ['autodocs'],
+	// The story renders ComponentStory; these only satisfy required props.
+	args: { position: 'TOP_LEFT' }
 } satisfies Meta<typeof MapControl>;
 
 export default meta;

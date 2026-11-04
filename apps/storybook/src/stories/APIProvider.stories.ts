@@ -5,7 +5,9 @@ import ComponentStory from './ComponentStory.svelte';
 const meta = {
 	title: 'Components/APIProvider',
 	component: APIProvider,
-	tags: ['autodocs']
+	tags: ['autodocs'],
+	// The story renders ComponentStory; these only satisfy required props.
+	args: { apiKey: '' }
 } satisfies Meta<typeof APIProvider>;
 
 export default meta;

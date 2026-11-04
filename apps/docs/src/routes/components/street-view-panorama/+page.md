@@ -5,89 +5,52 @@ title: StreetViewPanorama
 ## Storybook
 
 [Open the StreetViewPanorama story](https://skyt-a.github.io/svelte-google-maps-api/storybook/?path=/story/components-streetviewpanorama--basic)
-A component to display Street View panoramas.
 
-Must be used within an `<APIProvider>` component.
-
-```svelte
-<script lang="ts">
-  import { APIProvider, GoogleMap, StreetViewPanorama } from 'svelte-google-maps-api';
-  import { GOOGLE_MAPS_API_KEY } from '$env/static/private';
-
-  let panorama: google.maps.StreetViewPanorama | null = null;
-
-  const position = { lat: 40.729884, lng: -73.990988 }; // Example: Near Washington Square Park
-</script>
-
-<APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
-  <div style="height: 600px; width: 100%;">
-    <!-- You can either display the map and link the panorama to it -->
-    <GoogleMap initialCenter={position} initialZoom={14}>
-       <StreetViewPanorama bind:panorama {position} />
-    </GoogleMap>
-
-    <!-- Or display the panorama directly -->
-    <!-- <div style="height: 600px; width: 100%;">
-      <StreetViewPanorama {position} />
-    </div> -->
-  </div>
-</APIProvider>
-
-<button on:click={() => panorama?.setZoom(panorama.getZoom()! + 1)}>Zoom In</button>
-```
+`StreetViewPanorama` shows an interactive Street View panorama in its own container. Position, point of view and zoom can be two-way bound.
 
 ## Props
 
-| Prop                  | Type                                                   | Default           | Description                                                                   |
-| :-------------------- | :----------------------------------------------------- | :---------------- | :---------------------------------------------------------------------------- |
-| `options`             | `google.maps.StreetViewPanoramaOptions \| undefined` | `undefined`       | Initialization options for the panorama. Takes precedence over individual props. |
-| `containerId`         | `string \| undefined`                                  | `undefined`       | The ID for the div element that displays the panorama.                        |
-| `containerClass`      | `string`                                               | `''`              | The class name for the div element that displays the panorama.                  |
-| `containerStyle`      | `string`                                               | `'width:100%;height:100%;'` | The style for the div element that displays the panorama.                     |
-| `position`            | `google.maps.LatLng \| google.maps.LatLngLiteral \| undefined` | `undefined`       | The initial position for the panorama.                                        |
-| `pov`                 | `google.maps.StreetViewPov \| undefined`               | `undefined`       | The initial Point of View for the panorama.                                     |
-| `zoom`                | `number \| undefined`                                  | `undefined`       | The initial zoom level for the panorama.                                        |
-| `pano`                | `string \| undefined`                                  | `undefined`       | The specific panorama ID to display. Takes precedence over `position`.         |
-| `addressControl`      | `boolean \| undefined`                                 | `undefined`       | Whether to display the address control.                                       |
-| `enableCloseButton`   | `boolean \| undefined`                                 | `undefined`       | Whether to display the close button.                                          |
-| `fullscreenControl`   | `boolean \| undefined`                                 | `undefined`       | Whether to display the fullscreen control.                                    |
-| `imageDateControl`    | `boolean \| undefined`                                 | `undefined`       | Whether to display the image date control.                                    |
-| `linksControl`        | `boolean \| undefined`                                 | `undefined`       | Whether to display the links control.                                         |
-| `motionTracking`      | `boolean \| undefined`                                 | `undefined`       | Whether to enable motion tracking.                                            |
-| `motionTrackingControl` | `boolean \| undefined`                                 | `undefined`       | Whether to display the motion tracking control.                               |
-| `panControl`          | `boolean \| undefined`                                 | `undefined`       | Whether to display the pan control.                                           |
-| `scrollwheel`         | `boolean \| undefined`                                 | `undefined`       | Whether to enable zooming via the scroll wheel.                                 |
-| `zoomControl`         | `boolean \| undefined`                                 | `undefined`       | Whether to display the zoom control.                                          |
-| `visible`             | `boolean`                                              | `true`            | Whether the panorama is initially visible.                                    |
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| position | `google.maps.LatLngLiteral \| google.maps.LatLng` | | Panorama position. Bindable: follows the user moving around. |
+| pov | `google.maps.StreetViewPov` | | Camera heading and pitch. Bindable: follows the user looking around. |
+| zoom | `number` | | Zoom level. Bindable. |
+| visible | `boolean` | `true` | Whether the panorama is visible. |
+| options | `google.maps.StreetViewPanoramaOptions` (without `position`, `pov`, `zoom`, `visible`) | | Other panorama options. |
+| id | `string` | | `id` of the container. |
+| class | `string` | `''` | Class of the container. |
+| style | `string` | `'width:100%;height:100%;'` | Inline style of the container. The container needs a height. |
+| panorama | `google.maps.StreetViewPanorama \| null` | `null` | The instance. Bindable: read it with `bind:panorama`. |
 
-## Events
+### Event Props
 
-| Event               | Type                                                   | Description                                                     |
-| :------------------ | :----------------------------------------------------- | :------------------------------------------------------------ |
-| `onCloseClick`      | `(() => void) \| undefined`                            | Fired when the close button is clicked.                         |
-| `onPanoChanged`     | `(() => void) \| undefined`                            | Fired when the panorama ID changes.                             |
-| `onPositionChanged` | `(() => void) \| undefined`                            | Fired when the panorama position changes.                       |
-| `onPovChanged`      | `(() => void) \| undefined`                            | Fired when the panorama Point of View (pov) changes.            |
-| `onResize`          | `(() => void) \| undefined`                            | Fired when the panorama size changes.                           |
-| `onStatusChanged`   | `(() => void) \| undefined`                            | Fired when the panorama loading status changes.                 |
-| `onVisibleChanged`  | `(() => void) \| undefined`                            | Fired when the panorama visibility changes.                     |
-| `onZoomChanged`     | `(() => void) \| undefined`                            | Fired when the panorama zoom level changes.                     |
-| `onLoad`            | `((panorama: google.maps.StreetViewPanorama) => void) \| undefined` | Fired when the panorama is loaded. Receives the instance.       |
-| `onUnmount`         | `((panorama: google.maps.StreetViewPanorama) => void) \| undefined` | Fired when the component is destroyed. Receives the instance. |
+| Prop | Type | Description |
+|------|------|-------------|
+| onPanoChanged | `(pano: string) => void` | `pano_changed`, with the panorama ID. |
+| onStatusChanged | `(status) => void` | `status_changed`, with the result of `getStatus()` (`'OK'`, `'ZERO_RESULTS'`, ...). |
+| onCloseClick | `() => void` | `closeclick` |
+| onLoad | `(panorama: google.maps.StreetViewPanorama) => void` | Called once after the panorama is created. |
 
-## Binding
-
-You can access the `google.maps.StreetViewPanorama` instance using `bind:panorama`.
+## Usage
 
 ```svelte
 <script lang="ts">
-  import { StreetViewPanorama } from 'svelte-google-maps-api';
-  let panorama: google.maps.StreetViewPanorama | null = null;
+	import { APIProvider, StreetViewPanorama } from 'svelte-google-maps-api';
+
+	let position = $state({ lat: 35.6595, lng: 139.7005 });
+	let pov = $state({ heading: 165, pitch: 0 });
 </script>
 
-<StreetViewPanorama bind:panorama />
+<div style="height: 400px;">
+	<APIProvider apiKey="YOUR_API_KEY">
+		<StreetViewPanorama bind:position bind:pov options={{ addressControl: false }} />
+	</APIProvider>
+</div>
 
-<button disabled={!panorama} on:click={() => panorama?.setZoom(1)}>
-  Reset Zoom
-</button>
-``` 
+<p>Heading: {Math.round(pov.heading)}°</p>
+```
+
+## Notes
+
+- Use it directly inside `APIProvider`; it does not need (and should not be placed inside) `GoogleMap`.
+- The component loads the `streetView` library on demand.

@@ -3,107 +3,97 @@
 	import {
 		APIProvider,
 		AdvancedMarker,
-		Autocomplete,
 		BicyclingLayer,
 		Circle,
 		Data,
-		DirectionsRenderer,
-		DirectionsService,
-		DistanceMatrixService,
-		DrawingManager,
 		GoogleMap,
-		GoogleMarkerClusterer,
 		GroundOverlay,
-		HeatmapLayer,
-		InfoBox,
 		InfoWindow,
-		KmlLayer,
 		MapControl,
-		Marker,
 		MarkerClusterer,
 		OverlayView,
+		Pin,
+		PlaceAutocomplete,
 		Polygon,
 		Polyline,
 		Rectangle,
-		StandaloneSearchBox,
 		StreetViewPanorama,
-		StreetViewService,
 		TrafficLayer,
 		TransitLayer
 	} from 'svelte-google-maps-api';
-	import type { Library } from 'svelte-google-maps-api';
+	import RouteDemo from './RouteDemo.svelte';
 
-	export let componentName: string;
+	interface Props {
+		componentName: string;
+	}
+
+	let { componentName }: Props = $props();
 
 	const STORYBOOK_API_KEY_STORAGE_KEY = 'svelte-google-maps-api:storybook-google-maps-api-key';
 	const fallbackApiKey = import.meta.env.STORYBOOK_GOOGLE_MAPS_API_KEY ?? '';
-	const mapsApiVersion = '3.64';
-	const center = { lat: 35.6812362, lng: 139.7649361 };
-	const bicyclingCenter = { lat: 45.523, lng: -122.676 };
-	const second = { lat: 35.658584, lng: 139.7454316 };
-	const third = { lat: 35.710063, lng: 139.8107 };
-	const bounds = {
-		north: 35.73,
-		south: 35.64,
-		east: 139.84,
-		west: 139.69
-	};
-	const path = [center, second, third, center];
-	const mapOptions: google.maps.MapOptions = {
-		center,
-		zoom: 12,
-		mapId: 'DEMO_MAP_ID'
-	};
-	const bicyclingMapOptions: google.maps.MapOptions = {
-		center: bicyclingCenter,
-		zoom: 14,
-		mapId: 'DEMO_MAP_ID'
-	};
-	const heatmapData = [
-		{ location: center, weight: 3 },
-		{ location: second, weight: 2 },
-		{ location: third, weight: 4 }
-	];
-	const kmlUrl =
-		'https://developers.google.com/maps/documentation/javascript/examples/kml/westcampus.kml';
+	const mapId = 'DEMO_MAP_ID';
+	const tokyo = { lat: 35.6812362, lng: 139.7649361 };
+	const portland = { lat: 45.523, lng: -122.676 };
+	const tower = { lat: 35.658584, lng: 139.7454316 };
+	const skytree = { lat: 35.710063, lng: 139.8107 };
 	const groundOverlayUrl =
 		'https://developers.google.com/maps/documentation/javascript/examples/full/images/talkeetna.png';
-	const distanceRequest: google.maps.DistanceMatrixRequest = {
-		origins: [center],
-		destinations: [second],
-		travelMode: 'DRIVING' as google.maps.TravelMode
-	};
-	const directionsRequest: google.maps.DirectionsRequest = {
-		origin: center,
-		destination: second,
-		travelMode: 'DRIVING' as google.maps.TravelMode
-	};
+	const overlayBounds = { north: 35.73, south: 35.64, east: 139.84, west: 139.69 };
 	const clusterLocations = [
-		center,
-		second,
-		third,
+		tokyo,
+		tower,
+		skytree,
 		{ lat: 35.6895, lng: 139.6917 },
-		{ lat: 35.699, lng: 139.774 }
+		{ lat: 35.699, lng: 139.774 },
+		{ lat: 35.6655, lng: 139.7708 },
+		{ lat: 35.7148, lng: 139.7967 }
 	];
+	const geoJson = {
+		type: 'FeatureCollection',
+		features: [
+			{
+				type: 'Feature',
+				geometry: {
+					type: 'Polygon',
+					coordinates: [
+						[
+							[139.72, 35.67],
+							[139.79, 35.67],
+							[139.79, 35.71],
+							[139.72, 35.71],
+							[139.72, 35.67]
+						]
+					]
+				},
+				properties: { name: 'Tokyo sample polygon' }
+			}
+		]
+	};
 
-	let directions: google.maps.DirectionsResult | undefined = undefined;
-	let serviceStatus = 'Waiting';
-	let dataLoaded = false;
-	let apiKey = '';
-	let apiKeyInput = fallbackApiKey;
-	let isApiKeyPanelOpen = false;
-	let apiKeyMessage = '';
-	let isApiKeyReady = false;
-	let shouldRememberApiKey = false;
-	let advancedMarkerLoaded = false;
-	let bicyclingLayerLoaded = false;
-	let drawingManagerLoaded = false;
+	let apiKey = $state('');
+	let apiKeyInput = $state(fallbackApiKey);
+	let isApiKeyPanelOpen = $state(false);
+	let apiKeyMessage = $state('');
+	let isApiKeyReady = $state(false);
+	let shouldRememberApiKey = $state(false);
 
-	$: libraries = getLibraries(componentName);
-	$: storyMapOptions = componentName === 'BicyclingLayer' ? bicyclingMapOptions : mapOptions;
-	$: if (componentName !== 'AdvancedMarker') advancedMarkerLoaded = false;
-	$: if (componentName !== 'BicyclingLayer') bicyclingLayerLoaded = false;
-	$: if (componentName !== 'DrawingManager') drawingManagerLoaded = false;
+	let center = $state<google.maps.LatLngLiteral>(tokyo);
+	let zoom = $state(12);
+	let markerPosition = $state<google.maps.LatLngLiteral>(tokyo);
+	let infoMarker = $state<google.maps.marker.AdvancedMarkerElement | null>(null);
+	let infoWindowOpen = $state(true);
+	let linePath = $state<google.maps.LatLngLiteral[]>([tokyo, tower, skytree]);
+	let polygonPaths = $state<google.maps.LatLngLiteral[]>([tokyo, tower, skytree]);
+	let circleRadius = $state(1200);
+	let rectangleBounds = $state(overlayBounds);
+	let status = $state('');
+	let selectedPlace = $state('');
+
+	const mapCenter = $derived(componentName === 'BicyclingLayer' ? portland : tokyo);
+
+	$effect(() => {
+		center = mapCenter;
+	});
 
 	onMount(() => {
 		let storedApiKey = '';
@@ -111,14 +101,14 @@
 		try {
 			storedApiKey = window.localStorage.getItem(STORYBOOK_API_KEY_STORAGE_KEY) ?? '';
 			shouldRememberApiKey = Boolean(storedApiKey);
-		} catch (error) {
+		} catch {
 			apiKeyMessage = 'Could not read the remembered API key.';
 		}
 
 		if (!storedApiKey) {
 			try {
 				storedApiKey = window.sessionStorage.getItem(STORYBOOK_API_KEY_STORAGE_KEY) ?? '';
-			} catch (error) {
+			} catch {
 				apiKeyMessage = apiKeyMessage || 'Could not read the session API key.';
 			}
 		}
@@ -137,66 +127,12 @@
 	function saveApiKeyForSession(nextApiKey: string) {
 		try {
 			window.sessionStorage.setItem(STORYBOOK_API_KEY_STORAGE_KEY, nextApiKey);
-		} catch (error) {
+		} catch {
 			apiKeyMessage = 'Could not save the API key for this tab.';
 			return false;
 		}
 
 		return true;
-	}
-
-	function getLibraries(name: string): Library[] {
-		if (name === 'Autocomplete' || name === 'StandaloneSearchBox') return ['places'];
-		if (name === 'DrawingManager') return ['drawing'];
-		if (name === 'HeatmapLayer') return ['visualization'];
-		if (name === 'AdvancedMarker') return ['marker'];
-		return [];
-	}
-
-	function handleDirectionsResult(
-		result: google.maps.DirectionsResult | null,
-		status: google.maps.DirectionsStatus
-	) {
-		serviceStatus = String(status);
-		if (result) directions = result;
-	}
-
-	function handleDistanceMatrix(
-		response: google.maps.DistanceMatrixResponse | null,
-		status: google.maps.DistanceMatrixStatus
-	) {
-		serviceStatus = response ? `${status}: ${response.rows.length} row` : String(status);
-	}
-
-	function handleDataLoad(data: google.maps.Data) {
-		data.addGeoJson({
-			type: 'FeatureCollection',
-			features: [
-				{
-					type: 'Feature',
-					geometry: {
-						type: 'Polygon',
-						coordinates: [
-							[
-								[139.72, 35.67],
-								[139.79, 35.67],
-								[139.79, 35.71],
-								[139.72, 35.71],
-								[139.72, 35.67]
-							]
-						]
-					},
-					properties: { name: 'Tokyo sample polygon' }
-				}
-			]
-		} as any);
-		data.setStyle({
-			fillColor: '#1d9a8a',
-			fillOpacity: 0.25,
-			strokeColor: '#1d9a8a',
-			strokeWeight: 2
-		});
-		dataLoaded = true;
 	}
 
 	function saveApiKey() {
@@ -217,7 +153,7 @@
 			try {
 				window.localStorage.setItem(STORYBOOK_API_KEY_STORAGE_KEY, nextApiKey);
 				apiKeyMessage = 'API key remembered in this browser.';
-			} catch (error) {
+			} catch {
 				apiKeyMessage = didSaveForSession
 					? 'API key saved for this tab. Browser remember was unavailable.'
 					: 'Could not save the API key.';
@@ -225,7 +161,7 @@
 		} else if (didSaveForSession) {
 			try {
 				window.localStorage.removeItem(STORYBOOK_API_KEY_STORAGE_KEY);
-			} catch (error) {
+			} catch {
 				// The session value is enough; a blocked localStorage cleanup should not stop the story.
 			}
 
@@ -252,14 +188,14 @@
 
 		try {
 			window.sessionStorage.removeItem(STORYBOOK_API_KEY_STORAGE_KEY);
-		} catch (error) {
+		} catch {
 			apiKeyMessage = 'Could not clear the tab API key.';
 		}
 
 		try {
 			window.localStorage.removeItem(STORYBOOK_API_KEY_STORAGE_KEY);
 			apiKeyMessage = fallbackApiKey ? 'Using the environment API key.' : 'API key cleared.';
-		} catch (error) {
+		} catch {
 			apiKeyMessage = apiKeyMessage || 'Could not clear the remembered API key.';
 		}
 
@@ -274,9 +210,21 @@
 	}
 </script>
 
+{#snippet statusControl(text: string)}
+	<MapControl position="TOP_LEFT">
+		<div class="control">{text}</div>
+	</MapControl>
+{/snippet}
+
 {#if isApiKeyReady && !apiKey}
 	<div class="api-key-empty-state">
-		<form class="api-key-card" on:submit|preventDefault={saveApiKey}>
+		<form
+			class="api-key-card"
+			onsubmit={(event) => {
+				event.preventDefault();
+				saveApiKey();
+			}}
+		>
 			<strong>{componentName}</strong>
 			<label for="storybook-google-maps-api-key">Google Maps API key</label>
 			<div class="api-key-row">
@@ -302,7 +250,13 @@
 {:else if isApiKeyReady}
 	<div class="api-key-toolbar">
 		{#if isApiKeyPanelOpen}
-			<form class="api-key-popover" on:submit|preventDefault={saveApiKey}>
+			<form
+				class="api-key-popover"
+				onsubmit={(event) => {
+					event.preventDefault();
+					saveApiKey();
+				}}
+			>
 				<label for="storybook-google-maps-api-key-toolbar">Google Maps API key</label>
 				<div class="api-key-row">
 					<input
@@ -318,182 +272,143 @@
 					<span>Remember in this browser</span>
 				</label>
 				<div class="api-key-actions">
-					<button type="button" on:click={() => (isApiKeyPanelOpen = false)}>Close</button>
-					<button type="button" on:click={clearSavedApiKey}>Clear</button>
+					<button type="button" onclick={() => (isApiKeyPanelOpen = false)}>Close</button>
+					<button type="button" onclick={clearSavedApiKey}>Clear</button>
 				</div>
 				{#if apiKeyMessage}
 					<p class="api-key-message">{apiKeyMessage}</p>
 				{/if}
 			</form>
 		{:else}
-			<button type="button" class="api-key-toggle" on:click={() => (isApiKeyPanelOpen = true)}>
+			<button type="button" class="api-key-toggle" onclick={() => (isApiKeyPanelOpen = true)}>
 				API key
 			</button>
 		{/if}
 	</div>
 {/if}
 
-{#if isApiKeyReady && apiKey && componentName === 'APIProvider'}
-	<div class="map-frame">
-		<APIProvider {apiKey} version={mapsApiVersion}>
-			<GoogleMap options={mapOptions} mapContainerStyle="width:100%;height:100%;">
-				<Marker position={center} options={{ title: 'APIProvider story marker' }} />
-			</GoogleMap>
-		</APIProvider>
-	</div>
-{:else if isApiKeyReady && apiKey && componentName === 'Autocomplete'}
-	<div class="panel-frame">
-		<APIProvider {apiKey} libraries={['places']} version={mapsApiVersion}>
-			<Autocomplete placeholder="Search for a place" inputStyle="width:320px;padding:10px;" />
-		</APIProvider>
-	</div>
-{:else if isApiKeyReady && apiKey && componentName === 'StandaloneSearchBox'}
-	<div class="panel-frame">
-		<APIProvider {apiKey} libraries={['places']} version={mapsApiVersion}>
-			<StandaloneSearchBox placeholder="Search places" inputStyle="width:320px;padding:10px;" />
-		</APIProvider>
-	</div>
-{:else if isApiKeyReady && apiKey && componentName === 'StreetViewPanorama'}
-	<div class="map-frame">
-		<APIProvider {apiKey} version={mapsApiVersion}>
-			<StreetViewPanorama
-				position={center}
-				pov={{ heading: 165, pitch: 0 }}
-				zoom={1}
-				containerStyle="width:100%;height:100%;"
-			/>
-		</APIProvider>
-	</div>
-{:else if isApiKeyReady && apiKey && componentName === 'StreetViewService'}
-	<div class="panel-frame">
-		<APIProvider {apiKey} version={mapsApiVersion}>
-			<StreetViewService onLoad={() => (serviceStatus = 'StreetViewService loaded')} />
-			<p>{serviceStatus}</p>
-		</APIProvider>
-	</div>
-{:else if isApiKeyReady && apiKey && componentName === 'DistanceMatrixService'}
-	<div class="panel-frame">
-		<APIProvider {apiKey} version={mapsApiVersion}>
-			<DistanceMatrixService options={distanceRequest} callback={handleDistanceMatrix} />
-			<p>{serviceStatus}</p>
-		</APIProvider>
-	</div>
-{:else if isApiKeyReady && apiKey}
-	<div class="map-frame">
-		<APIProvider {apiKey} {libraries} version={mapsApiVersion} mapIds={['DEMO_MAP_ID']}>
-			<GoogleMap options={storyMapOptions} mapContainerStyle="width:100%;height:100%;">
-				{#if componentName === 'GoogleMap'}
-					<Marker position={center} options={{ title: 'Tokyo Station' }} />
-				{:else if componentName === 'Marker'}
-					<Marker position={center} options={{ title: 'Marker', draggable: true }} />
-				{:else if componentName === 'AdvancedMarker'}
-					<AdvancedMarker
-						position={center}
-						title="Advanced marker"
-						onLoad={() => (advancedMarkerLoaded = true)}
-					>
-						<div class="advanced-marker">A</div>
-					</AdvancedMarker>
-					{#if advancedMarkerLoaded}
-						<MapControl position={2 as google.maps.ControlPosition}>
-							<div class="control">Advanced marker loaded</div>
+{#if isApiKeyReady && apiKey}
+	<APIProvider {apiKey}>
+		{#if componentName === 'PlaceAutocomplete'}
+			<div class="panel-frame">
+				<PlaceAutocomplete
+					placeholder="Search for a place"
+					includedRegionCodes={['jp']}
+					onPlaceSelect={(place) =>
+						(selectedPlace = `${place.displayName ?? ''} — ${place.formattedAddress ?? ''}`)}
+				/>
+				<p>{selectedPlace || 'Select a suggestion to fetch its details.'}</p>
+			</div>
+		{:else if componentName === 'StreetViewPanorama'}
+			<div class="map-frame">
+				<StreetViewPanorama position={tokyo} pov={{ heading: 165, pitch: 0 }} zoom={1} />
+			</div>
+		{:else}
+			<div class="map-frame">
+				<GoogleMap bind:center bind:zoom {mapId}>
+					{#if componentName === 'APIProvider' || componentName === 'GoogleMap'}
+						<AdvancedMarker position={tokyo} title="Tokyo Station" />
+						{@render statusControl(
+							`center ${center.lat.toFixed(4)}, ${center.lng.toFixed(4)} · zoom ${zoom}`
+						)}
+					{:else if componentName === 'AdvancedMarker'}
+						<AdvancedMarker bind:position={markerPosition} title="Drag me" draggable>
+							<div class="advanced-marker">A</div>
+						</AdvancedMarker>
+						{@render statusControl(
+							`marker ${markerPosition.lat.toFixed(4)}, ${markerPosition.lng.toFixed(4)}`
+						)}
+					{:else if componentName === 'Pin'}
+						<AdvancedMarker position={tokyo} title="Tokyo Station">
+							<Pin background="#0f766e" borderColor="#115e59" glyphColor="white" glyphText="T" />
+						</AdvancedMarker>
+						<AdvancedMarker position={tower} title="Tokyo Tower">
+							<Pin background="#dc2626" glyphText="★" glyphColor="white" scale={1.3} />
+						</AdvancedMarker>
+					{:else if componentName === 'MarkerClusterer'}
+						<MarkerClusterer>
+							{#each clusterLocations as position, index (index)}
+								<AdvancedMarker {position} />
+							{/each}
+						</MarkerClusterer>
+					{:else if componentName === 'InfoWindow'}
+						<AdvancedMarker
+							position={tokyo}
+							bind:marker={infoMarker}
+							title="Tokyo Station"
+							onClick={() => (infoWindowOpen = true)}
+						/>
+						{#if infoMarker}
+							<InfoWindow anchor={infoMarker} bind:open={infoWindowOpen} headerContent="Tokyo">
+								<p>Tokyo Station. Click the marker to reopen.</p>
+							</InfoWindow>
+						{/if}
+					{:else if componentName === 'Polyline'}
+						<Polyline bind:path={linePath} strokeColor="#0f766e" strokeWeight={4} editable />
+						{@render statusControl(`${linePath.length} vertices (drag to edit)`)}
+					{:else if componentName === 'Polygon'}
+						<Polygon
+							bind:paths={polygonPaths}
+							fillColor="#0f766e"
+							fillOpacity={0.25}
+							strokeColor="#0f766e"
+							editable
+						/>
+					{:else if componentName === 'Circle'}
+						<Circle
+							center={tokyo}
+							bind:radius={circleRadius}
+							fillColor="#2563eb"
+							fillOpacity={0.2}
+							strokeColor="#2563eb"
+							editable
+						/>
+						{@render statusControl(`radius ${Math.round(circleRadius)} m`)}
+					{:else if componentName === 'Rectangle'}
+						<Rectangle
+							bind:bounds={rectangleBounds}
+							fillColor="#f59e0b"
+							fillOpacity={0.2}
+							strokeColor="#f59e0b"
+							editable
+							draggable
+						/>
+					{:else if componentName === 'GroundOverlay'}
+						<GroundOverlay url={groundOverlayUrl} bounds={overlayBounds} opacity={0.55} />
+					{:else if componentName === 'Data'}
+						<Data
+							{geoJson}
+							style={{
+								fillColor: '#1d9a8a',
+								fillOpacity: 0.25,
+								strokeColor: '#1d9a8a',
+								strokeWeight: 2
+							}}
+						/>
+					{:else if componentName === 'TrafficLayer'}
+						<TrafficLayer />
+					{:else if componentName === 'TransitLayer'}
+						<TransitLayer />
+					{:else if componentName === 'BicyclingLayer'}
+						<BicyclingLayer />
+					{:else if componentName === 'OverlayView'}
+						<OverlayView position={tokyo} pane="overlayMouseTarget">
+							<div class="overlay-view">OverlayView</div>
+						</OverlayView>
+					{:else if componentName === 'MapControl'}
+						<MapControl position="TOP_LEFT">
+							<button type="button" class="control" onclick={() => (zoom = 12)}>Reset zoom</button>
 						</MapControl>
+					{:else if componentName === 'RouteRenderer'}
+						<RouteDemo origin={tokyo} destination={skytree} onStatus={(next) => (status = next)} />
+						{#if status}
+							{@render statusControl(status)}
+						{/if}
 					{/if}
-				{:else if componentName === 'InfoWindow'}
-					<Marker position={center} />
-					<InfoWindow position={center}>
-						<strong>Tokyo Station</strong>
-					</InfoWindow>
-				{:else if componentName === 'InfoBox'}
-					<InfoBox
-						position={center}
-						options={{
-							boxClass: 'storybook-info-box',
-							pixelOffset: new google.maps.Size(-80, -40),
-							closeBoxURL: ''
-						}}
-					>
-						<div class="info-box">Custom InfoBox</div>
-					</InfoBox>
-				{:else if componentName === 'Polyline'}
-					<Polyline {path} strokeColor="#0f766e" strokeWeight={4} />
-				{:else if componentName === 'Polygon'}
-					<Polygon paths={path} fillColor="#0f766e" fillOpacity={0.25} strokeColor="#0f766e" />
-				{:else if componentName === 'Circle'}
-					<Circle
-						{center}
-						radius={1200}
-						fillColor="#2563eb"
-						fillOpacity={0.2}
-						strokeColor="#2563eb"
-					/>
-				{:else if componentName === 'Rectangle'}
-					<Rectangle {bounds} fillColor="#f59e0b" fillOpacity={0.2} strokeColor="#f59e0b" />
-				{:else if componentName === 'Data'}
-					<Data onLoad={handleDataLoad} />
-					{#if dataLoaded}
-						<MapControl position={2 as google.maps.ControlPosition}>
-							<div class="control">Data loaded</div>
-						</MapControl>
-					{/if}
-				{:else if componentName === 'HeatmapLayer'}
-					<HeatmapLayer data={heatmapData} radius={32} opacity={0.7} />
-				{:else if componentName === 'KmlLayer'}
-					<KmlLayer url={kmlUrl} preserveViewport />
-				{:else if componentName === 'TrafficLayer'}
-					<TrafficLayer />
-				{:else if componentName === 'TransitLayer'}
-					<TransitLayer />
-				{:else if componentName === 'BicyclingLayer'}
-					<BicyclingLayer onLoad={() => (bicyclingLayerLoaded = true)} />
-					{#if bicyclingLayerLoaded}
-						<MapControl position={2 as google.maps.ControlPosition}>
-							<div class="control">Bicycling layer loaded</div>
-						</MapControl>
-					{/if}
-				{:else if componentName === 'GroundOverlay'}
-					<GroundOverlay url={groundOverlayUrl} {bounds} opacity={0.55} />
-				{:else if componentName === 'OverlayView'}
-					<OverlayView position={center}>
-						<div class="overlay-view">OverlayView</div>
-					</OverlayView>
-				{:else if componentName === 'MapControl'}
-					<MapControl position={2 as google.maps.ControlPosition}>
-						<button class="control">Map control</button>
-					</MapControl>
-				{:else if componentName === 'DrawingManager'}
-					<DrawingManager drawingControl onLoad={() => (drawingManagerLoaded = true)} />
-					{#if drawingManagerLoaded}
-						<MapControl position={2 as google.maps.ControlPosition}>
-							<div class="control">Drawing manager loaded</div>
-						</MapControl>
-					{/if}
-				{:else if componentName === 'DirectionsRenderer'}
-					<DirectionsService options={directionsRequest} callback={handleDirectionsResult} />
-					{#if directions}
-						<DirectionsRenderer {directions} />
-					{/if}
-				{:else if componentName === 'DirectionsService'}
-					<DirectionsService options={directionsRequest} callback={handleDirectionsResult} />
-					<MapControl position={2 as google.maps.ControlPosition}>
-						<div class="control">Directions: {serviceStatus}</div>
-					</MapControl>
-				{:else if componentName === 'MarkerClusterer'}
-					<MarkerClusterer>
-						{#each clusterLocations as position}
-							<Marker {position} />
-						{/each}
-					</MarkerClusterer>
-				{:else if componentName === 'GoogleMarkerClusterer'}
-					<GoogleMarkerClusterer>
-						{#each clusterLocations as position}
-							<Marker {position} />
-						{/each}
-					</GoogleMarkerClusterer>
-				{/if}
-			</GoogleMap>
-		</APIProvider>
-	</div>
+				</GoogleMap>
+			</div>
+		{/if}
+	</APIProvider>
 {/if}
 
 <style>
@@ -503,6 +418,9 @@
 	}
 
 	.panel-frame {
+		display: grid;
+		gap: 12px;
+		max-width: 480px;
 		padding: 24px;
 		font-family: Inter, system-ui, sans-serif;
 	}
@@ -559,7 +477,9 @@
 		border: 1px solid #cbd5e1;
 		border-radius: 6px;
 		color: #111827;
-		font: 14px/1.4 system-ui, sans-serif;
+		font:
+			14px/1.4 system-ui,
+			sans-serif;
 		min-width: 0;
 		padding: 9px 10px;
 	}
@@ -576,7 +496,9 @@
 		border: 1px solid #cbd5e1;
 		border-radius: 6px;
 		cursor: pointer;
-		font: 600 13px/1 system-ui, sans-serif;
+		font:
+			600 13px/1 system-ui,
+			sans-serif;
 		min-height: 36px;
 		padding: 0 12px;
 	}
@@ -631,14 +553,15 @@
 	}
 
 	.control,
-	.overlay-view,
-	.info-box {
+	.overlay-view {
 		background: white;
 		border: 1px solid #d1d5db;
 		border-radius: 6px;
 		box-shadow: 0 8px 24px rgba(15, 23, 42, 0.16);
 		color: #111827;
-		font: 14px/1.4 system-ui, sans-serif;
+		font:
+			14px/1.4 system-ui,
+			sans-serif;
 		padding: 8px 12px;
 	}
 
@@ -650,7 +573,9 @@
 		box-shadow: 0 6px 18px rgba(15, 23, 42, 0.22);
 		color: white;
 		display: flex;
-		font: 700 14px/1 system-ui, sans-serif;
+		font:
+			700 14px/1 system-ui,
+			sans-serif;
 		height: 32px;
 		justify-content: center;
 		width: 32px;

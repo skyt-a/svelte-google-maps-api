@@ -10,7 +10,7 @@
 [![npm version](https://badge.fury.io/js/svelte-google-maps-api.svg)](https://badge.fury.io/js/svelte-google-maps-api)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A declarative Svelte component library for the Google Maps JavaScript API.
+Svelte 5 components for the Google Maps JavaScript API, built on Advanced Markers, Places API (New) and the Routes library.
 
 ## Links
 
@@ -22,60 +22,43 @@ A declarative Svelte component library for the Google Maps JavaScript API.
 
 ```bash
 pnpm add svelte-google-maps-api
-```
-
-```bash
+# or
 npm install svelte-google-maps-api
 ```
 
-```bash
-yarn add svelte-google-maps-api
-```
+Requires Svelte 5.
 
 ## Quick Start
 
 ```svelte
 <script lang="ts">
-	import { APIProvider, GoogleMap, Marker } from 'svelte-google-maps-api';
+	import { APIProvider, GoogleMap, AdvancedMarker } from 'svelte-google-maps-api';
 
-	const apiKey = 'YOUR_MAP_KEY';
+	const apiKey = 'YOUR_API_KEY';
+	let center = $state({ lat: 35.6812362, lng: 139.7649361 });
+	let zoom = $state(14);
 </script>
 
 <div style="width: 100%; height: 100vh;">
 	<APIProvider {apiKey}>
-		<GoogleMap
-			options={{
-				center: { lat: 35.6812362, lng: 139.7649361 },
-				zoom: 14
-			}}
-			mapContainerStyle="width:100%;height:100%;"
-		>
-			<Marker position={{ lat: 35.6812362, lng: 139.7649361 }} />
+		<GoogleMap bind:center bind:zoom mapId="DEMO_MAP_ID">
+			<AdvancedMarker position={{ lat: 35.6812362, lng: 139.7649361 }} title="Tokyo Station" />
 		</GoogleMap>
 	</APIProvider>
 </div>
 ```
 
-## Library Loading
-
-Some components require optional Google Maps libraries:
-
-| Component                             | Required library |
-| ------------------------------------- | ---------------- |
-| `AdvancedMarker`                      | `marker`         |
-| `Autocomplete`, `StandaloneSearchBox` | `places`         |
-| `DrawingManager`                      | `drawing`        |
-| `HeatmapLayer`                        | `visualization`  |
-
-```svelte
-<APIProvider {apiKey} libraries={['marker', 'places', 'drawing', 'visualization']}>
-	<!-- map components -->
-</APIProvider>
-```
+`AdvancedMarker`, `Pin`, `MarkerClusterer` and `RouteRenderer` markers need a map with a `mapId`. `DEMO_MAP_ID` works for development. Components load the Google Maps libraries they need on demand.
 
 ## Components
 
-The package includes map, marker, clusterer, info window, shape, layer, places, directions, distance matrix, custom control, custom overlay, data layer, and Street View components. See the docs for full props and examples.
+`APIProvider`, `GoogleMap`, `AdvancedMarker`, `Pin`, `MarkerClusterer`, `InfoWindow`, `Polyline`, `Polygon`, `Circle`, `Rectangle`, `GroundOverlay`, `Data`, `TrafficLayer`, `TransitLayer`, `BicyclingLayer`, `MapControl`, `OverlayView`, `PlaceAutocomplete`, `RouteRenderer` and `StreetViewPanorama`, plus the `useMap`, `useMapsLibrary` and `useAPILoadingStatus` helpers.
+
+See the [package README](packages/svelte-google-maps-api/README.md) and the docs for props and examples.
+
+## Upgrading from 0.2
+
+0.3 is a rewrite on Svelte 5 runes. It removes the components that wrapped deprecated or discontinued Google Maps APIs: `Marker`, `DrawingManager`, `HeatmapLayer`, `KmlLayer`, `Autocomplete`, `StandaloneSearchBox` and the Directions / Distance Matrix services. See the [migration guide](https://skyt-a.github.io/svelte-google-maps-api/guide/migration/).
 
 ## Development
 

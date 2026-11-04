@@ -5,7 +5,18 @@ title: BicyclingLayer
 ## Storybook
 
 [Open the BicyclingLayer story](https://skyt-a.github.io/svelte-google-maps-api/storybook/?path=/story/components-bicyclinglayer--basic)
-The `BicyclingLayer` component displays bicycle paths, suggested routes, and other overlays specific to cycling on the map.
+
+`BicyclingLayer` shows bike paths and bicycle-friendly roads with `google.maps.BicyclingLayer`. Render it inside `GoogleMap` to show the layer and remove it to hide the layer.
+
+## Props
+
+This component has no props other than `onLoad`.
+
+### Event Props
+
+| Prop | Type | Description |
+|------|------|-------------|
+| onLoad | `(layer: google.maps.BicyclingLayer) => void` | Called once after the layer is added to the map. |
 
 ## Usage
 
@@ -13,28 +24,22 @@ The `BicyclingLayer` component displays bicycle paths, suggested routes, and oth
 <script lang="ts">
 	import { APIProvider, GoogleMap, BicyclingLayer } from 'svelte-google-maps-api';
 
-	let apiKey = 'YOUR_MAP_KEY'; // Replace with your API key
-	let mapCenter = { lat: 45.523, lng: -122.676 }; // Portland
-	let mapZoom = 14;
+	let visible = $state(true);
 </script>
 
-<div style="height: 500px; width: 100%;">
-	<APIProvider {apiKey}>
-		<GoogleMap options={{ center: mapCenter, zoom: mapZoom }}>
-			<BicyclingLayer />
+<label><input type="checkbox" bind:checked={visible} /> Show layer</label>
+
+<div style="height: 400px;">
+	<APIProvider apiKey="YOUR_API_KEY">
+		<GoogleMap center={{ lat: 45.523, lng: -122.676 }} zoom={13}>
+			{#if visible}
+				<BicyclingLayer />
+			{/if}
 		</GoogleMap>
 	</APIProvider>
 </div>
 ```
 
-## Props
-
-| Prop      | Type                                          | Description                         |
-| --------- | --------------------------------------------- | ----------------------------------- |
-| onLoad    | `(layer: google.maps.BicyclingLayer) => void` | Called after the layer is created.  |
-| onUnmount | `(layer: google.maps.BicyclingLayer) => void` | Called before the layer is removed. |
-
 ## Notes
 
-- The layer highlights dedicated bike trails, streets with bike lanes, and recommended cycling streets.
-- Availability and detail depend on the region and zoom level. Use a location with cycling coverage when verifying the layer.
+- Bicycling data is not available in every region; try a city such as Portland, Oregon.

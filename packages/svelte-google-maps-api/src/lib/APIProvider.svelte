@@ -94,6 +94,7 @@
 			})
 			.then(() => {
 				if (cancelled) return;
+				preloaded = true;
 				onLoad?.();
 			})
 			.catch(fail);
@@ -103,10 +104,9 @@
 		};
 	});
 
-	// Children render only after the core and maps libraries are available.
-	const ready = $derived(
-		context.status === 'loaded' && Boolean(context.libraries.core && context.libraries.maps)
-	);
+	// Children render after the preloaded libraries (always core and maps) are available.
+	let preloaded = $state(false);
+	const ready = $derived(context.status === 'loaded' && preloaded);
 </script>
 
 {#if context.status === 'error' && context.error}

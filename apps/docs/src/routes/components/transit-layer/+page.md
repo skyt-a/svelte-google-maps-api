@@ -5,35 +5,41 @@ title: TransitLayer
 ## Storybook
 
 [Open the TransitLayer story](https://skyt-a.github.io/svelte-google-maps-api/storybook/?path=/story/components-transitlayer--basic)
-The `TransitLayer` component displays the public transportation network on the map.
+
+`TransitLayer` shows public transit lines with `google.maps.TransitLayer`. Render it inside `GoogleMap` to show the layer and remove it to hide the layer.
+
+## Props
+
+This component has no props other than `onLoad`.
+
+### Event Props
+
+| Prop | Type | Description |
+|------|------|-------------|
+| onLoad | `(layer: google.maps.TransitLayer) => void` | Called once after the layer is added to the map. |
 
 ## Usage
 
 ```svelte
 <script lang="ts">
-  import { APIProvider, GoogleMap, TransitLayer } from 'svelte-google-maps-api';
+	import { APIProvider, GoogleMap, TransitLayer } from 'svelte-google-maps-api';
 
-  let apiKey = 'YOUR_MAP_KEY'; // Replace with your API key
-  let map: google.maps.Map | null = null;
-  let mapCenter = { lat: 51.507, lng: -0.127 }; // London
-  let mapZoom = 13;
-
+	let visible = $state(true);
 </script>
 
-<div style="height: 500px; width: 100%;">
-  <APIProvider {apiKey}>
-    <GoogleMap bind:map options={{ center: mapCenter, zoom: mapZoom }}>
-      <TransitLayer />
-    </GoogleMap>
-  </APIProvider>
+<label><input type="checkbox" bind:checked={visible} /> Show layer</label>
+
+<div style="height: 400px;">
+	<APIProvider apiKey="YOUR_API_KEY">
+		<GoogleMap center={{ lat: 35.6812, lng: 139.7671 }} zoom={13}>
+			{#if visible}
+				<TransitLayer />
+			{/if}
+		</GoogleMap>
+	</APIProvider>
 </div>
 ```
 
-## Props
-
-This component does not typically take specific options via props in the standard API.
-
 ## Notes
 
-*   The transit layer displays major public transit routes (subway, bus, train lines) with distinct colors and styles based on the transit agency.
-*   Availability of transit information depends on the region and zoom level. 
+- Transit data is not available in every city.

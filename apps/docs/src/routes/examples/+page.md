@@ -2,302 +2,234 @@
 title: Examples
 ---
 
-Here are some examples of how to use the Svelte Google Maps API library.
+Live examples built with the components from this library.
 
-**Note:** You need a Google Maps API key to view these examples. Enter your key in the input field provided for each demo.
+**Note:** You need a Google Maps API key to view these examples. Enter your key in the input field for each demo. The examples use `DEMO_MAP_ID`, which works for development.
 
 ## Basic Map
 
-A simple map with default options.
+A map whose camera is bound to local state.
 
 ```svelte live title="BasicMap.svelte"
 <script lang="ts">
-  import { APIProvider, GoogleMap } from 'svelte-google-maps-api';
+	import { APIProvider, GoogleMap } from 'svelte-google-maps-api';
 
-  let userApiKey = '';
-  const mapOptions = {
-    center: { lat: 35.6812362, lng: 139.7649361 },
-    zoom: 10
-  };
+	let apiKey = $state('');
+	let center = $state({ lat: 35.6812362, lng: 139.7649361 });
+	let zoom = $state(10);
 </script>
 
-<div style="margin-bottom: 1rem;">
-  <label for="apiKeyBasic">Enter your API Key:</label>
-  <input id="apiKeyBasic" type="text" bind:value={userApiKey} placeholder="YOUR_API_KEY" style="width: 300px; padding: 4px; margin-left: 5px;"/>
-</div>
+<label>
+	Enter your API Key:
+	<input type="text" bind:value={apiKey} placeholder="YOUR_API_KEY" style="width: 300px" />
+</label>
 
-<div style="height: 400px; width: 100%; border: 1px solid #ccc;">
-  {#if !userApiKey}
-    <p style="text-align: center; padding: 2rem; color: #555;">Please enter your API key above to load the map.</p>
-  {:else}
-    {#key userApiKey}
-      <APIProvider apiKey={userApiKey}>
-        <GoogleMap
-          id="basic-map"
-          options={mapOptions}
-          mapContainerStyle="width: 100%; height: 100%;"
-        />
-      </APIProvider>
-    {/key}
-  {/if}
+<div style="height: 400px; margin-top: 1rem; border: 1px solid #ccc;">
+	{#if !apiKey}
+		<p style="text-align: center; padding: 2rem;">Please enter your API key above to load the map.</p>
+	{:else}
+		{#key apiKey}
+			<APIProvider {apiKey}>
+				<GoogleMap bind:center bind:zoom mapId="DEMO_MAP_ID" />
+			</APIProvider>
+		{/key}
+	{/if}
 </div>
+<p>Center: {center.lat.toFixed(4)}, {center.lng.toFixed(4)} · Zoom: {zoom}</p>
 ```
 
-## Map with Marker
+## Markers and an InfoWindow
 
-A map with a single marker.
+Click a marker to open its info window.
 
-```svelte live title="MapWithMarker.svelte"
+```svelte live title="MarkersWithInfoWindow.svelte"
 <script lang="ts">
-  import { APIProvider, GoogleMap, Marker } from 'svelte-google-maps-api';
+	import { APIProvider, GoogleMap, AdvancedMarker, Pin, InfoWindow } from 'svelte-google-maps-api';
 
-  let userApiKey = '';
-  const mapOptions = {
-    center: { lat: 35.6812362, lng: 139.7649361 },
-    zoom: 12
-  };
-  const position = { lat: 35.6812362, lng: 139.7649361 };
+	let apiKey = $state('');
+	const places = [
+		{ id: 1, position: { lat: 35.6812362, lng: 139.7649361 }, title: 'Tokyo Station' },
+		{ id: 2, position: { lat: 35.7100627, lng: 139.8107004 }, title: 'Tokyo Skytree' },
+		{ id: 3, position: { lat: 35.6586414, lng: 139.7454329 }, title: 'Tokyo Tower' }
+	];
+	const markers = $state<Record<number, google.maps.marker.AdvancedMarkerElement | null>>({});
+	let selectedId = $state<number | null>(null);
+	const selected = $derived(places.find((place) => place.id === selectedId));
 </script>
 
-<div style="margin-bottom: 1rem;">
-  <label for="apiKeyMarker">Enter your API Key:</label>
-  <input id="apiKeyMarker" type="text" bind:value={userApiKey} placeholder="YOUR_API_KEY" style="width: 300px; padding: 4px; margin-left: 5px;"/>
-</div>
+<label>
+	Enter your API Key:
+	<input type="text" bind:value={apiKey} placeholder="YOUR_API_KEY" style="width: 300px" />
+</label>
 
-<div style="height: 400px; width: 100%; border: 1px solid #ccc;">
-  {#if !userApiKey}
-    <p style="text-align: center; padding: 2rem; color: #555;">Please enter your API key above to load the map.</p>
-  {:else}
-    {#key userApiKey}
-      <APIProvider apiKey={userApiKey}>
-        <GoogleMap
-          id="map-with-marker"
-          options={mapOptions}
-          mapContainerStyle="width: 100%; height: 100%;"
-        >
-          <Marker {position} />
-        </GoogleMap>
-      </APIProvider>
-    {/key}
-  {/if}
-</div>
-```
+<div style="height: 400px; margin-top: 1rem; border: 1px solid #ccc;">
+	{#if !apiKey}
+		<p style="text-align: center; padding: 2rem;">Please enter your API key above to load the map.</p>
+	{:else}
+		{#key apiKey}
+			<APIProvider {apiKey}>
+				<GoogleMap center={{ lat: 35.68, lng: 139.77 }} zoom={12} mapId="DEMO_MAP_ID">
+					{#each places as place (place.id)}
+						<AdvancedMarker
+							position={place.position}
+							title={place.title}
+							bind:marker={markers[place.id]}
+							onClick={() => (selectedId = place.id)}
+						>
+							<Pin background={selectedId === place.id ? '#dc2626' : '#0f766e'} glyphColor="white" />
+						</AdvancedMarker>
+					{/each}
 
-## Interactive Map with Multiple Markers
-
-A map with multiple markers that can be clicked to show information.
-
-```svelte live title="InteractiveMarkers.svelte"
-<script lang="ts">
-  import { APIProvider, GoogleMap, Marker, InfoWindow } from 'svelte-google-maps-api';
-  import { writable } from 'svelte/store';
-
-  let userApiKey = '';
-  const mapOptions = {
-    center: { lat: 35.6812362, lng: 139.7649361 },
-    zoom: 11
-  };
-
-  const locations = [
-    { id: 1, position: { lat: 35.6812362, lng: 139.7649361 }, title: 'Tokyo Station' },
-    { id: 2, position: { lat: 35.7100627, lng: 139.8107004 }, title: 'Tokyo Skytree' },
-    { id: 3, position: { lat: 35.6586414, lng: 139.7454329 }, title: 'Tokyo Tower' }
-  ];
-
-  const selectedMarkerId = writable<number | null>(null);
-  let mapInstance: google.maps.Map | null = null;
-  let markerInstances: { [key: number]: google.maps.Marker } = {};
-
-  function handleMarkerClick(locationId: number) {
-    selectedMarkerId.set(locationId);
-  }
-
-  function closeInfoWindow() {
-    selectedMarkerId.set(null);
-  }
-</script>
-
-<div style="margin-bottom: 1rem;">
-  <label for="apiKeyInteractive">Enter your API Key:</label>
-  <input id="apiKeyInteractive" type="text" bind:value={userApiKey} placeholder="YOUR_API_KEY" style="width: 300px; padding: 4px; margin-left: 5px;"/>
-</div>
-
-<div style="height: 450px; width: 100%; border: 1px solid #ccc;">
-  {#if !userApiKey}
-    <p style="text-align: center; padding: 2rem; color: #555;">Please enter your API key above to load the map.</p>
-  {:else}
-    {#key userApiKey}
-      <APIProvider apiKey={userApiKey}>
-        <GoogleMap
-          bind:map={mapInstance}
-          id="interactive-map"
-          options={mapOptions}
-          mapContainerStyle="width: 100%; height: 100%;"
-        >
-          {#each locations as location (location.id)}
-            <Marker
-              bind:marker={markerInstances[location.id]}
-              position={location.position}
-              title={location.title}
-              onClick={() => handleMarkerClick(location.id)}
-            />
-          {/each}
-
-          {#if $selectedMarkerId !== null}
-            {@const selectedLocation = locations.find(l => l.id === $selectedMarkerId)}
-            {#if selectedLocation && markerInstances[$selectedMarkerId]}
-              <InfoWindow
-                anchor={markerInstances[$selectedMarkerId]}
-                options={{ pixelOffset: new google.maps.Size(0, -35) }} 
-                on:closeclick={closeInfoWindow}
-              >
-                <div>
-                  <strong>{selectedLocation.title}</strong>
-                  <p>Lat: {selectedLocation.position.lat.toFixed(6)}, Lng: {selectedLocation.position.lng.toFixed(6)}</p>
-                </div>
-              </InfoWindow>
-            {/if}
-          {/if}
-        </GoogleMap>
-      </APIProvider>
-    {/key}
-  {/if}
+					{#if selected && markers[selected.id]}
+						<InfoWindow
+							anchor={markers[selected.id]}
+							headerContent={selected.title}
+							onClose={() => (selectedId = null)}
+						>
+							<p>{selected.position.lat.toFixed(4)}, {selected.position.lng.toFixed(4)}</p>
+						</InfoWindow>
+					{/if}
+				</GoogleMap>
+			</APIProvider>
+		{/key}
+	{/if}
 </div>
 ```
 
 ## Draggable Marker
 
-A map with a draggable marker that updates its position when dragged.
+`bind:position` follows the marker as you drag it.
 
 ```svelte live title="DraggableMarker.svelte"
 <script lang="ts">
-  import { APIProvider, GoogleMap, Marker } from 'svelte-google-maps-api';
-  import { writable } from 'svelte/store';
+	import { APIProvider, GoogleMap, AdvancedMarker } from 'svelte-google-maps-api';
 
-  let userApiKey = '';
-  const initialPosition = { lat: 35.6812362, lng: 139.7649361 };
-  const mapOptions = {
-    center: initialPosition,
-    zoom: 12
-  };
-
-  const markerPosition = writable(initialPosition);
-
-  function handleDragEnd(event: CustomEvent<google.maps.MapMouseEvent>) {
-    if (event.detail.latLng) {
-      markerPosition.set({
-        lat: event.detail.latLng.lat(),
-        lng: event.detail.latLng.lng()
-      });
-    }
-  }
+	let apiKey = $state('');
+	let position = $state({ lat: 35.6812362, lng: 139.7649361 });
 </script>
 
-<div style="margin-bottom: 1rem;">
-  <label for="apiKeyDraggable">Enter your API Key:</label>
-  <input id="apiKeyDraggable" type="text" bind:value={userApiKey} placeholder="YOUR_API_KEY" style="width: 300px; padding: 4px; margin-left: 5px;"/>
-</div>
+<label>
+	Enter your API Key:
+	<input type="text" bind:value={apiKey} placeholder="YOUR_API_KEY" style="width: 300px" />
+</label>
 
-<div style="height: 450px; width: 100%;">
-  <p style="margin-bottom: 0.5rem; font-family: monospace;">
-    Marker Position: {$markerPosition.lat.toFixed(6)}, {$markerPosition.lng.toFixed(6)}
-  </p>
-  <p style="margin-bottom: 1rem;">Drag the marker to update its position.</p>
-
-  <div style="height: calc(100% - 90px); width: 100%; border: 1px solid #ccc;">
-    {#if !userApiKey}
-      <p style="text-align: center; padding: 2rem; color: #555;">Please enter your API key above to load the map.</p>
-    {:else}
-      {#key userApiKey}
-        <APIProvider apiKey={userApiKey}>
-          <GoogleMap
-            id="draggable-marker-map"
-            options={mapOptions}
-            mapContainerStyle="width: 100%; height: 100%;"
-          >
-            <Marker
-              position={$markerPosition}
-              options={{ draggable: true }}
-              on:dragend={handleDragEnd} 
-            />
-          </GoogleMap>
-        </APIProvider>
-      {/key}
-    {/if}
-  </div>
+<div style="height: 400px; margin-top: 1rem; border: 1px solid #ccc;">
+	{#if !apiKey}
+		<p style="text-align: center; padding: 2rem;">Please enter your API key above to load the map.</p>
+	{:else}
+		{#key apiKey}
+			<APIProvider {apiKey}>
+				<GoogleMap center={{ lat: 35.6812362, lng: 139.7649361 }} zoom={13} mapId="DEMO_MAP_ID">
+					<AdvancedMarker bind:position draggable title="Drag me" />
+				</GoogleMap>
+			</APIProvider>
+		{/key}
+	{/if}
 </div>
+<p>Marker: {position.lat.toFixed(5)}, {position.lng.toFixed(5)}</p>
 ```
 
 ## Click to Add Markers
 
-A map where clicking adds new markers.
+Click the map to drop a marker, and click a marker to remove it.
 
 ```svelte live title="ClickToAddMarkers.svelte"
 <script lang="ts">
-  import { APIProvider, GoogleMap, Marker } from 'svelte-google-maps-api';
-  import { writable } from 'svelte/store';
+	import { APIProvider, GoogleMap, AdvancedMarker, Pin } from 'svelte-google-maps-api';
 
-  let userApiKey = '';
-  const mapOptions = {
-    center: { lat: 35.6812362, lng: 139.7649361 },
-    zoom: 12
-  };
+	let apiKey = $state('');
+	let points = $state<{ id: number; position: google.maps.LatLngLiteral }[]>([]);
+	let nextId = 0;
 
-  interface SimpleMarker {
-    id: number;
-    position: google.maps.LatLngLiteral;
-  }
-
-  const markers = writable<SimpleMarker[]>([]);
-
-  function handleMapClick(event: google.maps.MapMouseEvent) {
-    if (event.latLng && userApiKey) {
-      const newMarker: SimpleMarker = {
-        id: Date.now(),
-        position: {
-          lat: event.latLng.lat(),
-          lng: event.latLng.lng()
-        }
-      };
-      markers.update(currentMarkers => [...currentMarkers, newMarker]);
-    }
-  }
-
-  function clearMarkers() {
-    markers.set([]);
-  }
+	function addPoint(event: google.maps.MapMouseEvent) {
+		if (!event.latLng) return;
+		points.push({ id: nextId++, position: event.latLng.toJSON() });
+	}
 </script>
 
-<div style="margin-bottom: 1rem;">
-  <label for="apiKeyClickToAdd">Enter your API Key:</label>
-  <input id="apiKeyClickToAdd" type="text" bind:value={userApiKey} placeholder="YOUR_API_KEY" style="width: 300px; padding: 4px; margin-left: 5px;"/>
-</div>
+<label>
+	Enter your API Key:
+	<input type="text" bind:value={apiKey} placeholder="YOUR_API_KEY" style="width: 300px" />
+</label>
 
-<div style="height: 450px; width: 100%;">
-  <div style="margin-bottom: 1rem;">
-    <p>Click on the map to add markers. Current markers: {$markers.length}</p>
-    <button onclick={clearMarkers} disabled={$markers.length === 0}>Clear All Markers</button>
-  </div>
-
-  <div style="height: calc(100% - 90px); width: 100%; border: 1px solid #ccc;">
-    {#if !userApiKey}
-      <p style="text-align: center; padding: 2rem; color: #555;">Please enter your API key above to load the map.</p>
-    {:else}
-      {#key userApiKey}
-        <APIProvider apiKey={userApiKey}>
-          <GoogleMap
-            id="click-to-add-markers"
-            options={mapOptions}
-            mapContainerStyle="width: 100%; height: 100%;"
-            onClick={handleMapClick}
-          >
-            {#each $markers as marker (marker.id)}
-              <Marker position={marker.position} />
-            {/each}
-          </GoogleMap>
-        </APIProvider>
-      {/key}
-    {/if}
-  </div>
+<div style="height: 400px; margin-top: 1rem; border: 1px solid #ccc;">
+	{#if !apiKey}
+		<p style="text-align: center; padding: 2rem;">Please enter your API key above to load the map.</p>
+	{:else}
+		{#key apiKey}
+			<APIProvider {apiKey}>
+				<GoogleMap
+					center={{ lat: 35.6812362, lng: 139.7649361 }}
+					zoom={12}
+					mapId="DEMO_MAP_ID"
+					onClick={addPoint}
+				>
+					{#each points as point, index (point.id)}
+						<AdvancedMarker
+							position={point.position}
+							onClick={() => (points = points.filter((item) => item.id !== point.id))}
+						>
+							<Pin glyphText={String(index + 1)} />
+						</AdvancedMarker>
+					{/each}
+				</GoogleMap>
+			</APIProvider>
+		{/key}
+	{/if}
 </div>
+<p>{points.length} marker(s)</p>
+```
+
+## Place Search
+
+`PlaceAutocomplete` uses Places API (New). Selecting a place moves the map to it.
+
+```svelte live title="PlaceSearch.svelte"
+<script lang="ts">
+	import { APIProvider, GoogleMap, AdvancedMarker, PlaceAutocomplete } from 'svelte-google-maps-api';
+
+	let apiKey = $state('');
+	let map = $state<google.maps.Map | null>(null);
+	let place = $state.raw<google.maps.places.Place | null>(null);
+
+	function select(selected: google.maps.places.Place) {
+		place = selected;
+		if (selected.viewport) map?.fitBounds(selected.viewport);
+		else if (selected.location) map?.panTo(selected.location);
+	}
+</script>
+
+<label>
+	Enter your API Key:
+	<input type="text" bind:value={apiKey} placeholder="YOUR_API_KEY" style="width: 300px" />
+</label>
+
+<div style="margin-top: 1rem;">
+	{#if !apiKey}
+		<p style="text-align: center; padding: 2rem; border: 1px solid #ccc;">
+			Please enter your API key above to load the map.
+		</p>
+	{:else}
+		{#key apiKey}
+			<APIProvider {apiKey}>
+				<PlaceAutocomplete placeholder="Search for a place" onPlaceSelect={select} />
+				<div style="height: 400px; margin-top: 0.5rem; border: 1px solid #ccc;">
+					<GoogleMap
+						bind:map
+						center={{ lat: 35.6812362, lng: 139.7649361 }}
+						zoom={11}
+						mapId="DEMO_MAP_ID"
+					>
+						{#if place?.location}
+							<AdvancedMarker position={place.location} title={place.displayName ?? ''} />
+						{/if}
+					</GoogleMap>
+				</div>
+			</APIProvider>
+		{/key}
+	{/if}
+</div>
+{#if place}
+	<p>{place.displayName} — {place.formattedAddress}</p>
+{/if}
 ```

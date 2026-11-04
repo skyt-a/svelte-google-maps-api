@@ -11,6 +11,7 @@
 		/** Image bounds. Changing them recreates the overlay. */
 		bounds: google.maps.LatLngBoundsLiteral | google.maps.LatLngBounds;
 		opacity?: number;
+		/** Set on creation; changing it takes effect when `url` or `bounds` changes. */
 		clickable?: boolean;
 		/** The `google.maps.GroundOverlay` instance. Read it with `bind:groundOverlay`. */
 		groundOverlay?: google.maps.GroundOverlay | null;
