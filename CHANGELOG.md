@@ -4,7 +4,7 @@ All notable changes to this project are documented in this file.
 
 This project follows semantic versioning while the public API stabilizes.
 
-## 0.3.0 - Unreleased
+## 0.3.0 - 2026-11-05
 
 This release rebuilds the library on Svelte 5 runes and the current Google Maps APIs. It contains breaking changes. See the [migration guide](https://skyt-a.github.io/svelte-google-maps-api/guide/migration/).
 

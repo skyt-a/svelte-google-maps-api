@@ -1,6 +1,6 @@
 {
 	"name": "svelte-google-maps-api",
-	"version": "0.2.3",
+	"version": "0.3.0",
 	"description": "Svelte 5 components for the Google Maps JavaScript API: maps, Advanced Markers, Places, Routes and more",
 	"svelte": "./dist/index.js",
 	"module": "./dist/index.js",
