@@ -1,115 +1,63 @@
 <script lang="ts">
-	import { getContext, onDestroy } from 'svelte';
-	import { BROWSER as browser } from 'esm-env';
-	import type { APIProviderContext } from './APIProvider.svelte';
+	import { untrack } from 'svelte';
+	import { getAPIContext, getMap } from './internal/context.svelte.js';
+	import { addListeners } from './internal/utils.js';
 
-	export let url: string;
-	export let bounds: google.maps.LatLngBounds | google.maps.LatLngBoundsLiteral;
-	export let options: google.maps.GroundOverlayOptions | undefined = undefined;
+	type MapMouseHandler = (event: google.maps.MapMouseEvent) => void;
 
-	export let clickable: boolean | undefined = undefined;
-	export let opacity: number | undefined = undefined;
+	interface Props {
+		/** Image URL. Changing it recreates the overlay. */
+		url: string;
+		/** Image bounds. Changing them recreates the overlay. */
+		bounds: google.maps.LatLngBoundsLiteral | google.maps.LatLngBounds;
+		opacity?: number;
+		/** Set on creation; changing it takes effect when `url` or `bounds` changes. */
+		clickable?: boolean;
+		/** The `google.maps.GroundOverlay` instance. Read it with `bind:groundOverlay`. */
+		groundOverlay?: google.maps.GroundOverlay | null;
+		onClick?: MapMouseHandler;
+		onDblClick?: MapMouseHandler;
+		onLoad?: (groundOverlay: google.maps.GroundOverlay) => void;
+	}
 
-	export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onLoad: ((overlay: google.maps.GroundOverlay) => void) | undefined = undefined;
-	export let onUnmount: ((overlay: google.maps.GroundOverlay) => void) | undefined = undefined;
+	let {
+		url,
+		bounds,
+		opacity,
+		clickable,
+		groundOverlay = $bindable(null),
+		onClick,
+		onDblClick,
+		onLoad
+	}: Props = $props();
 
-	let overlayInstance: google.maps.GroundOverlay | null = null;
-	let listeners: google.maps.MapsEventListener[] = [];
+	const api = getAPIContext('GroundOverlay');
+	const map = getMap('GroundOverlay');
+	const { GroundOverlay } = api.requireLibrary('maps');
+	let instance = $state.raw<google.maps.GroundOverlay | null>(null);
 
-	const { status, googleMapsApi } = getContext<APIProviderContext>('svelte-google-maps-api');
-	const map = getContext<google.maps.Map>('map');
+	$effect(() => {
+		const overlay = new GroundOverlay(url, bounds, {
+			clickable: untrack(() => clickable) ?? true,
+			opacity: untrack(() => opacity) ?? 1
+		});
+		overlay.setMap(map);
+		instance = overlay;
+		groundOverlay = overlay;
+		untrack(() => onLoad)?.(overlay);
 
-	function initializeOverlay() {
-		if (!browser || $status !== 'loaded' || !googleMapsApi || !map || overlayInstance) return;
-
-		const overlayOptions: google.maps.GroundOverlayOptions = {
-			...(options ?? {}),
-			map,
-			clickable,
-			opacity
+		return () => {
+			api.requireLibrary('core').event.clearInstanceListeners(overlay);
+			overlay.setMap(null);
 		};
-
-		Object.keys(overlayOptions).forEach((key) => {
-			if (overlayOptions[key as keyof typeof overlayOptions] === undefined) {
-				delete overlayOptions[key as keyof typeof overlayOptions];
-			}
-		});
-
-		try {
-			overlayInstance = new googleMapsApi.GroundOverlay(url, bounds, overlayOptions);
-			onLoad?.(overlayInstance);
-			setupListeners();
-		} catch (error) {
-			console.error('[GroundOverlay] Error creating instance:', error);
-		}
-	}
-
-	$: if (overlayInstance && opacity !== undefined) {
-		overlayInstance.setOpacity(opacity);
-	}
-
-	function setupListeners() {
-		if (!overlayInstance || !googleMapsApi) return;
-		const overlay = overlayInstance;
-
-		listeners.forEach((listener) => googleMapsApi?.event.removeListener(listener));
-		listeners = [];
-
-		const eventHandlers = [
-			['click', onClick],
-			['dblclick', onDblClick]
-		] as const;
-
-		eventHandlers.forEach(([eventName, callback]) => {
-			if (callback) {
-				listeners.push(overlay.addListener(eventName, callback));
-			}
-		});
-	}
-
-	$: if (overlayInstance && googleMapsApi && browser) {
-		setupListeners();
-	}
-
-	onDestroy(() => {
-		if (overlayInstance) {
-			onUnmount?.(overlayInstance);
-			listeners.forEach((listener) => googleMapsApi?.event.removeListener(listener));
-			overlayInstance.setMap(null);
-			overlayInstance = null;
-		}
 	});
 
-	$: if ($status === 'loaded' && map && url && bounds && !overlayInstance) {
-		initializeOverlay();
-	}
+	$effect(() => {
+		if (instance && opacity !== undefined) instance.setOpacity(opacity);
+	});
 
-	let previousBoundsLiteral: google.maps.LatLngBoundsLiteral | null = null;
-	$: {
-		let currentBoundsLiteral: google.maps.LatLngBoundsLiteral | null = null;
-		if (bounds && googleMapsApi) {
-			if (bounds instanceof googleMapsApi.LatLngBounds) {
-				currentBoundsLiteral = bounds.toJSON();
-			} else {
-				currentBoundsLiteral = bounds;
-			}
-		}
-		if (
-			overlayInstance &&
-			(url !== overlayInstance.getUrl() ||
-				JSON.stringify(currentBoundsLiteral) !== JSON.stringify(previousBoundsLiteral))
-		) {
-			console.warn('[GroundOverlay] Re-initializing due to url or bounds change.');
-			overlayInstance.setMap(null);
-
-			listeners.forEach((listener) => googleMapsApi?.event.removeListener(listener));
-			listeners = [];
-			overlayInstance = null;
-		}
-		previousBoundsLiteral = currentBoundsLiteral;
-	}
+	$effect(() => {
+		if (!instance) return;
+		return addListeners(instance, { click: onClick, dblclick: onDblClick });
+	});
 </script>
-
-<!-- GroundOverlay does not render any DOM element itself -->

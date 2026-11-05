@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Svelte component library for Google Maps API integration, structured as a pnpm monorepo using Turborepo. The library provides 20+ components for declarative Google Maps usage in Svelte 5 applications.
+This is a Svelte 5 component library for the Google Maps JavaScript API, structured as a pnpm monorepo using Turborepo. The library provides 20 components plus `useMap` / `useMapsLibrary` / `useAPILoadingStatus` helpers. It only wraps current (non-deprecated) Maps APIs: Advanced Markers, Places API (New) and the Routes library.
 
 ## Key Commands
 
@@ -45,8 +45,8 @@ pnpm dev
 cd apps/docs
 pnpm dev
 
-# Examples
-cd apps/examples
+# Storybook
+cd apps/storybook
 pnpm dev
 ```
 
@@ -55,19 +55,23 @@ pnpm dev
 ### Monorepo Structure
 - `/packages/svelte-google-maps-api/` - Main library with all Google Maps components
 - `/apps/docs/` - SveltePress documentation site
-- `/apps/examples/` - Example applications
+- `/apps/storybook/` - Storybook stories (one per exported component)
 
 ### Component Architecture
 All components follow a consistent pattern:
-1. Components use `getContext` to access the Google Maps API instance from `APIProvider`
-2. Each component manages its own Google Maps object lifecycle (create on mount, destroy on unmount)
-3. Props are reactive using `$effect` for Svelte 5 runes
-4. TypeScript types are imported from `@types/google.maps`
+1. Components get the API context with `getAPIContext()` and the map with `getMap()` (`src/lib/internal/context.svelte.ts`)
+2. Classes come from libraries loaded with `api.importLibrary(name)`. `core` and `maps` are always preloaded, so `api.requireLibrary('maps')` is safe at init
+3. Each component manages its own Google Maps object lifecycle (create on mount, destroy on unmount)
+4. Props are synced with `$effect`. Values the user can change on the map (camera, marker position, editable geometry) are `$bindable`
+5. Maps event listeners go through `addListeners()` (`src/lib/internal/utils.ts`), which runs handlers untracked
+6. Content snippets render into a hidden wrapper and are moved into the Google element (marker, info window, control, overlay)
+7. TypeScript types come from `@types/google.maps`
 
 ### Key Components
-- `APIProvider.svelte` - Loads Google Maps API and provides context
-- `GoogleMap.svelte` - Main map container that provides map instance to children
-- All other components require being nested within `GoogleMap` (except `Autocomplete` and `StreetViewPanorama`)
+- `APIProvider.svelte` - Loads the Maps JavaScript API once per page (`internal/loader.ts`) and provides context
+- `GoogleMap.svelte` - The map. Renders children only after the map exists
+- All other components must be nested within `GoogleMap`, except `PlaceAutocomplete` and `StreetViewPanorama`
+- Do not add components that wrap deprecated Google Maps APIs (check the `@deprecated` tags in `@types/google.maps`)
 
 ### Build Process
 1. Turborepo orchestrates builds across packages
@@ -77,10 +81,11 @@ All components follow a consistent pattern:
 
 ## Testing Approach
 When adding new features or fixing bugs:
-1. Create or update the example in `/apps/examples/`
-2. Add component tests using Vitest
-3. Update documentation in `/apps/docs/src/routes/components/[component-name]/+page.md`
-4. Run `pnpm test` to ensure all tests pass
+1. Add component tests using Vitest against the mock in `packages/svelte-google-maps-api/tests/googleMapsMock.ts`
+2. Update documentation in `/apps/docs/src/routes/components/[component-name]/+page.md`
+3. Update the Storybook story and `ComponentStory.svelte` in `/apps/storybook/src/stories/`
+4. Run `pnpm docs:sync` after adding or removing exported components
+5. Run `pnpm test`, `pnpm check` and `pnpm lint`
 
 ## Code Style
 - TypeScript with strict mode

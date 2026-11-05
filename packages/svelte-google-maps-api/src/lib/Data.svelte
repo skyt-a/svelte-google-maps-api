@@ -1,132 +1,117 @@
 <script lang="ts">
-	import { getContext, onDestroy } from 'svelte';
-	import { BROWSER as browser } from 'esm-env';
-	import type { APIProviderContext } from './APIProvider.svelte';
+	import { onMount, untrack } from 'svelte';
+	import { getAPIContext, getMap } from './internal/context.svelte.js';
+	import { addListeners } from './internal/utils.js';
 
-	export let options: google.maps.Data.DataOptions | undefined = undefined;
+	type DataMouseHandler = (event: google.maps.Data.MouseEvent) => void;
 
-	export let onClick: ((e: google.maps.Data.MouseEvent) => void) | undefined = undefined;
-	export let onDblClick: ((e: google.maps.Data.MouseEvent) => void) | undefined = undefined;
-	export let onMouseDown: ((e: google.maps.Data.MouseEvent) => void) | undefined = undefined;
-	export let onMouseMove: ((e: google.maps.Data.MouseEvent) => void) | undefined = undefined;
-	export let onMouseOut: ((e: google.maps.Data.MouseEvent) => void) | undefined = undefined;
-	export let onMouseOver: ((e: google.maps.Data.MouseEvent) => void) | undefined = undefined;
-	export let onMouseUp: ((e: google.maps.Data.MouseEvent) => void) | undefined = undefined;
-	export let onRightClick: ((e: google.maps.Data.MouseEvent) => void) | undefined = undefined;
-	export let onAddFeature: ((e: google.maps.Data.AddFeatureEvent) => void) | undefined = undefined;
-	export let onRemoveFeature: ((e: google.maps.Data.RemoveFeatureEvent) => void) | undefined =
-		undefined;
-	export let onRemoveProperty: ((e: google.maps.Data.RemovePropertyEvent) => void) | undefined =
-		undefined;
-	export let onSetGeometry: ((e: google.maps.Data.SetGeometryEvent) => void) | undefined =
-		undefined;
-	export let onSetProperty: ((e: google.maps.Data.SetPropertyEvent) => void) | undefined =
-		undefined;
-	export let onLoad: ((data: google.maps.Data) => void) | undefined = undefined;
-	export let onUnmount: ((data: google.maps.Data) => void) | undefined = undefined;
-
-	let data: google.maps.Data | null = null;
-	let listeners: google.maps.MapsEventListener[] = [];
-	let listenerDeps: unknown[] = [];
-
-	const { status, googleMapsApi } = getContext<APIProviderContext>('svelte-google-maps-api');
-	const map = getContext<google.maps.Map>('map');
-
-	function clearListeners() {
-		if (!googleMapsApi) return;
-		listeners.forEach((listener) => googleMapsApi.event.removeListener(listener));
-		listeners = [];
+	interface Props {
+		/** GeoJSON object to add. Replacing it removes the previous features. */
+		geoJson?: object;
+		/** URL of a GeoJSON file to load. Changing it removes the previous features. */
+		url?: string;
+		/** Property used as the feature ID. */
+		idPropertyName?: string;
+		style?: google.maps.Data.StylingFunction | google.maps.Data.StyleOptions;
+		/** Other `google.maps.Data.DataOptions` (controls, drawing mode, ...). Set once on creation. */
+		options?: Omit<google.maps.Data.DataOptions, 'map' | 'style'>;
+		/** The `google.maps.Data` instance. Read it with `bind:data`. */
+		data?: google.maps.Data | null;
+		onClick?: DataMouseHandler;
+		onDblClick?: DataMouseHandler;
+		onContextMenu?: DataMouseHandler;
+		onMouseDown?: DataMouseHandler;
+		onMouseUp?: DataMouseHandler;
+		onMouseOver?: DataMouseHandler;
+		onMouseOut?: DataMouseHandler;
+		onAddFeature?: (event: google.maps.Data.AddFeatureEvent) => void;
+		onRemoveFeature?: (event: google.maps.Data.RemoveFeatureEvent) => void;
+		onSetGeometry?: (event: google.maps.Data.SetGeometryEvent) => void;
+		onSetProperty?: (event: google.maps.Data.SetPropertyEvent) => void;
+		onRemoveProperty?: (event: google.maps.Data.RemovePropertyEvent) => void;
+		onLoad?: (data: google.maps.Data) => void;
 	}
 
-	function addListener<T>(
-		instance: google.maps.Data,
-		eventName: string,
-		handler: ((event: T) => void) | undefined
-	) {
-		if (handler && googleMapsApi) {
-			listeners.push(googleMapsApi.event.addListener(instance, eventName, handler));
-		}
-	}
-
-	function setupListeners() {
-		if (!data || !googleMapsApi) return;
-
-		clearListeners();
-		addListener<google.maps.Data.MouseEvent>(data, 'click', onClick);
-		addListener<google.maps.Data.MouseEvent>(data, 'dblclick', onDblClick);
-		addListener<google.maps.Data.MouseEvent>(data, 'mousedown', onMouseDown);
-		addListener<google.maps.Data.MouseEvent>(data, 'mousemove', onMouseMove);
-		addListener<google.maps.Data.MouseEvent>(data, 'mouseout', onMouseOut);
-		addListener<google.maps.Data.MouseEvent>(data, 'mouseover', onMouseOver);
-		addListener<google.maps.Data.MouseEvent>(data, 'mouseup', onMouseUp);
-		addListener<google.maps.Data.MouseEvent>(data, 'rightclick', onRightClick);
-		addListener<google.maps.Data.AddFeatureEvent>(data, 'addfeature', onAddFeature);
-		addListener<google.maps.Data.RemoveFeatureEvent>(data, 'removefeature', onRemoveFeature);
-		addListener<google.maps.Data.RemovePropertyEvent>(data, 'removeproperty', onRemoveProperty);
-		addListener<google.maps.Data.SetGeometryEvent>(data, 'setgeometry', onSetGeometry);
-		addListener<google.maps.Data.SetPropertyEvent>(data, 'setproperty', onSetProperty);
-	}
-
-	function applyOptions(nextOptions: google.maps.Data.DataOptions | undefined) {
-		if (!data || !nextOptions) return;
-
-		if (nextOptions.controlPosition !== undefined) {
-			data.setControlPosition(nextOptions.controlPosition);
-		}
-		if (nextOptions.controls !== undefined) {
-			data.setControls(nextOptions.controls);
-		}
-		if (nextOptions.drawingMode !== undefined) {
-			data.setDrawingMode(nextOptions.drawingMode);
-		}
-		if (nextOptions.style !== undefined) {
-			data.setStyle(nextOptions.style);
-		}
-	}
-
-	$: if ($status === 'loaded' && googleMapsApi && map && !data && browser) {
-		data = new googleMapsApi.Data({
-			...(options ?? {}),
-			map
-		});
-		setupListeners();
-		onLoad?.(data);
-	}
-
-	$: if (data && options) {
-		applyOptions(options);
-	}
-
-	$: listenerDeps = [
+	let {
+		geoJson,
+		url,
+		idPropertyName,
+		style,
+		options,
+		data = $bindable(null),
 		onClick,
 		onDblClick,
+		onContextMenu,
 		onMouseDown,
-		onMouseMove,
-		onMouseOut,
-		onMouseOver,
 		onMouseUp,
-		onRightClick,
+		onMouseOver,
+		onMouseOut,
 		onAddFeature,
 		onRemoveFeature,
-		onRemoveProperty,
 		onSetGeometry,
-		onSetProperty
-	];
+		onSetProperty,
+		onRemoveProperty,
+		onLoad
+	}: Props = $props();
 
-	$: if (data && googleMapsApi && browser && listenerDeps) {
-		setupListeners();
-	}
+	const api = getAPIContext('Data');
+	const map = getMap('Data');
+	const { Data } = api.requireLibrary('maps');
+	const instance = new Data({ ...untrack(() => options), map });
 
-	onDestroy(() => {
-		if (data) {
-			clearListeners();
-			onUnmount?.(data);
-			data.setMap(null);
-			data = null;
-		}
+	onMount(() => {
+		data = instance;
+		onLoad?.(instance);
+
+		return () => {
+			api.requireLibrary('core').event.clearInstanceListeners(instance);
+			instance.setMap(null);
+		};
+	});
+
+	$effect(() => {
+		instance.setStyle(style ?? {});
+	});
+
+	$effect(() => {
+		if (!geoJson) return;
+		const features = instance.addGeoJson(geoJson, idPropertyName ? { idPropertyName } : undefined);
+		return () => features.forEach((feature) => instance.remove(feature));
+	});
+
+	$effect(() => {
+		if (!url) return;
+		let features: google.maps.Data.Feature[] = [];
+		let active = true;
+
+		instance.loadGeoJson(url, idPropertyName ? { idPropertyName } : undefined, (loaded) => {
+			if (active) {
+				features = loaded;
+			} else {
+				loaded.forEach((feature) => instance.remove(feature));
+			}
+		});
+
+		return () => {
+			active = false;
+			features.forEach((feature) => instance.remove(feature));
+		};
+	});
+
+	$effect(() => {
+		return addListeners(instance, {
+			click: onClick,
+			dblclick: onDblClick,
+			contextmenu: onContextMenu,
+			mousedown: onMouseDown,
+			mouseup: onMouseUp,
+			mouseover: onMouseOver,
+			mouseout: onMouseOut,
+			addfeature: onAddFeature,
+			removefeature: onRemoveFeature,
+			setgeometry: onSetGeometry,
+			setproperty: onSetProperty,
+			removeproperty: onRemoveProperty
+		});
 	});
 </script>
-
-{#if data}
-	<slot />
-{/if}

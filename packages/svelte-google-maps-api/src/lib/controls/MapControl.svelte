@@ -1,82 +1,36 @@
 <script lang="ts">
-	import { getContext, onDestroy, onMount } from 'svelte';
-	import { BROWSER as browser } from 'esm-env';
-	import type { APIProviderContext } from '../APIProvider.svelte';
+	import type { Snippet } from 'svelte';
+	import { getAPIContext, getMap } from '../internal/context.svelte.js';
 
-	export let position: google.maps.ControlPosition;
+	type ControlPositionName = keyof typeof google.maps.ControlPosition;
 
-	let controlWrapper: HTMLDivElement | null = null;
-	let isMounted = false;
-	let controlIndex: number | undefined = undefined;
+	interface Props {
+		/** A `google.maps.ControlPosition` value or its name, e.g. `'TOP_LEFT'` or `'BLOCK_START_INLINE_END'`. */
+		position: google.maps.ControlPosition | ControlPositionName;
+		children?: Snippet;
+	}
 
-	const { status, googleMapsApi } = getContext<APIProviderContext>('svelte-google-maps-api');
-	const map = getContext<google.maps.Map>('map');
+	let { position, children }: Props = $props();
 
-	onMount(() => {
-		isMounted = true;
+	const api = getAPIContext('MapControl');
+	const map = getMap('MapControl');
+	const { ControlPosition } = api.requireLibrary('core');
+	let content: HTMLDivElement;
 
-		addControl();
+	$effect(() => {
+		const resolved = typeof position === 'string' ? ControlPosition[position] : position;
+		const controls = map.controls[resolved];
+		const element = content;
+
+		controls.push(element);
+
+		return () => {
+			const index = controls.getArray().indexOf(element);
+			if (index >= 0) controls.removeAt(index);
+		};
 	});
-
-	onDestroy(() => {
-		removeControl();
-	});
-
-	function addControl() {
-		if (!browser || !map || !googleMapsApi || !controlWrapper || !isMounted || $status !== 'loaded')
-			return;
-
-		if (position === undefined || position === null) {
-			console.error('[MapControl] position prop is required.');
-			return;
-		}
-
-		try {
-			if (!map.controls[position]) {
-				console.warn(
-					`[MapControl] Controls array for position ${position} not found. Cannot add control.`
-				);
-				return;
-			}
-
-			removeControl();
-
-			controlIndex = map.controls[position].push(controlWrapper) - 1;
-		} catch (error) {
-			console.error('[MapControl] Error adding control:', error);
-		}
-	}
-
-	function removeControl() {
-		if (browser && map && googleMapsApi && controlWrapper && controlIndex !== undefined) {
-			try {
-				const controlsArray = map.controls[position];
-				if (controlsArray) {
-					let found = false;
-					for (let i = 0; i < controlsArray.getLength(); i++) {
-						if (controlsArray.getAt(i) === controlWrapper) {
-							controlsArray.removeAt(i);
-							found = true;
-							break;
-						}
-					}
-					if (!found) {
-						console.warn('[MapControl] Could not find control element to remove.');
-					}
-				}
-			} catch (error) {
-				console.error('[MapControl] Error removing control:', error);
-			}
-			controlIndex = undefined;
-		}
-	}
-
-	$: if (isMounted && map && googleMapsApi && $status === 'loaded') {
-		addControl();
-	}
 </script>
 
-<!-- This div wraps the slot content and is added to the map controls -->
-<div bind:this={controlWrapper}>
-	<slot />
+<div hidden>
+	<div bind:this={content}>{@render children?.()}</div>
 </div>

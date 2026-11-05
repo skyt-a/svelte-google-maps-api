@@ -8,33 +8,24 @@ const checkOnly = process.argv.includes('--check');
 const preferredOrder = [
 	'APIProvider',
 	'GoogleMap',
-	'Marker',
 	'AdvancedMarker',
+	'Pin',
 	'MarkerClusterer',
-	'GoogleMarkerClusterer',
 	'InfoWindow',
-	'InfoBox',
 	'Polyline',
 	'Polygon',
 	'Circle',
 	'Rectangle',
+	'GroundOverlay',
 	'Data',
-	'DrawingManager',
-	'DirectionsRenderer',
-	'DirectionsService',
-	'DistanceMatrixService',
-	'HeatmapLayer',
-	'KmlLayer',
 	'TrafficLayer',
 	'TransitLayer',
 	'BicyclingLayer',
-	'GroundOverlay',
 	'MapControl',
-	'Autocomplete',
-	'StandaloneSearchBox',
 	'OverlayView',
-	'StreetViewPanorama',
-	'StreetViewService'
+	'PlaceAutocomplete',
+	'RouteRenderer',
+	'StreetViewPanorama'
 ];
 
 function readJson(path) {

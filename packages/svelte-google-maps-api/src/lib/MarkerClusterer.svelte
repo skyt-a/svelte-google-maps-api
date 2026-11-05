@@ -1,109 +1,77 @@
-<script context="module" lang="ts">
-	import type {
-		Cluster,
-		MarkerClustererOptions as BaseMarkerClustererOptions
-	} from '@googlemaps/markerclusterer';
-
-	export type MarkerClustererOptionsSubset = Omit<BaseMarkerClustererOptions, 'map' | 'markers'>;
-</script>
-
 <script lang="ts">
-	import { getContext, onDestroy, setContext } from 'svelte';
-	import { BROWSER as browser } from 'esm-env';
+	import { onMount, untrack, type Snippet } from 'svelte';
 	import {
-		MarkerClusterer as GoogleMapsMarkerClusterer,
-		type Marker,
-		type MarkerClustererOptions
+		MarkerClusterer,
+		type Algorithm,
+		type onClusterClickHandler,
+		type Renderer
 	} from '@googlemaps/markerclusterer';
-	import type { APIProviderContext } from './APIProvider.svelte';
-	import type { MarkerClustererContext } from './types/markerClusterer.js';
+	import { getMap, setClustererContext } from './internal/context.svelte.js';
 
-	export let options: MarkerClustererOptionsSubset = {};
-	export let markers: Marker[] = [];
-	export let onClick: ((cluster: Cluster) => void) | undefined = undefined;
-	export let onClusterClick: MarkerClustererOptions['onClusterClick'] | undefined = undefined;
-	export let onLoad: ((markerClusterer: GoogleMapsMarkerClusterer) => void) | undefined =
-		undefined;
-	export let onUnmount: ((markerClusterer: GoogleMapsMarkerClusterer) => void) | undefined =
-		undefined;
-
-	let markerClusterer: GoogleMapsMarkerClusterer | null = null;
-	let registeredMarkers = new Set<Marker>();
-
-	const { status } = getContext<APIProviderContext>('svelte-google-maps-api');
-	const map = getContext<google.maps.Map>('map');
-
-	function getOnClusterClick(): MarkerClustererOptions['onClusterClick'] | undefined {
-		if (onClusterClick) return onClusterClick;
-		if (!onClick) return undefined;
-
-		return ((event: google.maps.MapMouseEvent, cluster: Cluster) => {
-			onClick?.(cluster);
-		}) as MarkerClustererOptions['onClusterClick'];
+	interface Props {
+		/** Clustering algorithm from `@googlemaps/markerclusterer`. Set once on creation. */
+		algorithm?: Algorithm;
+		/** Cluster renderer from `@googlemaps/markerclusterer`. Set once on creation. */
+		renderer?: Renderer;
+		onClusterClick?: onClusterClickHandler;
+		/** The `MarkerClusterer` instance. Read it with `bind:clusterer`. */
+		clusterer?: MarkerClusterer | null;
+		onLoad?: (clusterer: MarkerClusterer) => void;
+		/** `<AdvancedMarker>` children are clustered. */
+		children?: Snippet;
 	}
 
-	function getClustererOptions(): MarkerClustererOptions {
-		const clusterClick = getOnClusterClick();
+	let {
+		algorithm,
+		renderer,
+		onClusterClick,
+		clusterer = $bindable(null),
+		onLoad,
+		children
+	}: Props = $props();
 
-		return {
-			...options,
-			map,
-			...(clusterClick ? { onClusterClick: clusterClick } : {})
-		};
-	}
+	const map = getMap('MarkerClusterer');
+	const instance = untrack(
+		() =>
+			new MarkerClusterer({
+				map,
+				...(algorithm ? { algorithm } : {}),
+				...(renderer ? { renderer } : {}),
+				...(onClusterClick ? { onClusterClick } : {})
+			})
+	);
 
-	function addMarker(marker: Marker) {
-		if (!markerClusterer || registeredMarkers.has(marker)) return;
-		registeredMarkers.add(marker);
-		markerClusterer.addMarker(marker, true);
-		markerClusterer.render();
-	}
+	let renderScheduled = false;
+	const scheduleRender = () => {
+		if (renderScheduled) return;
+		renderScheduled = true;
+		queueMicrotask(() => {
+			renderScheduled = false;
+			instance.render();
+		});
+	};
 
-	function removeMarker(marker: Marker) {
-		if (!markerClusterer || !registeredMarkers.has(marker)) return;
-		markerClusterer.removeMarker(marker, true);
-		registeredMarkers.delete(marker);
-		markerClusterer.render();
-	}
-
-	setContext<MarkerClustererContext>('markerClusterer', {
-		addMarker,
-		removeMarker
+	setClustererContext({
+		clusterer: instance,
+		addMarker(marker) {
+			instance.addMarker(marker, true);
+			scheduleRender();
+		},
+		removeMarker(marker) {
+			instance.removeMarker(marker, true);
+			scheduleRender();
+		}
 	});
 
-	function syncMarkers(nextMarkers: Marker[]) {
-		if (!markerClusterer) return;
+	onMount(() => {
+		clusterer = instance;
+		onLoad?.(instance);
 
-		for (const marker of Array.from(registeredMarkers)) {
-			if (!nextMarkers.includes(marker)) {
-				removeMarker(marker);
-			}
-		}
-
-		nextMarkers.forEach(addMarker);
-	}
-
-	$: if ($status === 'loaded' && map && !markerClusterer && browser) {
-		markerClusterer = new GoogleMapsMarkerClusterer(getClustererOptions());
-		syncMarkers(markers);
-		onLoad?.(markerClusterer);
-	}
-
-	$: if (markerClusterer && markers) {
-		syncMarkers(markers);
-	}
-
-	onDestroy(() => {
-		if (markerClusterer) {
-			onUnmount?.(markerClusterer);
-			markerClusterer.clearMarkers(true);
-			markerClusterer.setMap(null);
-			registeredMarkers.clear();
-			markerClusterer = null;
-		}
+		return () => {
+			instance.clearMarkers(true);
+			instance.setMap(null);
+		};
 	});
 </script>
 
-{#if markerClusterer}
-	<slot {markerClusterer} />
-{/if}
+{@render children?.()}

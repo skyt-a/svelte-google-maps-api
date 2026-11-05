@@ -6,126 +6,75 @@ title: InfoWindow
 
 [Open the InfoWindow story](https://skyt-a.github.io/svelte-google-maps-api/storybook/?path=/story/components-infowindow--basic)
 
-The `InfoWindow` component creates and manages info windows on the map, which can display content when opened.
+`InfoWindow` shows a `google.maps.InfoWindow` popup, either anchored to a marker or at a position. Its content and optional header are Svelte snippets, and its open state can be two-way bound.
 
 ## Props
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| position | google.maps.LatLng \| google.maps.LatLngLiteral | | Geographical coordinates for the info window |
-| options | google.maps.InfoWindowOptions | | Info window configuration options |
-| onLoad | (infoWindow: google.maps.InfoWindow) => void | | Callback when info window is loaded |
-| onUnmount | (infoWindow: google.maps.InfoWindow) => void | | Callback before info window is destroyed |
-| anchor | google.maps.MVCObject | null | The anchor to which the info window is attached |
+| open | `boolean` | `true` | Whether the info window is open. Bindable: closing it from the map sets it to `false`. |
+| anchor | `google.maps.marker.AdvancedMarkerElement \| google.maps.MVCObject \| null` | | Marker to attach to. Takes precedence over `position`. |
+| position | `LatLngInput \| null` | | Position used when there is no `anchor`. |
+| headerContent | `string` | | Header text. Use the `header` snippet for rich content. |
+| headerDisabled | `boolean` | | Hides the header row, including the close button. |
+| maxWidth | `number` | | Maximum width in pixels. |
+| minWidth | `number` | | Minimum width in pixels. |
+| pixelOffset | `[number, number]` | | Offset from the anchor point, as `[x, y]`. |
+| zIndex | `number` | | Stacking order. |
+| disableAutoPan | `boolean` | | Stops the map from panning to show the info window when it opens. |
+| ariaLabel | `string` | | Accessible label. |
+| shouldFocus | `boolean` | | Whether focus moves into the info window when it opens. |
+| options | `google.maps.InfoWindowOptions` | | Other info window options. |
+| infoWindow | `google.maps.InfoWindow \| null` | `null` | The instance. Bindable: read it with `bind:infoWindow`. |
+| header | `Snippet` | | Rich header content. Overrides `headerContent` when it renders something. |
+| children | `Snippet` | | Info window content. |
 
-### Event Handler Props
+### Event Props
 
 | Prop | Type | Description |
 |------|------|-------------|
-| onCloseClick | () => void | Close click event handler |
-| onContentChanged | () => void | Content changed event handler |
-| onDomReady | () => void | DOM ready event handler |
-| onPositionChanged | () => void | Position changed event handler |
-| onZindexChanged | () => void | Z-index changed event handler |
+| onClose | `() => void` | Called whenever the info window closes (close button or `open = false`). |
+| onCloseClick | `() => void` | Called when the user clicks the close button. |
+| onLoad | `(infoWindow: google.maps.InfoWindow) => void` | Called once after the info window is created. |
 
 ## Usage
 
 ```svelte
-<script>
-  import { APIProvider, GoogleMap, Marker, InfoWindow } from 'svelte-google-maps-api';
-  
-  const apiKey = 'YOUR_API_KEY';
-  const mapOptions = {
-    center: { lat: 35.6812362, lng: 139.7649361 },
-    zoom: 12
-  };
-  
-  const position = { lat: 35.6812362, lng: 139.7649361 };
-  let showInfoWindow = true;
-  let markerRef;
-  
-  function handleMarkerLoad(marker) {
-    markerRef = marker;
-  }
-  
-  function toggleInfoWindow() {
-    showInfoWindow = !showInfoWindow;
-  }
+<script lang="ts">
+	import { APIProvider, GoogleMap, AdvancedMarker, InfoWindow } from 'svelte-google-maps-api';
+
+	let marker = $state<google.maps.marker.AdvancedMarkerElement | null>(null);
+	let open = $state(false);
 </script>
 
-<div style="height: 400px; width: 100%;">
-  <APIProvider {apiKey}>
-    <GoogleMap id="map" options={mapOptions} mapContainerStyle="width: 100%; height: 100%;">
-      <Marker 
-        position={position}
-        onLoad={handleMarkerLoad}
-        onClick={toggleInfoWindow}
-      />
-      
-      {#if showInfoWindow && markerRef}
-        <InfoWindow anchor={markerRef} onCloseClick={toggleInfoWindow}>
-          <div>
-            <h3>Tokyo</h3>
-            <p>The capital city of Japan</p>
-          </div>
-        </InfoWindow>
-      {/if}
-    </GoogleMap>
-  </APIProvider>
+<div style="height: 400px;">
+	<APIProvider apiKey="YOUR_API_KEY">
+		<GoogleMap center={{ lat: 35.6812, lng: 139.7671 }} zoom={13} mapId="DEMO_MAP_ID">
+			<AdvancedMarker
+				position={{ lat: 35.6812, lng: 139.7671 }}
+				bind:marker
+				onClick={() => (open = true)}
+			/>
+
+			{#if marker}
+				<InfoWindow anchor={marker} bind:open maxWidth={240}>
+					{#snippet header()}
+						<strong>Tokyo Station</strong>
+					{/snippet}
+					<p>Opened in 1914. Marunouchi side.</p>
+				</InfoWindow>
+			{/if}
+
+			<InfoWindow position={{ lat: 35.6586, lng: 139.7454 }} headerContent="Tokyo Tower">
+				<p>333 m tall.</p>
+			</InfoWindow>
+		</GoogleMap>
+	</APIProvider>
 </div>
-```
-
-## Using with Position
-
-You can also use the InfoWindow with a position instead of anchoring it to a marker:
-
-```svelte
-<script>
-  import { APIProvider, GoogleMap, InfoWindow } from 'svelte-google-maps-api';
-  
-  const apiKey = 'YOUR_API_KEY';
-  const mapOptions = {
-    center: { lat: 35.6812362, lng: 139.7649361 },
-    zoom: 12
-  };
-  
-  const position = { lat: 35.6812362, lng: 139.7649361 };
-  let showInfoWindow = true;
-  
-  function toggleInfoWindow() {
-    showInfoWindow = !showInfoWindow;
-  }
-</script>
-
-<div style="height: 400px; width: 100%;">
-  <APIProvider {apiKey}>
-    <GoogleMap id="map" options={mapOptions} mapContainerStyle="width: 100%; height: 100%;">
-      {#if showInfoWindow}
-        <InfoWindow position={position} onCloseClick={toggleInfoWindow}>
-          <div>
-            <h3>Tokyo</h3>
-            <p>The capital city of Japan</p>
-          </div>
-        </InfoWindow>
-      {/if}
-    </GoogleMap>
-  </APIProvider>
-</div>
-```
-
-## Context
-
-The `InfoWindow` component consumes the context set by `GoogleMap` to access the map instance:
-
-```javascript
-const { getMap } = getContext('map') ?? {};
-let map = getMap();
 ```
 
 ## Notes
 
-- The `InfoWindow` component must be a child of the `GoogleMap` component.
-- It can be anchored to a marker or other MVCObject, or positioned directly on the map.
-- The content of the info window is provided as a slot.
-- Event listeners are automatically cleaned up when the component is destroyed.
-- The info window is automatically removed from the map when the component is unmounted.
+- Get the marker for `anchor` with `bind:marker` on `AdvancedMarker`. Render the `InfoWindow` only once the marker exists.
+- Unmounting the component closes the info window.
+- `InfoWindow` must be inside `GoogleMap`.

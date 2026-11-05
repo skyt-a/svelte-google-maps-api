@@ -6,111 +6,86 @@ title: APIProvider
 
 [Open the APIProvider story](https://skyt-a.github.io/svelte-google-maps-api/storybook/?path=/story/components-apiprovider--basic)
 
-The `APIProvider` component is responsible for loading the Google Maps JavaScript API.
+`APIProvider` loads the Google Maps JavaScript API once per page and makes it available to every component inside it. Children are rendered only after the `core` and `maps` libraries are ready; other libraries (`marker`, `places`, `routes`, `streetView`, ...) are loaded on demand by the components that need them.
 
 ## Props
 
-| Prop                      | Type                     | Default                           | Description                                                     |
-| ------------------------- | ------------------------ | --------------------------------- | --------------------------------------------------------------- |
-| apiKey                    | `string`                 | `''`                              | Google Maps API key.                                            |
-| googleMapsApiKey          | `string`                 |                                   | API key alias.                                                  |
-| googleMapsClientId        | `string`                 |                                   | Google Maps Premium Plan client id. Do not use with an API key. |
-| libraries                 | `Library[]`              | `[]`                              | Google Maps libraries to load.                                  |
-| version                   | `string`                 | `'weekly'`                        | Google Maps API version to load.                                |
-| language                  | `string`                 |                                   | Language for the Google Maps API.                               |
-| region                    | `string`                 |                                   | Region for the Google Maps API.                                 |
-| channel                   | `string`                 |                                   | Usage tracking channel.                                         |
-| mapIds                    | `string[]`               |                                   | Map IDs for cloud-based map styling.                            |
-| authReferrerPolicy        | `'origin'`               |                                   | Auth referrer policy.                                           |
-| apiUrl                    | `string`                 | `'https://maps.googleapis.com'`   | Google Maps API base URL.                                       |
-| solutionChannel           | `string`                 |                                   | Google solution channel.                                        |
-| id                        | `string`                 | `'svelte-google-maps-api-script'` | Script element id.                                              |
-| nonce                     | `string`                 |                                   | CSP nonce for the script tag.                                   |
-| preventGoogleFontsLoading | `boolean`                | `false`                           | Prevents Google Maps from injecting its default font styles.    |
-| onLoad                    | `() => void`             |                                   | Called when the script has loaded.                              |
-| onError                   | `(error: Error) => void` |                                   | Called when the script fails to load.                           |
-| onUnmount                 | `() => void`             |                                   | Called when the provider is destroyed.                          |
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| apiKey | `string` | (required) | Google Maps Platform API key. |
+| version | `string` | `'weekly'` | Maps JavaScript API version or channel (`weekly`, `quarterly`, `beta`, `3.66`, ...). |
+| libraries | `Library[]` | `[]` | Libraries to preload. Components load the libraries they need on demand, so this is optional. |
+| language | `string` | | Language for map labels and controls. |
+| region | `string` | | Region code used to bias results. |
+| authReferrerPolicy | `'origin'` | | Sent as `auth_referrer_policy`. |
+| channel | `string` | | Usage tracking channel. |
+| solutionChannel | `string` | | Sent as `solution_channel`. |
+| mapIds | `string[]` | | Map IDs to preload. |
+| apiUrl | `string` | `'https://maps.googleapis.com'` | Base URL of the Maps JavaScript API. |
+| nonce | `string` | | CSP nonce for the injected script tag. |
+| preventGoogleFontsLoading | `boolean` | `false` | Stops the API from injecting Google Fonts (Roboto / Google Sans Text). |
+| children | `Snippet` | | Content rendered once the API is ready. |
+| loading | `Snippet` | | Rendered while the API loads. |
+| error | `Snippet` (receives the `Error`) | | Rendered when the API fails to load. Without it, a short message with `role="alert"` is shown. |
+
+### Event Props
+
+| Prop | Type | Description |
+|------|------|-------------|
+| onLoad | `() => void` | Called after the script and the preloaded libraries are ready. |
+| onError | `(error: Error) => void` | Called when the script or a preloaded library fails to load, or when `apiKey` is empty. |
 
 ## Usage
 
 ```svelte
-<script>
+<script lang="ts">
 	import { APIProvider, GoogleMap } from 'svelte-google-maps-api';
 
 	const apiKey = 'YOUR_API_KEY';
-	const libraries = ['places', 'geometry'];
 </script>
 
-<APIProvider {apiKey} {libraries}>
-	<GoogleMap id="map" options={{ center: { lat: 35.6812362, lng: 139.7649361 }, zoom: 10 }} />
-</APIProvider>
+<div style="height: 400px;">
+	<APIProvider {apiKey} language="ja" region="JP">
+		<GoogleMap center={{ lat: 35.6812, lng: 139.7671 }} zoom={12} />
+
+		{#snippet loading()}
+			<p>Loading map...</p>
+		{/snippet}
+
+		{#snippet error(err)}
+			<p>Could not load Google Maps: {err.message}</p>
+		{/snippet}
+	</APIProvider>
+</div>
 ```
 
-## Context
+## Hooks
 
-The `APIProvider` component sets the `svelte-google-maps-api` context with the load status, API reference, and error state. `GoogleMap` and service components use that context to wait for the script before creating Google Maps objects.
+These helpers must be called during component initialisation inside `APIProvider`:
 
-## Loading Multiple Libraries
-
-You can load additional Google Maps libraries by passing them in the `libraries` prop. If the Google Maps script is already present, `APIProvider` imports the requested libraries before rendering child components:
+- `useAPILoadingStatus()` returns an object with reactive `status` (`'loading' | 'loaded' | 'error'`) and `error`.
+- `useMapsLibrary(name)` loads a library with `importLibrary()` and returns an object whose `current` is the library, or `null` until it loads.
+- `useMap()` returns an object whose `current` is the nearest `GoogleMap` instance (call it inside `GoogleMap`).
 
 ```svelte
-<script>
-	import { APIProvider, GoogleMap } from 'svelte-google-maps-api';
+<script lang="ts">
+	import { useMap, useMapsLibrary } from 'svelte-google-maps-api';
 
-	const apiKey = 'YOUR_API_KEY';
-	const libraries = ['places', 'geometry', 'drawing', 'visualization'];
+	const map = useMap();
+	const geometry = useMapsLibrary('geometry');
+
+	$effect(() => {
+		if (map.current && geometry.current) {
+			// Use map.current and geometry.current here.
+		}
+	});
 </script>
-
-<APIProvider {apiKey} {libraries}>
-	<!-- Your map components here -->
-</APIProvider>
 ```
 
-## Language and Region
-
-You can specify the language and region for the Google Maps API:
-
-```svelte
-<script>
-	import { APIProvider, GoogleMap } from 'svelte-google-maps-api';
-
-	const apiKey = 'YOUR_API_KEY';
-	const language = 'ja';
-	const region = 'JP';
-</script>
-
-<APIProvider {apiKey} {language} {region}>
-	<!-- Your map components here -->
-</APIProvider>
-```
-
-## Cloud-Based Map Styling with Map IDs
-
-If you're using cloud-based map styling, you can specify map IDs:
-
-```svelte
-<script>
-	import { APIProvider, GoogleMap } from 'svelte-google-maps-api';
-
-	const apiKey = 'YOUR_API_KEY';
-	const mapIds = ['YOUR_MAP_ID_1', 'YOUR_MAP_ID_2'];
-
-	const mapOptions = {
-		center: { lat: 35.6812362, lng: 139.7649361 },
-		zoom: 10,
-		mapId: 'YOUR_MAP_ID_1'
-	};
-</script>
-
-<APIProvider {apiKey} {mapIds}>
-	<GoogleMap id="map" options={mapOptions} />
-</APIProvider>
-```
+See [Getting Started](/guide/getting-started/) for a full walkthrough.
 
 ## Notes
 
-- The `APIProvider` component must be the parent of all other Google Maps components.
-- It dynamically loads the Google Maps JavaScript API with the specified configuration.
-- Child components will not render until the API is fully loaded.
-- You only need one `APIProvider` component per application, even if you have multiple maps.
+- The Maps JavaScript API can only be loaded once per page. If a second `APIProvider` uses different options, the first load is reused and a warning is logged.
+- If the API was already loaded by another script tag, `APIProvider` reuses it instead of injecting a new one.
+- Nothing is loaded during server-side rendering; the `loading` snippet is rendered on the server.

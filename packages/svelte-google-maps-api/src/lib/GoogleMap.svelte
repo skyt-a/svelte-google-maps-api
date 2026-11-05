@@ -1,184 +1,211 @@
 <script lang="ts">
-	import { getContext, onDestroy } from 'svelte';
-	import { BROWSER as browser } from 'esm-env';
-	import { setContext } from 'svelte';
-	import type { APIProviderContext } from './APIProvider.svelte';
+	import { onMount, type Snippet } from 'svelte';
+	import { getAPIContext, MapContext, setMapContext } from './internal/context.svelte.js';
+	import { addListeners, definedOnly, latLngEquals, toLatLngLiteral } from './internal/utils.js';
+	import type { MapCameraState } from './types.js';
 
-	export let id: string | undefined = undefined;
-	export let options: google.maps.MapOptions = {};
+	type MapMouseHandler = (event: google.maps.MapMouseEvent) => void;
 
-	export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onCenterChanged: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-
-	export let onLoad: ((map: google.maps.Map) => void) | undefined = undefined;
-	export let onUnmount: ((map: google.maps.Map) => void) | undefined = undefined;
-
-	export let mapContainerStyle: string = 'width:100%;height:100%';
-	export let mapContainerClassName: string = '';
-
-	let element: HTMLElement | null = null;
-	let map: google.maps.Map | null = null;
-
-	const { status, googleMapsApi } = getContext<APIProviderContext>('svelte-google-maps-api');
-
-	let dblclickListener: google.maps.MapsEventListener | null = null;
-	let dragendListener: google.maps.MapsEventListener | null = null;
-	let dragstartListener: google.maps.MapsEventListener | null = null;
-	let mousedownListener: google.maps.MapsEventListener | null = null;
-	let mousemoveListener: google.maps.MapsEventListener | null = null;
-	let mouseoutListener: google.maps.MapsEventListener | null = null;
-	let mouseoverListener: google.maps.MapsEventListener | null = null;
-	let mouseupListener: google.maps.MapsEventListener | null = null;
-	let rightClickListener: google.maps.MapsEventListener | null = null;
-	let clickListener: google.maps.MapsEventListener | null = null;
-	let dragListener: google.maps.MapsEventListener | null = null;
-	let centerChangedListener: google.maps.MapsEventListener | null = null;
-
-	$: if (map && onDblClick && googleMapsApi && browser) {
-		if (dblclickListener !== null) {
-			googleMapsApi.event.removeListener(dblclickListener);
-		}
-		dblclickListener = googleMapsApi.event.addListener(map, 'dblclick', onDblClick);
+	interface Props {
+		id?: string;
+		/** Map ID from the Cloud Console. Required for AdvancedMarker. Set once on creation. */
+		mapId?: string;
+		/** Map center. Use `bind:center` to track user panning. */
+		center?: google.maps.LatLngLiteral | google.maps.LatLng;
+		/** Zoom level. Use `bind:zoom` to track user zooming. */
+		zoom?: number;
+		heading?: number;
+		tilt?: number;
+		/** Set once on creation. */
+		colorScheme?: google.maps.MapOptions['colorScheme'];
+		/** Set once on creation. */
+		renderingType?: google.maps.MapOptions['renderingType'];
+		/** Any other `google.maps.MapOptions`. Applied with `setOptions()` whenever it changes. */
+		options?: Omit<
+			google.maps.MapOptions,
+			'center' | 'zoom' | 'heading' | 'tilt' | 'mapId' | 'colorScheme' | 'renderingType'
+		>;
+		class?: string;
+		/** Inline style for the map container. The container needs a height. */
+		style?: string;
+		/** The `google.maps.Map` instance. Read it with `bind:map`. */
+		map?: google.maps.Map | null;
+		onClick?: MapMouseHandler;
+		onDblClick?: MapMouseHandler;
+		onContextMenu?: MapMouseHandler;
+		onMouseMove?: MapMouseHandler;
+		onMouseOver?: MapMouseHandler;
+		onMouseOut?: MapMouseHandler;
+		onDragStart?: () => void;
+		onDrag?: () => void;
+		onDragEnd?: () => void;
+		onIdle?: (map: google.maps.Map) => void;
+		onTilesLoaded?: (map: google.maps.Map) => void;
+		onBoundsChanged?: (bounds: google.maps.LatLngBoundsLiteral) => void;
+		onCameraChanged?: (camera: MapCameraState) => void;
+		onLoad?: (map: google.maps.Map) => void;
+		children?: Snippet;
 	}
 
-	$: if (map && onDragEnd && googleMapsApi && browser) {
-		if (dragendListener !== null) {
-			googleMapsApi.event.removeListener(dragendListener);
-		}
-		dragendListener = googleMapsApi.event.addListener(map, 'dragend', onDragEnd);
-	}
+	let {
+		id,
+		mapId,
+		center = $bindable(),
+		zoom = $bindable(),
+		heading = $bindable(),
+		tilt = $bindable(),
+		colorScheme,
+		renderingType,
+		options,
+		class: className = '',
+		style = 'width:100%;height:100%;',
+		map = $bindable(null),
+		onClick,
+		onDblClick,
+		onContextMenu,
+		onMouseMove,
+		onMouseOver,
+		onMouseOut,
+		onDragStart,
+		onDrag,
+		onDragEnd,
+		onIdle,
+		onTilesLoaded,
+		onBoundsChanged,
+		onCameraChanged,
+		onLoad,
+		children
+	}: Props = $props();
 
-	$: if (map && onDragStart && googleMapsApi && browser) {
-		if (dragstartListener !== null) {
-			googleMapsApi.event.removeListener(dragstartListener);
-		}
-		dragstartListener = googleMapsApi.event.addListener(map, 'dragstart', onDragStart);
-	}
+	const api = getAPIContext('GoogleMap');
+	const context = setMapContext(new MapContext());
+	let container: HTMLDivElement;
 
-	$: if (map && onMouseDown && googleMapsApi && browser) {
-		if (mousedownListener !== null) {
-			googleMapsApi.event.removeListener(mousedownListener);
-		}
-		mousedownListener = googleMapsApi.event.addListener(map, 'mousedown', onMouseDown);
-	}
+	onMount(() => {
+		const { Map } = api.requireLibrary('maps');
+		// Pass only the props that are set. The Maps API rejects `null` for some options
+		// (e.g. `renderingType`), and unset props must not override values from `options`.
+		const instance = new Map(container, {
+			...options,
+			...definedOnly({ center, zoom, heading, tilt, mapId, colorScheme, renderingType })
+		});
 
-	$: if (map && onMouseMove && googleMapsApi && browser) {
-		if (mousemoveListener !== null) {
-			googleMapsApi.event.removeListener(mousemoveListener);
-		}
-		mousemoveListener = googleMapsApi.event.addListener(map, 'mousemove', onMouseMove);
-	}
+		context.map = instance;
+		map = instance;
+		onLoad?.(instance);
 
-	$: if (map && onMouseOut && googleMapsApi && browser) {
-		if (mouseoutListener !== null) {
-			googleMapsApi.event.removeListener(mouseoutListener);
-		}
-		mouseoutListener = googleMapsApi.event.addListener(map, 'mouseout', onMouseOut);
-	}
-
-	$: if (map && onMouseOver && googleMapsApi && browser) {
-		if (mouseoverListener !== null) {
-			googleMapsApi.event.removeListener(mouseoverListener);
-		}
-		mouseoverListener = googleMapsApi.event.addListener(map, 'mouseover', onMouseOver);
-	}
-
-	$: if (map && onMouseUp && googleMapsApi && browser) {
-		if (mouseupListener !== null) {
-			googleMapsApi.event.removeListener(mouseupListener);
-		}
-		mouseupListener = googleMapsApi.event.addListener(map, 'mouseup', onMouseUp);
-	}
-
-	$: if (map && onRightClick && googleMapsApi && browser) {
-		if (rightClickListener !== null) {
-			googleMapsApi.event.removeListener(rightClickListener);
-		}
-		rightClickListener = googleMapsApi.event.addListener(map, 'rightclick', onRightClick);
-	}
-
-	$: if (map && onClick && googleMapsApi && browser) {
-		if (clickListener !== null) {
-			googleMapsApi.event.removeListener(clickListener);
-		}
-		clickListener = googleMapsApi.event.addListener(map, 'click', onClick);
-	}
-
-	$: if (map && onDrag && googleMapsApi && browser) {
-		if (dragListener !== null) {
-			googleMapsApi.event.removeListener(dragListener);
-		}
-		dragListener = googleMapsApi.event.addListener(map, 'drag', onDrag);
-	}
-
-	$: if (map && onCenterChanged && googleMapsApi && browser) {
-		if (centerChangedListener !== null) {
-			googleMapsApi.event.removeListener(centerChangedListener);
-		}
-		centerChangedListener = googleMapsApi.event.addListener(map, 'center_changed', onCenterChanged);
-	}
-
-	$: if (map && options) {
-		map.setOptions(options);
-	}
-
-	const initialize = (gmaps: typeof google.maps) => {
-		if (!browser || !element) return;
-
-		map = new gmaps.Map(element, options);
-
-		if (onCenterChanged)
-			centerChangedListener = gmaps.event.addListener(map, 'center_changed', onCenterChanged);
-		if (onDblClick) dblclickListener = gmaps.event.addListener(map, 'dblclick', onDblClick);
-		if (onDragEnd) dragendListener = gmaps.event.addListener(map, 'dragend', onDragEnd);
-		if (onDragStart) dragstartListener = gmaps.event.addListener(map, 'dragstart', onDragStart);
-		if (onMouseDown) mousedownListener = gmaps.event.addListener(map, 'mousedown', onMouseDown);
-		if (onMouseMove) mousemoveListener = gmaps.event.addListener(map, 'mousemove', onMouseMove);
-		if (onMouseOut) mouseoutListener = gmaps.event.addListener(map, 'mouseout', onMouseOut);
-		if (onMouseOver) mouseoverListener = gmaps.event.addListener(map, 'mouseover', onMouseOver);
-		if (onMouseUp) mouseupListener = gmaps.event.addListener(map, 'mouseup', onMouseUp);
-		if (onRightClick) rightClickListener = gmaps.event.addListener(map, 'rightclick', onRightClick);
-		if (onClick) clickListener = gmaps.event.addListener(map, 'click', onClick);
-		if (onDrag) dragListener = gmaps.event.addListener(map, 'drag', onDrag);
-
-		onLoad?.(map);
-		setContext('map', map);
-	};
-	onDestroy(() => {
-		if (map !== null && googleMapsApi && browser) {
-			if (onUnmount) {
-				onUnmount(map);
-			}
-			googleMapsApi.event.clearInstanceListeners(map);
-		}
+		return () => {
+			api.requireLibrary('core').event.clearInstanceListeners(instance);
+			context.map = null;
+		};
 	});
 
-	$: if ($status === 'loaded' && googleMapsApi && element && !map) {
-		initialize(googleMapsApi);
-	}
+	// Prop -> map
+	$effect(() => {
+		const instance = context.map;
+		const next = center;
+		if (!instance || !next) return;
+		if (!latLngEquals(instance.getCenter(), next)) instance.setCenter(next);
+	});
+
+	$effect(() => {
+		const instance = context.map;
+		const next = zoom;
+		if (!instance || next === undefined) return;
+		if (instance.getZoom() !== next) instance.setZoom(next);
+	});
+
+	$effect(() => {
+		const instance = context.map;
+		const next = heading;
+		if (!instance || next === undefined) return;
+		if (instance.getHeading() !== next) instance.setHeading(next);
+	});
+
+	$effect(() => {
+		const instance = context.map;
+		const next = tilt;
+		if (!instance || next === undefined) return;
+		if (instance.getTilt() !== next) instance.setTilt(next);
+	});
+
+	$effect(() => {
+		const instance = context.map;
+		if (!instance || !options) return;
+		instance.setOptions(options);
+	});
+
+	// Map -> props (two-way binding for the camera)
+	$effect(() => {
+		const instance = context.map;
+		if (!instance) return;
+
+		// Each event syncs only its own value. These events fire synchronously while the
+		// prop -> map effects run, so writing every camera value here would overwrite props
+		// (e.g. a new zoom) that were changed in the same update but not yet applied.
+		const notifyCamera = () => {
+			const nextCenter = toLatLngLiteral(instance.getCenter());
+			if (!onCameraChanged || !nextCenter) return;
+			onCameraChanged({
+				center: nextCenter,
+				zoom: instance.getZoom() ?? 0,
+				heading: instance.getHeading() ?? 0,
+				tilt: instance.getTilt() ?? 0
+			});
+		};
+
+		return addListeners(instance, {
+			center_changed: () => {
+				const next = toLatLngLiteral(instance.getCenter());
+				if (next && !latLngEquals(next, center)) center = next;
+				notifyCamera();
+			},
+			zoom_changed: () => {
+				const next = instance.getZoom();
+				if (next !== undefined && next !== zoom) zoom = next;
+				notifyCamera();
+			},
+			heading_changed: () => {
+				const next = instance.getHeading();
+				if (next !== undefined && next !== heading) heading = next;
+				notifyCamera();
+			},
+			tilt_changed: () => {
+				const next = instance.getTilt();
+				if (next !== undefined && next !== tilt) tilt = next;
+				notifyCamera();
+			}
+		});
+	});
+
+	$effect(() => {
+		const instance = context.map;
+		if (!instance) return;
+
+		return addListeners(instance, {
+			click: onClick,
+			dblclick: onDblClick,
+			contextmenu: onContextMenu,
+			mousemove: onMouseMove,
+			mouseover: onMouseOver,
+			mouseout: onMouseOut,
+			dragstart: onDragStart,
+			drag: onDrag,
+			dragend: onDragEnd,
+			idle: onIdle && (() => onIdle(instance)),
+			tilesloaded: onTilesLoaded && (() => onTilesLoaded(instance)),
+			bounds_changed:
+				onBoundsChanged &&
+				(() => {
+					const bounds = instance.getBounds();
+					if (bounds) onBoundsChanged(bounds.toJSON());
+				})
+		});
+	});
 </script>
 
-<div bind:this={element} {id} style={mapContainerStyle} class={mapContainerClassName}>
-	{#if $status === 'loading'}
-		<slot name="loading">
-			<!-- Optional: Display loading indicator -->
-		</slot>
-	{:else if $status === 'error'}
-		<slot name="error">
-			<!-- Optional: Display error message -->
-			<p style="color: red;">Error loading map.</p>
-		</slot>
-	{:else if map}
-		<slot />
-	{/if}
-</div>
+<div bind:this={container} {id} class={className} {style}></div>
+
+{#if context.map}
+	{@render children?.()}
+{/if}

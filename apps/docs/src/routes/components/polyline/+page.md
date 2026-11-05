@@ -6,147 +6,69 @@ title: Polyline
 
 [Open the Polyline story](https://skyt-a.github.io/svelte-google-maps-api/storybook/?path=/story/components-polyline--basic)
 
-The `Polyline` component draws a line on the map connecting a series of locations.
+`Polyline` draws a `google.maps.Polyline`. With `editable` or `draggable`, the user's edits flow back through `bind:path`.
 
 ## Props
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| path | google.maps.LatLng[] \| google.maps.LatLngLiteral[] | | Array of coordinates that define the line |
-| options | google.maps.PolylineOptions | | Polyline configuration options |
-| onLoad | (polyline: google.maps.Polyline) => void | | Callback when polyline is loaded |
-| onUnmount | (polyline: google.maps.Polyline) => void | | Callback before polyline is destroyed |
+| path | `google.maps.LatLngLiteral[]` | | Vertices of the line. Bindable: use `bind:path` to track edits. |
+| strokeColor | `string` | | Stroke color. |
+| strokeOpacity | `number` | | Stroke opacity between 0 and 1. |
+| strokeWeight | `number` | | Stroke width in pixels. |
+| geodesic | `boolean` | | Draw great-circle segments. |
+| clickable | `boolean` | | Whether the shape handles mouse events. |
+| draggable | `boolean` | | Lets the user drag the shape. |
+| editable | `boolean` | | Shows handles so the user can edit the shape. |
+| visible | `boolean` | | Whether the shape is visible. |
+| zIndex | `number` | | Stacking order. |
+| icons | `google.maps.IconSequence[]` | | Symbols along the line. |
+| options | `google.maps.PolylineOptions` | | Other polyline options. Individual props override these. |
+| polyline | `google.maps.Polyline \| null` | `null` | The instance. Bindable: read it with `bind:polyline`. |
 
-### Event Handler Props
+### Event Props
 
 | Prop | Type | Description |
 |------|------|-------------|
-| onClick | (e: google.maps.MapMouseEvent) => void | Click event handler |
-| onDblClick | (e: google.maps.MapMouseEvent) => void | Double click event handler |
-| onDrag | (e: google.maps.MapMouseEvent) => void | Drag event handler |
-| onDragEnd | (e: google.maps.MapMouseEvent) => void | Drag end event handler |
-| onDragStart | (e: google.maps.MapMouseEvent) => void | Drag start event handler |
-| onMouseDown | (e: google.maps.MapMouseEvent) => void | Mouse down event handler |
-| onMouseMove | (e: google.maps.MapMouseEvent) => void | Mouse move event handler |
-| onMouseOut | (e: google.maps.MapMouseEvent) => void | Mouse out event handler |
-| onMouseOver | (e: google.maps.MapMouseEvent) => void | Mouse over event handler |
-| onMouseUp | (e: google.maps.MapMouseEvent) => void | Mouse up event handler |
-| onRightClick | (e: google.maps.MapMouseEvent) => void | Right click event handler |
+| onClick | `(event: google.maps.PolyMouseEvent) => void` | `click` |
+| onDblClick | `(event: google.maps.PolyMouseEvent) => void` | `dblclick` |
+| onContextMenu | `(event: google.maps.PolyMouseEvent) => void` | `contextmenu` |
+| onMouseDown | `(event: google.maps.PolyMouseEvent) => void` | `mousedown` |
+| onMouseUp | `(event: google.maps.PolyMouseEvent) => void` | `mouseup` |
+| onMouseOver | `(event: google.maps.PolyMouseEvent) => void` | `mouseover` |
+| onMouseOut | `(event: google.maps.PolyMouseEvent) => void` | `mouseout` |
+| onMouseMove | `(event: google.maps.PolyMouseEvent) => void` | `mousemove` |
+| onDragStart | `(event: google.maps.MapMouseEvent) => void` | `dragstart` |
+| onDrag | `(event: google.maps.MapMouseEvent) => void` | `drag` |
+| onDragEnd | `(event: google.maps.MapMouseEvent) => void` | `dragend` |
+| onPathChanged | `(path: google.maps.LatLngLiteral[]) => void` | Called after the user edits or drags the line. |
+| onLoad | `(polyline: google.maps.Polyline) => void` | Called once after the polyline is created. |
 
 ## Usage
 
 ```svelte
-<script>
-  import { APIProvider, GoogleMap, Polyline } from 'svelte-google-maps-api';
-  
-  const apiKey = 'YOUR_API_KEY';
-  const mapOptions = {
-    center: { lat: 35.6812362, lng: 139.7649361 },
-    zoom: 12
-  };
-  
-  // Define a path for the polyline
-  const path = [
-    { lat: 35.6812362, lng: 139.7649361 }, // Tokyo
-    { lat: 35.4437078, lng: 139.6380256 }, // Yokohama
-    { lat: 35.7090259, lng: 139.4631742 }  // Tachikawa
-  ];
-  
-  // Polyline options
-  const polylineOptions = {
-    strokeColor: '#FF0000',
-    strokeOpacity: 1.0,
-    strokeWeight: 3
-  };
-  
-  function handlePolylineClick() {
-    alert('Polyline clicked!');
-  }
+<script lang="ts">
+	import { APIProvider, GoogleMap, Polyline } from 'svelte-google-maps-api';
+
+	let path = $state([
+		{ lat: 35.6812, lng: 139.7671 },
+		{ lat: 35.6586, lng: 139.7454 },
+		{ lat: 35.71, lng: 139.8107 }
+	]);
 </script>
 
-<div style="height: 400px; width: 100%;">
-  <APIProvider {apiKey}>
-    <GoogleMap id="map" options={mapOptions} mapContainerStyle="width: 100%; height: 100%;">
-      <Polyline 
-        path={path} 
-        options={polylineOptions}
-        onClick={handlePolylineClick}
-      />
-    </GoogleMap>
-  </APIProvider>
+<div style="height: 400px;">
+	<APIProvider apiKey="YOUR_API_KEY">
+		<GoogleMap center={{ lat: 35.68, lng: 139.77 }} zoom={12}>
+			<Polyline bind:path strokeColor="#0f766e" strokeWeight={4} geodesic editable />
+		</GoogleMap>
+	</APIProvider>
 </div>
-```
 
-## Editable Polyline
-
-You can make the polyline editable by setting the `editable` option to `true`:
-
-```svelte
-<script>
-  import { APIProvider, GoogleMap, Polyline } from 'svelte-google-maps-api';
-  
-  const apiKey = 'YOUR_API_KEY';
-  const mapOptions = {
-    center: { lat: 35.6812362, lng: 139.7649361 },
-    zoom: 12
-  };
-  
-  // Define a path for the polyline
-  let path = [
-    { lat: 35.6812362, lng: 139.7649361 }, // Tokyo
-    { lat: 35.4437078, lng: 139.6380256 }, // Yokohama
-    { lat: 35.7090259, lng: 139.4631742 }  // Tachikawa
-  ];
-  
-  // Polyline options
-  const polylineOptions = {
-    strokeColor: '#0000FF',
-    strokeOpacity: 0.8,
-    strokeWeight: 4,
-    editable: true
-  };
-  
-  function handlePathChanged(polyline) {
-    // Get the updated path
-    const newPath = polyline.getPath().getArray().map(latLng => ({
-      lat: latLng.lat(),
-      lng: latLng.lng()
-    }));
-    
-    path = newPath;
-    console.log('Path updated:', path);
-  }
-</script>
-
-<div style="height: 400px; width: 100%;">
-  <APIProvider {apiKey}>
-    <GoogleMap id="map" options={mapOptions} mapContainerStyle="width: 100%; height: 100%;">
-      <Polyline 
-        path={path} 
-        options={polylineOptions}
-        onLoad={(polyline) => {
-          // Add a listener for path changes
-          google.maps.event.addListener(polyline.getPath(), 'set_at', () => handlePathChanged(polyline));
-          google.maps.event.addListener(polyline.getPath(), 'insert_at', () => handlePathChanged(polyline));
-        }}
-      />
-    </GoogleMap>
-  </APIProvider>
-</div>
-```
-
-## Context
-
-The `Polyline` component consumes the context set by `GoogleMap` to access the map instance:
-
-```javascript
-const { getMap } = getContext('map') ?? {};
-let map = getMap();
+<p>{path.length} vertices</p>
 ```
 
 ## Notes
 
-- The `Polyline` component must be a child of the `GoogleMap` component.
-- It creates a Google Maps polyline and attaches it to the map.
-- Event listeners are automatically cleaned up when the component is destroyed.
-- The polyline is automatically removed from the map when the component is unmounted.
+- Style props are applied with `setOptions()` whenever they change; unset props keep the API defaults.
+- Assigning a new `path` array redraws the line. Editing or dragging writes a new array back to `path`.

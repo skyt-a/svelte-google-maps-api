@@ -1,51 +1,40 @@
 import { render, waitFor } from '@testing-library/svelte';
 import { describe, expect, it, vi } from 'vitest';
 import StreetViewPanorama from '../src/lib/street-view/StreetViewPanorama.svelte';
-import MapContextHarness from './fixtures/MapContextHarness.svelte';
-import { createGoogleMapsMock } from './googleMapsMock';
+import ProviderHarness from './fixtures/ProviderHarness.svelte';
+import { installGoogleMapsMock } from './googleMapsMock';
 
 describe('StreetViewPanorama', () => {
-	it('creates a panorama, wires events, and calls unmount callback', async () => {
-		const googleMaps = createGoogleMapsMock();
-		const onPovChanged = vi.fn();
+	it('creates a panorama in its own container and forwards events', async () => {
+		const mock = installGoogleMapsMock();
+		const onPanoChanged = vi.fn();
 		const onLoad = vi.fn();
-		const onUnmount = vi.fn();
-		const position = { lat: 35, lng: 139 };
-		const pov = { heading: 90, pitch: 0 };
-
-		const { unmount } = render(MapContextHarness, {
+		const { unmount } = render(ProviderHarness, {
 			props: {
 				component: StreetViewPanorama,
-				googleMapsApi: googleMaps.maps as unknown as typeof google.maps,
 				props: {
-					position,
-					pov,
-					zoom: 2,
-					containerId: 'street-view',
-					onPovChanged,
-					onLoad,
-					onUnmount
+					position: { lat: 1, lng: 2 },
+					pov: { heading: 90, pitch: 0 },
+					class: 'pano',
+					onPanoChanged,
+					onLoad
 				}
 			}
 		});
 
-		await waitFor(() => {
-			expect(googleMaps.classes.StreetViewPanorama.instances).toHaveLength(1);
-		});
+		await waitFor(() => expect(mock.classes.StreetViewPanorama.instances).toHaveLength(1));
+		const panorama = mock.classes.StreetViewPanorama.instances[0];
 
-		const panorama = googleMaps.classes.StreetViewPanorama.instances[0];
-
-		expect(panorama.options).toMatchObject({
-			pov,
-			zoom: 2,
-			visible: true
-		});
-		expect(panorama.options.position).toEqual(position);
-		expect(panorama.addListener).toHaveBeenCalledWith('pov_changed', onPovChanged);
+		expect(mock.importLibrary).toHaveBeenCalledWith('streetView');
+		expect(panorama.element).toHaveClass('pano');
+		expect(panorama.getPosition()?.toJSON()).toEqual({ lat: 1, lng: 2 });
+		expect(panorama.getPov()).toEqual({ heading: 90, pitch: 0 });
 		expect(onLoad).toHaveBeenCalledWith(panorama);
 
-		unmount();
+		panorama.trigger('pano_changed');
+		expect(onPanoChanged).toHaveBeenCalledWith('pano-id');
 
-		expect(onUnmount).toHaveBeenCalledWith(panorama);
+		unmount();
+		expect(mock.event.clearInstanceListeners).toHaveBeenCalledWith(panorama);
 	});
 });

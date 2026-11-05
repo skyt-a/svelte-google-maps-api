@@ -1,76 +1,31 @@
-import APIProvider from './APIProvider.svelte';
-import GoogleMap from './GoogleMap.svelte';
-import Marker from './Marker.svelte';
-import AdvancedMarker from './AdvancedMarker.svelte';
-import InfoWindow from './InfoWindow.svelte';
-import Polyline from './Polyline.svelte';
-import Polygon from './Polygon.svelte';
-import Circle from './Circle.svelte';
-import Rectangle from './Rectangle.svelte';
-import HeatmapLayer from './HeatmapLayer.svelte';
-import GroundOverlay from './GroundOverlay.svelte';
-import DirectionsRenderer from './DirectionsRenderer.svelte';
-import DirectionsService from './DirectionsService.svelte';
-import DistanceMatrixService from './DistanceMatrixService.svelte';
-import DrawingManager from './DrawingManager.svelte';
-import Data from './Data.svelte';
-import MarkerClusterer from './MarkerClusterer.svelte';
-import GoogleMarkerClusterer from './GoogleMarkerClusterer.svelte';
-import InfoBox from './InfoBox.svelte';
-import TrafficLayer from './layers/TrafficLayer.svelte';
-import TransitLayer from './layers/TransitLayer.svelte';
-import BicyclingLayer from './layers/BicyclingLayer.svelte';
-import KmlLayer from './layers/KmlLayer.svelte';
-import Autocomplete from './places/Autocomplete.svelte';
-import StandaloneSearchBox from './places/StandaloneSearchBox.svelte';
-import OverlayView from './overlay/OverlayView.svelte';
-import StreetViewPanorama from './street-view/StreetViewPanorama.svelte';
-import StreetViewService from './street-view/StreetViewService.svelte';
-import MapControl from './controls/MapControl.svelte';
+export { default as APIProvider } from './APIProvider.svelte';
+export { default as GoogleMap } from './GoogleMap.svelte';
+export { default as AdvancedMarker } from './AdvancedMarker.svelte';
+export { default as Pin } from './Pin.svelte';
+export { default as MarkerClusterer } from './MarkerClusterer.svelte';
+export { default as InfoWindow } from './InfoWindow.svelte';
+export { default as Polyline } from './Polyline.svelte';
+export { default as Polygon } from './Polygon.svelte';
+export { default as Circle } from './Circle.svelte';
+export { default as Rectangle } from './Rectangle.svelte';
+export { default as GroundOverlay } from './GroundOverlay.svelte';
+export { default as Data } from './Data.svelte';
+export { default as TrafficLayer } from './layers/TrafficLayer.svelte';
+export { default as TransitLayer } from './layers/TransitLayer.svelte';
+export { default as BicyclingLayer } from './layers/BicyclingLayer.svelte';
+export { default as MapControl } from './controls/MapControl.svelte';
+export { default as OverlayView } from './overlay/OverlayView.svelte';
+export { default as PlaceAutocomplete } from './places/PlaceAutocomplete.svelte';
+export { default as RouteRenderer } from './routes/RouteRenderer.svelte';
+export { default as StreetViewPanorama } from './street-view/StreetViewPanorama.svelte';
 
-const FLOAT_PANE = 'floatPane';
-const MAP_PANE = 'mapPane';
-const MARKER_LAYER = 'markerLayer';
-const OVERLAY_LAYER = 'overlayLayer';
-const OVERLAY_MOUSE_TARGET = 'overlayMouseTarget';
+export { useMap, useMapsLibrary, useAPILoadingStatus, type Current } from './hooks.svelte.js';
+export type {
+	APILoadingStatus,
+	LatLngInput,
+	Library,
+	LibraryMap,
+	MapCameraState
+} from './types.js';
 
-export {
-	APIProvider,
-	GoogleMap,
-	Marker,
-	AdvancedMarker,
-	InfoWindow,
-	Polyline,
-	Polygon,
-	Circle,
-	Rectangle,
-	Data,
-	HeatmapLayer,
-	GroundOverlay,
-	DirectionsRenderer,
-	DirectionsService,
-	DistanceMatrixService,
-	DrawingManager,
-	MarkerClusterer,
-	GoogleMarkerClusterer,
-	InfoBox,
-	TrafficLayer,
-	TransitLayer,
-	BicyclingLayer,
-	KmlLayer,
-	Autocomplete,
-	StandaloneSearchBox,
-	OverlayView,
-	StreetViewPanorama,
-	StreetViewService,
-	MapControl,
-	FLOAT_PANE,
-	MAP_PANE,
-	MARKER_LAYER,
-	OVERLAY_LAYER,
-	OVERLAY_MOUSE_TARGET
-};
-
-export * from './types/googleMap.js';
-export * from './types/markerClusterer.js';
 export * as GoogleMapsMarkerClusterer from '@googlemaps/markerclusterer';

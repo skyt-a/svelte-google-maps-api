@@ -5,7 +5,9 @@ import ComponentStory from './ComponentStory.svelte';
 const meta = {
 	title: 'Components/GroundOverlay',
 	component: GroundOverlay,
-	tags: ['autodocs']
+	tags: ['autodocs'],
+	// The story renders ComponentStory; these only satisfy required props.
+	args: { url: '', bounds: { north: 0, south: 0, east: 0, west: 0 } }
 } satisfies Meta<typeof GroundOverlay>;
 
 export default meta;

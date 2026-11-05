@@ -1,171 +1,129 @@
 <script lang="ts">
-	import { getContext, onDestroy, onMount, tick } from 'svelte';
-	import { BROWSER as browser } from 'esm-env';
-	import type { APIProviderContext } from './APIProvider.svelte';
+	import { onMount, type Snippet } from 'svelte';
+	import { getAPIContext, getMap } from './internal/context.svelte.js';
+	import { addListeners, definedOnly, hasRenderableContent } from './internal/utils.js';
+	import type { LatLngInput } from './types.js';
 
-	type Anchor =
-		| google.maps.MVCObject
-		| google.maps.marker.AdvancedMarkerElement
-		| google.maps.LatLng
-		| google.maps.LatLngLiteral;
+	interface Props {
+		/** Whether the info window is open. Closing it from the map sets this to `false`. */
+		open?: boolean;
+		/** Marker (or other anchor) to attach to. Takes precedence over `position`. */
+		anchor?: google.maps.marker.AdvancedMarkerElement | google.maps.MVCObject | null;
+		position?: LatLngInput | null;
+		/** Header text. Use the `header` snippet for rich content. */
+		headerContent?: string;
+		headerDisabled?: boolean;
+		maxWidth?: number;
+		minWidth?: number;
+		/** Pixel offset from the anchor point, as `[x, y]`. */
+		pixelOffset?: [number, number];
+		zIndex?: number;
+		disableAutoPan?: boolean;
+		ariaLabel?: string;
+		shouldFocus?: boolean;
+		/** Other `google.maps.InfoWindowOptions`. */
+		options?: google.maps.InfoWindowOptions;
+		/** The `google.maps.InfoWindow` instance. Read it with `bind:infoWindow`. */
+		infoWindow?: google.maps.InfoWindow | null;
+		/** Called whenever the info window closes. */
+		onClose?: () => void;
+		/** Called when the user clicks the close button. */
+		onCloseClick?: () => void;
+		onLoad?: (infoWindow: google.maps.InfoWindow) => void;
+		header?: Snippet;
+		children?: Snippet;
+	}
 
-	export let anchor: Anchor | undefined = undefined;
-	export let position: google.maps.LatLng | google.maps.LatLngLiteral | undefined = undefined;
-	export let options: google.maps.InfoWindowOptions | undefined = undefined;
-	export let headerContent: Element | string | undefined = undefined;
-	export let zIndex: number | undefined = undefined;
-	export let shouldFocus: boolean = true;
+	let {
+		open = $bindable(true),
+		anchor,
+		position,
+		headerContent,
+		headerDisabled,
+		maxWidth,
+		minWidth,
+		pixelOffset,
+		zIndex,
+		disableAutoPan,
+		ariaLabel,
+		shouldFocus,
+		options,
+		infoWindow = $bindable(null),
+		onClose,
+		onCloseClick,
+		onLoad,
+		header,
+		children
+	}: Props = $props();
 
-	export let isOpen: boolean = true;
-
-	export let onCloseClick: (() => void) | undefined = undefined;
-	export let onDomReady: (() => void) | undefined = undefined;
-	export let onContentChanged: (() => void) | undefined = undefined;
-	export let onPositionChanged: (() => void) | undefined = undefined;
-	export let onZIndexChanged: (() => void) | undefined = undefined;
-	export let onLoad: ((infoWindow: google.maps.InfoWindow) => void) | undefined = undefined;
-	export let onUnmount: ((infoWindow: google.maps.InfoWindow) => void) | undefined = undefined;
-
-	let infoWindowInstance: google.maps.InfoWindow | null = null;
-	let contentWrapper: HTMLDivElement | null = null;
-	let headerWrapper: HTMLDivElement | null = null;
-	let closeClickListener: google.maps.MapsEventListener | null = null;
-	let domReadyListener: google.maps.MapsEventListener | null = null;
-	let contentChangedListener: google.maps.MapsEventListener | null = null;
-	let positionChangedListener: google.maps.MapsEventListener | null = null;
-	let zIndexChangedListener: google.maps.MapsEventListener | null = null;
-
-	let internalOpenState = isOpen;
-
-	const { status, googleMapsApi } = getContext<APIProviderContext>('svelte-google-maps-api');
-	const map = getContext<google.maps.Map>('map');
+	const api = getAPIContext('InfoWindow');
+	const map = getMap('InfoWindow');
+	const { InfoWindow } = api.requireLibrary('maps');
+	const { Size } = api.requireLibrary('core');
+	const instance = new InfoWindow();
+	let content: HTMLDivElement;
+	let headerElement: HTMLDivElement;
 
 	onMount(() => {
-		tick().then(initializeInfoWindow);
-	});
+		instance.setContent(content);
+		infoWindow = instance;
+		onLoad?.(instance);
 
-	onDestroy(() => {
-		if (infoWindowInstance) {
-			onUnmount?.(infoWindowInstance);
-			if (googleMapsApi) {
-				googleMapsApi.event.clearInstanceListeners(infoWindowInstance);
-			}
-			infoWindowInstance.close();
-			infoWindowInstance = null;
-		}
-	});
-
-	async function initializeInfoWindow() {
-		if (!browser || $status !== 'loaded' || !googleMapsApi || !map || infoWindowInstance) return;
-
-		const infoWindowOptions: google.maps.InfoWindowOptions = {
-			...(options ?? {}),
-			content: contentWrapper ?? undefined,
-			headerContent: headerWrapper ?? headerContent ?? undefined,
-			position,
-			zIndex
+		return () => {
+			api.requireLibrary('core').event.clearInstanceListeners(instance);
+			instance.close();
+			content.remove();
+			headerElement.remove();
 		};
+	});
 
-		Object.keys(infoWindowOptions).forEach((key) => {
-			if (
-				key !== 'content' &&
-				key !== 'headerContent' &&
-				infoWindowOptions[key as keyof typeof infoWindowOptions] === undefined
-			) {
-				delete infoWindowOptions[key as keyof typeof infoWindowOptions];
-			}
+	$effect(() => {
+		instance.setOptions({
+			...options,
+			...definedOnly({
+				maxWidth,
+				minWidth,
+				zIndex,
+				disableAutoPan,
+				ariaLabel,
+				headerDisabled
+			}),
+			...(pixelOffset ? { pixelOffset: new Size(pixelOffset[0], pixelOffset[1]) } : {})
 		});
+	});
 
-		infoWindowInstance = new googleMapsApi.InfoWindow(infoWindowOptions);
-		onLoad?.(infoWindowInstance);
-
-		setupListeners();
-
-		updateOpenState();
-	}
-
-	$: if (infoWindowInstance && position) {
-		infoWindowInstance.setPosition(position);
-	}
-	$: if (infoWindowInstance && zIndex !== undefined) {
-		infoWindowInstance.setZIndex(zIndex);
-	}
-	$: if (infoWindowInstance && options) {
-		infoWindowInstance.setOptions(options);
-	}
-
-	$: if (isOpen !== internalOpenState) {
-		internalOpenState = isOpen;
-		updateOpenState();
-	}
-
-	function setupListeners() {
-		if (!infoWindowInstance || !googleMapsApi) return;
-
-		if (closeClickListener) googleMapsApi.event.removeListener(closeClickListener);
-		if (domReadyListener) googleMapsApi.event.removeListener(domReadyListener);
-		if (contentChangedListener) googleMapsApi.event.removeListener(contentChangedListener);
-		if (positionChangedListener) googleMapsApi.event.removeListener(positionChangedListener);
-		if (zIndexChangedListener) googleMapsApi.event.removeListener(zIndexChangedListener);
-
-		if (onCloseClick) {
-			closeClickListener = infoWindowInstance.addListener('closeclick', () => {
-				internalOpenState = false;
-				isOpen = false;
-				onCloseClick();
-			});
-		}
-		if (onDomReady) {
-			domReadyListener = infoWindowInstance.addListener('domready', onDomReady);
-		}
-		if (onContentChanged) {
-			contentChangedListener = infoWindowInstance.addListener('content_changed', onContentChanged);
-		}
-		if (onPositionChanged) {
-			positionChangedListener = infoWindowInstance.addListener(
-				'position_changed',
-				onPositionChanged
-			);
-		}
-		if (onZIndexChanged) {
-			zIndexChangedListener = infoWindowInstance.addListener('zindex_changed', onZIndexChanged);
-		}
-	}
-
-	$: if (infoWindowInstance && googleMapsApi && browser) {
-		setupListeners();
-	}
-
-	function updateOpenState() {
-		if (!infoWindowInstance || !map) return;
-		if (internalOpenState) {
-			let openAnchor: google.maps.MVCObject | undefined = undefined;
-			if (anchor && typeof anchor === 'object' && anchor !== null) {
-				if ('addListener' in anchor || 'position' in anchor) {
-					openAnchor = anchor as google.maps.MVCObject;
-				}
-			}
-			infoWindowInstance.open({ map: map, anchor: openAnchor, shouldFocus: shouldFocus });
+	$effect(() => {
+		if (header && hasRenderableContent(headerElement)) {
+			instance.setHeaderContent(headerElement);
 		} else {
-			infoWindowInstance.close();
+			instance.setHeaderContent(headerContent ?? null);
 		}
-	}
+	});
 
-	$: if (infoWindowInstance && map) {
-		updateOpenState();
-	}
+	$effect(() => {
+		if (!anchor && position) instance.setPosition(position);
+	});
 
-	$: if ($status === 'loaded' && !infoWindowInstance) {
-		tick().then(initializeInfoWindow);
-	}
+	$effect(() => {
+		if (open) {
+			instance.open({ map, anchor: anchor ?? undefined, shouldFocus });
+		} else {
+			instance.close();
+		}
+	});
+
+	$effect(() => {
+		return addListeners(instance, {
+			close: () => {
+				if (open) open = false;
+				onClose?.();
+			},
+			closeclick: onCloseClick
+		});
+	});
 </script>
 
-<div bind:this={contentWrapper}>
-	<slot />
+<div hidden>
+	<div bind:this={content}>{@render children?.()}</div>
+	<div bind:this={headerElement}>{@render header?.()}</div>
 </div>
-
-{#if $$slots.header}
-	<div bind:this={headerWrapper}>
-		<slot name="header" />
-	</div>
-{/if}

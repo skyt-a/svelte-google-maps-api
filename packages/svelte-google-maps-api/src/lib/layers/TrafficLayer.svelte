@@ -1,47 +1,30 @@
 <script lang="ts">
-	import { getContext, onDestroy } from 'svelte';
-	import { BROWSER as browser } from 'esm-env';
-	import type { APIProviderContext } from '../APIProvider.svelte';
+	import { onMount } from 'svelte';
+	import { getAPIContext, getMap } from '../internal/context.svelte.js';
 
-	export let onLoad: ((layer: google.maps.TrafficLayer) => void) | undefined = undefined;
-	export let onUnmount: ((layer: google.maps.TrafficLayer) => void) | undefined = undefined;
-
-	let layerInstance: google.maps.TrafficLayer | null = null;
-
-	const { status, googleMapsApi } = getContext<APIProviderContext>('svelte-google-maps-api');
-	const map = getContext<google.maps.Map>('map');
-
-	function initializeLayer() {
-		if (!browser || $status !== 'loaded' || !googleMapsApi || !map || layerInstance) return;
-
-		if (!googleMapsApi.TrafficLayer) {
-			console.error('[TrafficLayer] google.maps.TrafficLayer not available.');
-			return;
-		}
-
-		const layerOptions = {
-			map
-		};
-
-		try {
-			layerInstance = new googleMapsApi.TrafficLayer(layerOptions);
-			onLoad?.(layerInstance);
-		} catch (error) {
-			console.error('[TrafficLayer] Error creating instance:', error);
-		}
+	interface Props {
+		/** Refresh traffic data automatically. Defaults to `true`. */
+		autoRefresh?: boolean;
+		onLoad?: (layer: google.maps.TrafficLayer) => void;
 	}
 
-	onDestroy(() => {
-		if (layerInstance) {
-			onUnmount?.(layerInstance);
-			layerInstance.setMap(null);
-			layerInstance = null;
-		}
+	let { autoRefresh = true, onLoad }: Props = $props();
+
+	const api = getAPIContext('TrafficLayer');
+	const map = getMap('TrafficLayer');
+	let layer = $state.raw<google.maps.TrafficLayer | null>(null);
+
+	onMount(() => {
+		const { TrafficLayer } = api.requireLibrary('maps');
+		const instance = new TrafficLayer({ autoRefresh });
+		instance.setMap(map);
+		layer = instance;
+		onLoad?.(instance);
+
+		return () => instance.setMap(null);
 	});
 
-	$: if ($status === 'loaded' && map && !layerInstance) {
-		initializeLayer();
-	}
+	$effect(() => {
+		layer?.setOptions({ autoRefresh });
+	});
 </script>
-
-<!-- This layer component does not render any DOM element itself -->

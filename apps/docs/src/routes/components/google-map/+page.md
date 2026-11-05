@@ -6,124 +6,80 @@ title: GoogleMap
 
 [Open the GoogleMap story](https://skyt-a.github.io/svelte-google-maps-api/storybook/?path=/story/components-googlemap--basic)
 
-The GoogleMap component renders a Google Map instance.
+`GoogleMap` creates a `google.maps.Map` and provides it to its children. The camera (`center`, `zoom`, `heading`, `tilt`) is controlled by props and can be two-way bound, so user panning and zooming flows back into your state.
 
 ## Props
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| id | string | | Unique identifier for the map container |
-| options | google.maps.MapOptions | `{}` | Google Maps configuration options |
-| mapContainerStyle | string | 'width:100%;height:100%' | CSS styles for the map container |
-| mapContainerClassName | string | | CSS class for the map container |
-| onLoad | (map: google.maps.Map) => void | | Callback when map is loaded |
-| onUnmount | (map: google.maps.Map) => void | | Callback before map is destroyed |
+| center | `google.maps.LatLngLiteral \| google.maps.LatLng` | | Map center. Bindable: use `bind:center` to track panning. |
+| zoom | `number` | | Zoom level. Bindable: use `bind:zoom` to track zooming. |
+| heading | `number` | | Heading in degrees. Bindable. |
+| tilt | `number` | | Tilt in degrees. Bindable. |
+| mapId | `string` | | Map ID from the Cloud Console. Required for `AdvancedMarker`. Creation-only. |
+| colorScheme | `google.maps.MapOptions['colorScheme']` | | `LIGHT`, `DARK` or `FOLLOW_SYSTEM`. Creation-only. |
+| renderingType | `google.maps.MapOptions['renderingType']` | | `RASTER` or `VECTOR`. Creation-only. |
+| options | `google.maps.MapOptions` (without camera, `mapId`, `colorScheme`, `renderingType`) | | Any other map options. Applied with `setOptions()` whenever it changes. |
+| id | `string` | | `id` of the map container. |
+| class | `string` | `''` | Class of the map container. |
+| style | `string` | `'width:100%;height:100%;'` | Inline style of the map container. The container needs a height. |
+| map | `google.maps.Map \| null` | `null` | The map instance. Bindable: read it with `bind:map`. |
+| children | `Snippet` | | Map children, rendered once the map exists. |
 
-### Event Handler Props
+### Event Props
 
 | Prop | Type | Description |
 |------|------|-------------|
-| onClick | (e: google.maps.MapMouseEvent) => void | Click event handler |
-| onDblClick | (e: google.maps.MapMouseEvent) => void | Double click event handler |
-| onDrag | (e: google.maps.MapMouseEvent) => void | Drag event handler |
-| onDragEnd | (e: google.maps.MapMouseEvent) => void | Drag end event handler |
-| onDragStart | (e: google.maps.MapMouseEvent) => void | Drag start event handler |
-| onMouseDown | (e: google.maps.MapMouseEvent) => void | Mouse down event handler |
-| onMouseMove | (e: google.maps.MapMouseEvent) => void | Mouse move event handler |
-| onMouseOut | (e: google.maps.MapMouseEvent) => void | Mouse out event handler |
-| onMouseOver | (e: google.maps.MapMouseEvent) => void | Mouse over event handler |
-| onMouseUp | (e: google.maps.MapMouseEvent) => void | Mouse up event handler |
-| onRightClick | (e: google.maps.MapMouseEvent) => void | Right click event handler |
-| onCenterChanged | (e: google.maps.MapMouseEvent) => void | Center changed event handler |
+| onClick | `(event: google.maps.MapMouseEvent) => void` | `click` |
+| onDblClick | `(event: google.maps.MapMouseEvent) => void` | `dblclick` |
+| onContextMenu | `(event: google.maps.MapMouseEvent) => void` | `contextmenu` (right click) |
+| onMouseMove | `(event: google.maps.MapMouseEvent) => void` | `mousemove` |
+| onMouseOver | `(event: google.maps.MapMouseEvent) => void` | `mouseover` |
+| onMouseOut | `(event: google.maps.MapMouseEvent) => void` | `mouseout` |
+| onDragStart | `() => void` | `dragstart` |
+| onDrag | `() => void` | `drag` |
+| onDragEnd | `() => void` | `dragend` |
+| onIdle | `(map: google.maps.Map) => void` | `idle` |
+| onTilesLoaded | `(map: google.maps.Map) => void` | `tilesloaded` |
+| onBoundsChanged | `(bounds: google.maps.LatLngBoundsLiteral) => void` | `bounds_changed` |
+| onCameraChanged | `(camera: MapCameraState) => void` | Any of `center_changed`, `zoom_changed`, `heading_changed`, `tilt_changed`. Receives center, zoom, heading and tilt. |
+| onLoad | `(map: google.maps.Map) => void` | Called once after the map is created. |
 
 ## Usage
 
 ```svelte
-<script>
-  import { APIProvider, GoogleMap } from 'svelte-google-maps-api';
-  
-  const apiKey = 'YOUR_API_KEY';
-  const mapOptions = {
-    center: { lat: 35.6812362, lng: 139.7649361 },
-    zoom: 10
-  };
-  
-  function handleClick(e) {
-    console.log('Map clicked at:', e.latLng.lat(), e.latLng.lng());
-  }
-  
-  function handleLoad(map) {
-    console.log('Map loaded:', map);
-  }
+<script lang="ts">
+	import { APIProvider, GoogleMap } from 'svelte-google-maps-api';
+
+	let center = $state({ lat: 35.6812, lng: 139.7671 });
+	let zoom = $state(12);
 </script>
 
-<div style="height: 400px; width: 100%;">
-  <APIProvider {apiKey}>
-    <GoogleMap 
-      id="map" 
-      options={mapOptions} 
-      mapContainerStyle="width: 100%; height: 100%;"
-      onClick={handleClick}
-      onLoad={handleLoad}
-    />
-  </APIProvider>
+<div style="height: 400px;">
+	<APIProvider apiKey="YOUR_API_KEY">
+		<GoogleMap
+			bind:center
+			bind:zoom
+			mapId="DEMO_MAP_ID"
+			options={{ disableDefaultUI: true, gestureHandling: 'greedy' }}
+			onClick={(event) => console.log(event.latLng?.toJSON())}
+		/>
+	</APIProvider>
 </div>
+
+<p>{center.lat.toFixed(4)}, {center.lng.toFixed(4)} @ {zoom}</p>
 ```
 
-## Context
+## Migrating from 0.2
 
-The GoogleMap component consumes the context set by APIProvider and sets its own context with the map instance:
-
-```javascript
-setContext('map', { getMap: () => map });
-```
-
-This context is used by child components like Marker.
-
-## Example with Event Handling
-
-```svelte
-<script>
-  import { APIProvider, GoogleMap } from 'svelte-google-maps-api';
-  
-  const apiKey = 'YOUR_API_KEY';
-  const mapOptions = {
-    center: { lat: 35.6812362, lng: 139.7649361 },
-    zoom: 10
-  };
-  
-  let clickedPosition = null;
-  
-  function handleClick(e) {
-    clickedPosition = {
-      lat: e.latLng.lat(),
-      lng: e.latLng.lng()
-    };
-  }
-</script>
-
-<div>
-  {#if clickedPosition}
-    <p>Clicked at: {clickedPosition.lat.toFixed(6)}, {clickedPosition.lng.toFixed(6)}</p>
-  {:else}
-    <p>Click on the map to see coordinates</p>
-  {/if}
-  
-  <div style="height: 300px; width: 100%;">
-    <APIProvider {apiKey}>
-      <GoogleMap 
-        id="map" 
-        options={mapOptions} 
-        mapContainerStyle="width: 100%; height: 100%;"
-        onClick={handleClick}
-      />
-    </APIProvider>
-  </div>
-</div>
-```
+- `options.center` and `options.zoom` are now the `center` and `zoom` props (bindable).
+- `mapContainerStyle` is now `style`, and `mapContainerClassName` is now `class`.
+- `options.mapId` is now the `mapId` prop.
+- `onLoad` is unchanged. `onUnmount` was removed; use an effect cleanup in a child component if you need it.
+- The map instance is also available with `bind:map` or the `useMap()` hook.
 
 ## Notes
 
-- The GoogleMap component must be a child of the APIProvider component.
-- It creates a Google Maps instance and attaches it to the specified DOM element.
-- Event listeners are automatically cleaned up when the component is destroyed.
+- The map is invisible until it has both `center` and `zoom`.
+- `mapId`, `colorScheme` and `renderingType` are read once when the map is created. Recreate the component (for example inside a `key` block) to change them.
+- Children are rendered only after the map exists, so child components can use the map right away.

@@ -1,167 +1,175 @@
 <script lang="ts">
-	import { getContext, onDestroy } from 'svelte';
-	import { BROWSER as browser } from 'esm-env';
-	import type { APIProviderContext } from './APIProvider.svelte';
+	import { onMount } from 'svelte';
+	import { getAPIContext, getMap } from './internal/context.svelte.js';
+	import {
+		addListeners,
+		definedOnly,
+		mvcArrayToPath,
+		pathEquals,
+		watchMvcArray
+	} from './internal/utils.js';
 
-	type PathType =
-		| google.maps.MVCArray<google.maps.LatLng>
-		| (google.maps.LatLng | google.maps.LatLngLiteral)[];
-	type PathsType = google.maps.MVCArray<PathType> | PathType[];
+	type PolyMouseHandler = (event: google.maps.PolyMouseEvent) => void;
+	type MapMouseHandler = (event: google.maps.MapMouseEvent) => void;
+	type Paths = google.maps.LatLngLiteral[] | google.maps.LatLngLiteral[][];
 
-	export let paths: PathsType | undefined = undefined;
-	export let options: google.maps.PolygonOptions | undefined = undefined;
-	export let draggable: boolean | undefined = undefined;
-	export let editable: boolean | undefined = undefined;
-	export let visible: boolean | undefined = undefined;
+	interface Props {
+		/**
+		 * A single ring, or an array of rings (outer boundary first, then holes).
+		 * With `editable` or `draggable`, use `bind:paths` to track edits.
+		 */
+		paths?: Paths;
+		strokeColor?: string;
+		strokeOpacity?: number;
+		strokeWeight?: number;
+		strokePosition?: google.maps.StrokePosition;
+		fillColor?: string;
+		fillOpacity?: number;
+		geodesic?: boolean;
+		clickable?: boolean;
+		draggable?: boolean;
+		editable?: boolean;
+		visible?: boolean;
+		zIndex?: number;
+		/** Other `google.maps.PolygonOptions`. */
+		options?: google.maps.PolygonOptions;
+		/** The `google.maps.Polygon` instance. Read it with `bind:polygon`. */
+		polygon?: google.maps.Polygon | null;
+		onClick?: PolyMouseHandler;
+		onDblClick?: PolyMouseHandler;
+		onContextMenu?: PolyMouseHandler;
+		onMouseDown?: PolyMouseHandler;
+		onMouseUp?: PolyMouseHandler;
+		onMouseOver?: PolyMouseHandler;
+		onMouseOut?: PolyMouseHandler;
+		onMouseMove?: PolyMouseHandler;
+		onDragStart?: MapMouseHandler;
+		onDrag?: MapMouseHandler;
+		onDragEnd?: MapMouseHandler;
+		/** Called after the user edits or drags the polygon. Always receives an array of rings. */
+		onPathsChanged?: (paths: google.maps.LatLngLiteral[][]) => void;
+		onLoad?: (polygon: google.maps.Polygon) => void;
+	}
 
-	export let fillColor: string | undefined = undefined;
-	export let fillOpacity: number | undefined = undefined;
-	export let strokeColor: string | undefined = undefined;
-	export let strokeOpacity: number | undefined = undefined;
-	export let strokeWeight: number | undefined = undefined;
-	export let zIndex: number | undefined = undefined;
+	let {
+		paths = $bindable(),
+		strokeColor,
+		strokeOpacity,
+		strokeWeight,
+		strokePosition,
+		fillColor,
+		fillOpacity,
+		geodesic,
+		clickable,
+		draggable,
+		editable,
+		visible,
+		zIndex,
+		options,
+		polygon = $bindable(null),
+		onClick,
+		onDblClick,
+		onContextMenu,
+		onMouseDown,
+		onMouseUp,
+		onMouseOver,
+		onMouseOut,
+		onMouseMove,
+		onDragStart,
+		onDrag,
+		onDragEnd,
+		onPathsChanged,
+		onLoad
+	}: Props = $props();
 
-	export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onPathsChanged:
-		| ((newPaths: google.maps.MVCArray<google.maps.MVCArray<google.maps.LatLng>>) => void)
-		| undefined = undefined;
-	export let onLoad: ((polygon: google.maps.Polygon) => void) | undefined = undefined;
-	export let onUnmount: ((polygon: google.maps.Polygon) => void) | undefined = undefined;
+	const api = getAPIContext('Polygon');
+	const map = getMap('Polygon');
+	const { Polygon } = api.requireLibrary('maps');
+	const instance = new Polygon({ paths: paths ?? [] });
 
-	let polygonInstance: google.maps.Polygon | null = null;
-	let listeners: google.maps.MapsEventListener[] = [];
+	function toRings(value: Paths): google.maps.LatLngLiteral[][] {
+		if (value.length === 0) return [];
+		return Array.isArray(value[0])
+			? (value as google.maps.LatLngLiteral[][])
+			: [value as google.maps.LatLngLiteral[]];
+	}
 
-	const { status, googleMapsApi } = getContext<APIProviderContext>('svelte-google-maps-api');
-	const map = getContext<google.maps.Map>('map');
+	function readRings(): google.maps.LatLngLiteral[][] {
+		return instance
+			.getPaths()
+			.getArray()
+			.map((ring) => mvcArrayToPath(ring));
+	}
 
-	function initializePolygon() {
-		if (!browser || $status !== 'loaded' || !googleMapsApi || !map || polygonInstance) return;
+	function ringsEqual(a: google.maps.LatLngLiteral[][], b: google.maps.LatLngLiteral[][]) {
+		return a.length === b.length && a.every((ring, index) => pathEquals(ring, b[index]));
+	}
 
-		const polygonOptions: google.maps.PolygonOptions = {
-			...(options ?? {}),
-			map,
-			paths,
-			draggable,
-			editable,
-			visible,
-			fillColor,
-			fillOpacity,
-			strokeColor,
-			strokeOpacity,
-			strokeWeight,
-			zIndex
+	onMount(() => {
+		instance.setMap(map);
+		polygon = instance;
+		onLoad?.(instance);
+
+		return () => {
+			api.requireLibrary('core').event.clearInstanceListeners(instance);
+			instance.setMap(null);
 		};
-
-		Object.keys(polygonOptions).forEach((key) => {
-			if (polygonOptions[key as keyof typeof polygonOptions] === undefined) {
-				delete polygonOptions[key as keyof typeof polygonOptions];
-			}
-		});
-
-		try {
-			polygonInstance = new googleMapsApi.Polygon(polygonOptions);
-			onLoad?.(polygonInstance);
-			setupListeners();
-		} catch (error) {
-			console.error('[Polygon] Error creating instance:', error);
-		}
-	}
-
-	$: if (polygonInstance && paths) {
-		polygonInstance.setPaths(paths);
-	}
-	$: if (polygonInstance && options) {
-		polygonInstance.setOptions(options);
-	} else if (polygonInstance) {
-		if (draggable !== undefined) polygonInstance.setDraggable(draggable);
-		if (editable !== undefined) polygonInstance.setEditable(editable);
-		if (visible !== undefined) polygonInstance.setVisible(visible);
-		const styleOpts: google.maps.PolygonOptions = {};
-		if (fillColor !== undefined) styleOpts.fillColor = fillColor;
-		if (fillOpacity !== undefined) styleOpts.fillOpacity = fillOpacity;
-		if (strokeColor !== undefined) styleOpts.strokeColor = strokeColor;
-		if (strokeOpacity !== undefined) styleOpts.strokeOpacity = strokeOpacity;
-		if (strokeWeight !== undefined) styleOpts.strokeWeight = strokeWeight;
-		if (zIndex !== undefined) styleOpts.zIndex = zIndex;
-		if (Object.keys(styleOpts).length > 0) polygonInstance.setOptions(styleOpts);
-	}
-
-	function setupListeners() {
-		if (!polygonInstance || !googleMapsApi) return;
-		const polygon = polygonInstance;
-
-		listeners.forEach((listener) => googleMapsApi?.event.removeListener(listener));
-		listeners = [];
-
-		const eventHandlers = [
-			['click', onClick],
-			['dblclick', onDblClick],
-			['drag', onDrag],
-			['dragend', onDragEnd],
-			['dragstart', onDragStart],
-			['mousedown', onMouseDown],
-			['mousemove', onMouseMove],
-			['mouseout', onMouseOut],
-			['mouseover', onMouseOver],
-			['mouseup', onMouseUp],
-			['rightclick', onRightClick]
-		] as const;
-
-		eventHandlers.forEach(([eventName, callback]) => {
-			if (callback) {
-				listeners.push(polygon.addListener(eventName, callback));
-			}
-		});
-
-		if (onPathsChanged) {
-			const polygonPaths = polygonInstance.getPaths();
-			if (polygonPaths) {
-				const updatePaths = () => onPathsChanged(polygonPaths);
-
-				listeners.push(googleMapsApi.event.addListener(polygonPaths, 'insert_at', updatePaths));
-				listeners.push(googleMapsApi.event.addListener(polygonPaths, 'remove_at', updatePaths));
-				listeners.push(googleMapsApi.event.addListener(polygonPaths, 'set_at', updatePaths));
-
-				polygonPaths.forEach((path) => {
-					listeners.push(googleMapsApi.event.addListener(path, 'insert_at', updatePaths));
-					listeners.push(googleMapsApi.event.addListener(path, 'set_at', updatePaths));
-				});
-			}
-
-			if (draggable) {
-				listeners.push(
-					polygon.addListener('dragend', () => onPathsChanged(polygon.getPaths()))
-				);
-			}
-		}
-	}
-
-	$: if (polygonInstance && googleMapsApi && browser) {
-		setupListeners();
-	}
-
-	onDestroy(() => {
-		if (polygonInstance) {
-			onUnmount?.(polygonInstance);
-			listeners.forEach((listener) => googleMapsApi?.event.removeListener(listener));
-			polygonInstance.setMap(null);
-			polygonInstance = null;
-		}
 	});
 
-	$: if ($status === 'loaded' && map && !polygonInstance) {
-		initializePolygon();
-	}
-</script>
+	$effect(() => {
+		instance.setOptions({
+			...options,
+			...definedOnly({
+				strokeColor,
+				strokeOpacity,
+				strokeWeight,
+				strokePosition,
+				fillColor,
+				fillOpacity,
+				geodesic,
+				clickable,
+				draggable,
+				editable,
+				visible,
+				zIndex
+			})
+		});
+	});
 
-<!-- Polygon does not render any DOM element itself -->
+	$effect(() => {
+		const next = paths;
+		if (next && !ringsEqual(readRings(), toRings(next))) {
+			instance.setPaths(next);
+		}
+
+		const outer = instance.getPaths();
+		const sync = () => {
+			const updated = readRings();
+			const isNested = Array.isArray(paths?.[0]) || updated.length !== 1;
+			paths = isNested ? updated : updated[0];
+			onPathsChanged?.(updated);
+		};
+
+		const cleanups = [
+			watchMvcArray(outer as google.maps.MVCArray<unknown>, sync),
+			...outer.getArray().map((ring) => watchMvcArray(ring as google.maps.MVCArray<unknown>, sync))
+		];
+		return () => cleanups.forEach((cleanup) => cleanup());
+	});
+
+	$effect(() => {
+		return addListeners(instance, {
+			click: onClick,
+			dblclick: onDblClick,
+			contextmenu: onContextMenu,
+			mousedown: onMouseDown,
+			mouseup: onMouseUp,
+			mouseover: onMouseOver,
+			mouseout: onMouseOut,
+			mousemove: onMouseMove,
+			dragstart: onDragStart,
+			drag: onDrag,
+			dragend: onDragEnd
+		});
+	});
+</script>

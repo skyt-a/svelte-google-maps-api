@@ -1,137 +1,137 @@
 <script lang="ts">
-	import { getContext, onDestroy } from 'svelte';
-	import { BROWSER as browser } from 'esm-env';
-	import type { APIProviderContext } from './APIProvider.svelte';
+	import { onMount, untrack } from 'svelte';
+	import { getAPIContext, getMap } from './internal/context.svelte.js';
+	import { addListeners, boundsEquals, definedOnly, toBoundsLiteral } from './internal/utils.js';
 
-	export let bounds: google.maps.LatLngBounds | google.maps.LatLngBoundsLiteral | undefined =
-		undefined;
-	export let options: google.maps.RectangleOptions | undefined = undefined;
-	export let draggable: boolean | undefined = undefined;
-	export let editable: boolean | undefined = undefined;
-	export let visible: boolean | undefined = undefined;
-	export let fillColor: string | undefined = undefined;
-	export let fillOpacity: number | undefined = undefined;
-	export let strokeColor: string | undefined = undefined;
-	export let strokeOpacity: number | undefined = undefined;
-	export let strokeWeight: number | undefined = undefined;
-	export let zIndex: number | undefined = undefined;
+	type MapMouseHandler = (event: google.maps.MapMouseEvent) => void;
 
-	export let onBoundsChanged: (() => void) | undefined = undefined;
-	export let onClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onDblClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onDrag: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onDragEnd: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onDragStart: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onMouseDown: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onMouseMove: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onMouseOut: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onMouseOver: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onMouseUp: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onRightClick: ((e: google.maps.MapMouseEvent) => void) | undefined = undefined;
-	export let onLoad: ((rectangle: google.maps.Rectangle) => void) | undefined = undefined;
-	export let onUnmount: ((rectangle: google.maps.Rectangle) => void) | undefined = undefined;
+	interface Props {
+		/** Rectangle bounds. With `editable` or `draggable`, use `bind:bounds`. */
+		bounds?: google.maps.LatLngBoundsLiteral | google.maps.LatLngBounds;
+		strokeColor?: string;
+		strokeOpacity?: number;
+		strokeWeight?: number;
+		strokePosition?: google.maps.StrokePosition;
+		fillColor?: string;
+		fillOpacity?: number;
+		clickable?: boolean;
+		draggable?: boolean;
+		editable?: boolean;
+		visible?: boolean;
+		zIndex?: number;
+		/** Other `google.maps.RectangleOptions`. */
+		options?: google.maps.RectangleOptions;
+		/** The `google.maps.Rectangle` instance. Read it with `bind:rectangle`. */
+		rectangle?: google.maps.Rectangle | null;
+		onClick?: MapMouseHandler;
+		onDblClick?: MapMouseHandler;
+		onContextMenu?: MapMouseHandler;
+		onMouseDown?: MapMouseHandler;
+		onMouseUp?: MapMouseHandler;
+		onMouseOver?: MapMouseHandler;
+		onMouseOut?: MapMouseHandler;
+		onMouseMove?: MapMouseHandler;
+		onDragStart?: MapMouseHandler;
+		onDrag?: MapMouseHandler;
+		onDragEnd?: MapMouseHandler;
+		onBoundsChanged?: (bounds: google.maps.LatLngBoundsLiteral) => void;
+		onLoad?: (rectangle: google.maps.Rectangle) => void;
+	}
 
-	let rectangleInstance: google.maps.Rectangle | null = null;
-	let listeners: google.maps.MapsEventListener[] = [];
+	let {
+		bounds = $bindable(),
+		strokeColor,
+		strokeOpacity,
+		strokeWeight,
+		strokePosition,
+		fillColor,
+		fillOpacity,
+		clickable,
+		draggable,
+		editable,
+		visible,
+		zIndex,
+		options,
+		rectangle = $bindable(null),
+		onClick,
+		onDblClick,
+		onContextMenu,
+		onMouseDown,
+		onMouseUp,
+		onMouseOver,
+		onMouseOut,
+		onMouseMove,
+		onDragStart,
+		onDrag,
+		onDragEnd,
+		onBoundsChanged,
+		onLoad
+	}: Props = $props();
 
-	const { status, googleMapsApi } = getContext<APIProviderContext>('svelte-google-maps-api');
-	const map = getContext<google.maps.Map>('map');
+	const api = getAPIContext('Rectangle');
+	const map = getMap('Rectangle');
+	const { Rectangle } = api.requireLibrary('maps');
+	const instance = new Rectangle(untrack(() => (bounds ? { bounds } : {})));
 
-	function initializeRectangle() {
-		if (!browser || $status !== 'loaded' || !googleMapsApi || !map || rectangleInstance) return;
+	onMount(() => {
+		instance.setMap(map);
+		rectangle = instance;
+		onLoad?.(instance);
 
-		const rectangleOptions: google.maps.RectangleOptions = {
-			...(options ?? {}),
-			map,
-			bounds,
-			draggable,
-			editable,
-			visible,
-			fillColor,
-			fillOpacity,
-			strokeColor,
-			strokeOpacity,
-			strokeWeight,
-			zIndex
+		return () => {
+			api.requireLibrary('core').event.clearInstanceListeners(instance);
+			instance.setMap(null);
 		};
-
-		Object.keys(rectangleOptions).forEach((key) => {
-			if (rectangleOptions[key as keyof typeof rectangleOptions] === undefined) {
-				delete rectangleOptions[key as keyof typeof rectangleOptions];
-			}
-		});
-
-		try {
-			rectangleInstance = new googleMapsApi.Rectangle(rectangleOptions);
-			onLoad?.(rectangleInstance);
-			setupListeners();
-		} catch (error) {
-			console.error('[Rectangle] Error creating instance:', error);
-		}
-	}
-
-	$: if (rectangleInstance && bounds) {
-		rectangleInstance.setBounds(bounds);
-	}
-	$: if (rectangleInstance && options) {
-		rectangleInstance.setOptions(options);
-	} else if (rectangleInstance) {
-		if (draggable !== undefined) rectangleInstance.setDraggable(draggable);
-		if (editable !== undefined) rectangleInstance.setEditable(editable);
-		if (visible !== undefined) rectangleInstance.setVisible(visible);
-		const styleOpts: google.maps.RectangleOptions = {};
-		if (fillColor !== undefined) styleOpts.fillColor = fillColor;
-		if (fillOpacity !== undefined) styleOpts.fillOpacity = fillOpacity;
-		if (strokeColor !== undefined) styleOpts.strokeColor = strokeColor;
-		if (strokeOpacity !== undefined) styleOpts.strokeOpacity = strokeOpacity;
-		if (strokeWeight !== undefined) styleOpts.strokeWeight = strokeWeight;
-		if (zIndex !== undefined) styleOpts.zIndex = zIndex;
-		if (Object.keys(styleOpts).length > 0) rectangleInstance.setOptions(styleOpts);
-	}
-
-	function setupListeners() {
-		if (!rectangleInstance || !googleMapsApi) return;
-		const rectangle = rectangleInstance;
-
-		listeners.forEach((listener) => googleMapsApi?.event.removeListener(listener));
-		listeners = [];
-
-		const eventHandlers = [
-			['bounds_changed', onBoundsChanged],
-			['click', onClick],
-			['dblclick', onDblClick],
-			['drag', onDrag],
-			['dragend', onDragEnd],
-			['dragstart', onDragStart],
-			['mousedown', onMouseDown],
-			['mousemove', onMouseMove],
-			['mouseout', onMouseOut],
-			['mouseover', onMouseOver],
-			['mouseup', onMouseUp],
-			['rightclick', onRightClick]
-		] as const;
-
-		eventHandlers.forEach(([eventName, callback]) => {
-			if (callback) {
-				listeners.push(rectangle.addListener(eventName, callback));
-			}
-		});
-	}
-
-	$: if (rectangleInstance && googleMapsApi && browser) {
-		setupListeners();
-	}
-
-	onDestroy(() => {
-		if (rectangleInstance) {
-			onUnmount?.(rectangleInstance);
-			listeners.forEach((listener) => googleMapsApi?.event.removeListener(listener));
-			rectangleInstance.setMap(null);
-			rectangleInstance = null;
-		}
 	});
 
-	$: if ($status === 'loaded' && map && !rectangleInstance) {
-		initializeRectangle();
-	}
+	$effect(() => {
+		instance.setOptions({
+			...options,
+			...definedOnly({
+				strokeColor,
+				strokeOpacity,
+				strokeWeight,
+				strokePosition,
+				fillColor,
+				fillOpacity,
+				clickable,
+				draggable,
+				editable,
+				visible,
+				zIndex
+			})
+		});
+	});
+
+	$effect(() => {
+		const next = bounds;
+		if (next && !boundsEquals(instance.getBounds(), next)) instance.setBounds(next);
+	});
+
+	$effect(() => {
+		return addListeners(instance, {
+			bounds_changed: () => {
+				const next = toBoundsLiteral(instance.getBounds());
+				if (!next) return;
+				if (!boundsEquals(next, bounds)) bounds = next;
+				onBoundsChanged?.(next);
+			}
+		});
+	});
+
+	$effect(() => {
+		return addListeners(instance, {
+			click: onClick,
+			dblclick: onDblClick,
+			contextmenu: onContextMenu,
+			mousedown: onMouseDown,
+			mouseup: onMouseUp,
+			mouseover: onMouseOver,
+			mouseout: onMouseOut,
+			mousemove: onMouseMove,
+			dragstart: onDragStart,
+			drag: onDrag,
+			dragend: onDragEnd
+		});
+	});
 </script>

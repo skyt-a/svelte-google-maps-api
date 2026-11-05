@@ -1,193 +1,111 @@
 <script lang="ts">
-	import { getContext, onDestroy, onMount, tick } from 'svelte';
-	import { BROWSER as browser } from 'esm-env';
-	import type { APIProviderContext } from '../APIProvider.svelte';
+	import { onMount, type Snippet } from 'svelte';
+	import { getAPIContext, getMap } from '../internal/context.svelte.js';
+	import { toLatLngLiteral } from '../internal/utils.js';
+	import type { LatLngInput } from '../types.js';
 
-	export let position: google.maps.LatLng | google.maps.LatLngLiteral | undefined = undefined;
-	export let bounds: google.maps.LatLngBounds | google.maps.LatLngBoundsLiteral | undefined =
-		undefined;
-	export let mapPaneName: keyof google.maps.MapPanes = 'floatPane';
+	interface Props {
+		/** Geographic point the content is placed at. Use `bounds` to stretch the content instead. */
+		position?: LatLngInput | null;
+		/** Geographic area the content is stretched over. */
+		bounds?: google.maps.LatLngBoundsLiteral | google.maps.LatLngBounds | null;
+		/** Map pane to render into. Use `overlayMouseTarget` or `floatPane` for clickable content. */
+		pane?: keyof google.maps.MapPanes;
+		/** Pixel offset applied to `position`, as `[x, y]`. */
+		offset?: [number, number];
+		zIndex?: number;
+		class?: string;
+		/** The `google.maps.OverlayView` instance. Read it with `bind:overlayView`. */
+		overlayView?: google.maps.OverlayView | null;
+		onLoad?: (overlayView: google.maps.OverlayView) => void;
+		children?: Snippet;
+	}
 
-	export let onLoad: ((overlayView: google.maps.OverlayView) => void) | undefined = undefined;
-	export let onUnmount: ((overlayView: google.maps.OverlayView) => void) | undefined = undefined;
+	let {
+		position,
+		bounds,
+		pane = 'floatPane',
+		offset = [0, 0],
+		zIndex,
+		class: className = '',
+		overlayView = $bindable(null),
+		onLoad,
+		children
+	}: Props = $props();
 
-	let overlayViewInstance: google.maps.OverlayView | null = null;
-	let contentWrapper: HTMLDivElement | null = null;
-	let isMounted = false;
+	const api = getAPIContext('OverlayView');
+	const map = getMap('OverlayView');
+	const { OverlayView } = api.requireLibrary('maps');
+	const { LatLng, LatLngBounds } = api.requireLibrary('core');
+	let content: HTMLDivElement;
 
-	const { status, googleMapsApi } = getContext<APIProviderContext>('svelte-google-maps-api');
-	const map = getContext<google.maps.Map>('map');
-
-	class CustomOverlay extends google.maps.OverlayView {
-		private paneName: keyof google.maps.MapPanes;
-		private container: HTMLDivElement;
-		private pos: google.maps.LatLng | undefined;
-		private bnds: google.maps.LatLngBounds | undefined;
-		private api: typeof google.maps | null = null;
-
-		constructor(
-			apiRef: typeof google.maps,
-			paneName: keyof google.maps.MapPanes,
-			containerElement: HTMLDivElement,
-			initialPosition?: google.maps.LatLng | google.maps.LatLngLiteral,
-			initialBounds?: google.maps.LatLngBounds | google.maps.LatLngBoundsLiteral
-		) {
-			super();
-			this.api = apiRef;
-			this.paneName = paneName;
-			this.container = containerElement;
-
-			if (initialPosition) {
-				this.pos =
-					initialPosition instanceof this.api.LatLng
-						? initialPosition
-						: new this.api.LatLng(initialPosition.lat, initialPosition.lng);
-			}
-			if (initialBounds) {
-				this.bnds =
-					initialBounds instanceof this.api.LatLngBounds
-						? initialBounds
-						: new this.api.LatLngBounds(initialBounds);
-			}
-		}
-
+	class SvelteOverlay extends OverlayView {
 		onAdd() {
-			const pane = this.getPanes()?.[this.paneName];
-			if (pane && this.container) {
-				pane.appendChild(this.container);
-			} else {
-				console.error('[OverlayView] Pane or container not found in onAdd.');
-			}
+			this.getPanes()?.[pane].appendChild(content);
 		}
 
 		draw() {
 			const projection = this.getProjection();
-			if (!projection || !this.container) {
+			if (!projection) return;
+
+			content.style.position = 'absolute';
+			content.style.zIndex = zIndex === undefined ? '' : String(zIndex);
+
+			if (bounds) {
+				const area = bounds instanceof LatLngBounds ? bounds : new LatLngBounds(bounds);
+				const southWest = projection.fromLatLngToDivPixel(area.getSouthWest());
+				const northEast = projection.fromLatLngToDivPixel(area.getNorthEast());
+				if (!southWest || !northEast) return;
+
+				content.style.left = `${southWest.x}px`;
+				content.style.top = `${northEast.y}px`;
+				content.style.width = `${northEast.x - southWest.x}px`;
+				content.style.height = `${southWest.y - northEast.y}px`;
+				content.style.visibility = 'visible';
 				return;
 			}
 
-			if (this.pos) {
-				const point = projection.fromLatLngToDivPixel(this.pos);
-				if (point) {
-					this.container.style.left = `${point.x}px`;
-					this.container.style.top = `${point.y}px`;
-					this.container.style.position = 'absolute';
-					this.container.style.display = '';
-				} else {
-					console.warn('[OverlayView] Could not get div pixel for position.');
-				}
-			} else if (this.bnds) {
-				const sw = projection.fromLatLngToDivPixel(this.bnds.getSouthWest());
-				const ne = projection.fromLatLngToDivPixel(this.bnds.getNorthEast());
-				if (sw && ne) {
-					this.container.style.left = `${sw.x}px`;
-					this.container.style.top = `${ne.y}px`;
-					this.container.style.width = `${ne.x - sw.x}px`;
-					this.container.style.height = `${sw.y - ne.y}px`;
-					this.container.style.position = 'absolute';
-					this.container.style.display = '';
-				} else {
-					console.warn('[OverlayView] Could not get div pixel for bounds.');
-				}
+			const literal = toLatLngLiteral(position);
+			if (literal) {
+				const point = projection.fromLatLngToDivPixel(new LatLng(literal));
+				if (!point) return;
+
+				content.style.left = `${point.x + offset[0]}px`;
+				content.style.top = `${point.y + offset[1]}px`;
+				content.style.visibility = 'visible';
 			}
 		}
 
 		onRemove() {
-			if (this.container && this.container.parentNode) {
-				this.container.parentNode.removeChild(this.container);
-				this.container.style.display = 'none';
-			}
-		}
-
-		updatePosition(newPos: google.maps.LatLng | google.maps.LatLngLiteral | undefined) {
-			if (!this.api) return;
-			this.pos = newPos
-				? newPos instanceof this.api.LatLng
-					? newPos
-					: new this.api.LatLng(newPos.lat, newPos.lng)
-				: undefined;
-			this.bnds = undefined;
-			this.draw();
-		}
-
-		updateBounds(
-			newBounds: google.maps.LatLngBounds | google.maps.LatLngBoundsLiteral | undefined
-		) {
-			if (!this.api) return;
-			this.bnds = newBounds
-				? newBounds instanceof this.api.LatLngBounds
-					? newBounds
-					: new this.api.LatLngBounds(newBounds)
-				: undefined;
-			this.pos = undefined;
-			this.draw();
+			content.remove();
 		}
 	}
+
+	const instance = new SvelteOverlay();
 
 	onMount(() => {
-		isMounted = true;
+		content.style.visibility = 'hidden';
+		instance.setMap(map);
+		overlayView = instance;
+		onLoad?.(instance);
 
-		tick().then(initializeOverlayView);
+		return () => instance.setMap(null);
 	});
 
-	function initializeOverlayView() {
-		if (
-			!browser ||
-			$status !== 'loaded' ||
-			!googleMapsApi ||
-			!map ||
-			!contentWrapper ||
-			!isMounted ||
-			overlayViewInstance
-		)
-			return;
-
-		if (!googleMapsApi.OverlayView) {
-			console.error('[OverlayView] google.maps.OverlayView not available.');
-			return;
-		}
-
-		try {
-			overlayViewInstance = new CustomOverlay(
-				googleMapsApi,
-				mapPaneName,
-				contentWrapper,
-				position,
-				bounds
-			);
-			overlayViewInstance.setMap(map);
-			onLoad?.(overlayViewInstance);
-		} catch (error) {
-			console.error('[OverlayView] Error creating instance:', error);
-		}
-	}
-
-	$: if (overlayViewInstance && position && googleMapsApi) {
-		(overlayViewInstance as CustomOverlay).updatePosition(position);
-	} else if (overlayViewInstance && bounds && googleMapsApi) {
-		(overlayViewInstance as CustomOverlay).updateBounds(bounds);
-	} else if (overlayViewInstance && !position && !bounds) {
-		console.warn(
-			'[OverlayView] Both position and bounds are undefined. Hiding overlay content element.'
-		);
-		if (contentWrapper) contentWrapper.style.display = 'none';
-	}
-
-	onDestroy(() => {
-		if (overlayViewInstance) {
-			onUnmount?.(overlayViewInstance);
-			overlayViewInstance.setMap(null);
-			overlayViewInstance = null;
-		}
+	$effect(() => {
+		// Redraw whenever placement props change.
+		void [position, bounds, offset, zIndex];
+		instance.draw();
 	});
 
-	$: if ($status === 'loaded' && map && contentWrapper && isMounted && !overlayViewInstance) {
-		initializeOverlayView();
-	}
+	$effect(() => {
+		// Move to another pane when `pane` changes after mount.
+		const target = pane;
+		const panes = instance.getPanes();
+		if (panes && content.parentElement !== panes[target]) panes[target].appendChild(content);
+	});
 </script>
 
-<!-- This div wraps the slot content and is managed by OverlayView -->
-<!-- Initial styles might be needed to prevent flash of unstyled content -->
-<div bind:this={contentWrapper} style="display: none;">
-	<slot />
+<div hidden>
+	<div bind:this={content} class={className}>{@render children?.()}</div>
 </div>

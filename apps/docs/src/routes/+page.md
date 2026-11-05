@@ -1,7 +1,7 @@
 ---
 title: Svelte Google Maps API
 heroImage: /images/svelte-google-maps-logo.png
-tagline: A Svelte component library for integrating Google Maps JavaScript API into Svelte applications.
+tagline: Svelte 5 components for the Google Maps JavaScript API, built on Advanced Markers, Places API (New) and the Routes library.
 actions:
   - label: Get Started
     type: primary
@@ -11,10 +11,10 @@ actions:
     to: https://github.com/skyt-a/svelte-google-maps-api
     external: true
 features:
-  - title: Easy Integration
-    description: Simple components to integrate Google Maps into your Svelte applications with minimal configuration
+  - title: Svelte 5 Runes
+    description: Declarative components with bind:center, bind:zoom, bind:position and snippets for marker and info window content
+  - title: Current Google Maps APIs
+    description: Advanced Markers, PlaceAutocompleteElement and the Routes library instead of deprecated Marker, Autocomplete and Directions APIs
   - title: Fully Typed
-    description: Complete TypeScript support for better developer experience and code reliability
-  - title: Svelte-First Design
-    description: Built specifically for Svelte, leveraging its reactivity and component model
+    description: Typed props and events from @types/google.maps, plus useMap and useMapsLibrary helpers for your own components
 ---

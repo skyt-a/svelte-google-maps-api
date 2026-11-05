@@ -5,63 +5,63 @@ title: OverlayView
 ## Storybook
 
 [Open the OverlayView story](https://skyt-a.github.io/svelte-google-maps-api/storybook/?path=/story/components-overlayview--basic)
-A component for displaying custom HTML elements (`<slot>`) as an overlay at a specified position or bounds on the map.
-Wraps `google.maps.OverlayView` to integrate Svelte components into map panes.
 
-Must be used within a `<GoogleMap>` component.
-
-```svelte
-<script lang="ts">
-  import { APIProvider, GoogleMap, OverlayView } from 'svelte-google-maps-api';
-  import { GOOGLE_MAPS_API_KEY } from '$env/static/private';
-
-  const center = { lat: 34.0522, lng: -118.2437 }; // Los Angeles
-</script>
-
-<APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
-  <GoogleMap initialCenter={center} initialZoom={12}>
-    <!-- Position-based Overlay -->
-    <OverlayView position={center} mapPaneName="floatPane">
-      <div style="background: rgba(255, 0, 0, 0.7); color: white; padding: 10px; border-radius: 5px; transform: translate(-50%, -100%);">
-        Hello from OverlayView! (at center)
-      </div>
-    </OverlayView>
-
-    <!-- Bounds-based Overlay (Example) -->
-    <OverlayView bounds={{ north: 34.06, south: 34.04, east: -118.23, west: -118.25 }} mapPaneName="overlayLayer">
-       <div style="border: 2px dashed blue; background: rgba(0, 0, 255, 0.2); width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; color: blue;">
-         Bounds Overlay
-       </div>
-    </OverlayView>
-  </GoogleMap>
-</APIProvider>
-```
+`OverlayView` renders Svelte content inside a map pane at a geographic position, or stretched over geographic bounds. Use it for fully custom HTML overlays.
 
 ## Props
 
-| Prop          | Type                                                                 | Default       | Description                                                                                                                                                                        |
-| :------------ | :------------------------------------------------------------------- | :------------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `position`    | `google.maps.LatLng \| google.maps.LatLngLiteral \| undefined`        | `undefined`   | The single geographical coordinate where the overlay should be displayed. If provided along with `bounds`, `position` takes precedence.                                              |
-| `bounds`      | `google.maps.LatLngBounds \| google.maps.LatLngBoundsLiteral \| undefined` | `undefined`   | The geographical bounds where the overlay should be displayed. If provided, the slot content will be stretched to fit these bounds. Used only if `position` is not provided.      |
-| `mapPaneName` | `keyof google.maps.MapPanes`                                       | `'floatPane'` | The name of the map pane where the overlay's container element should be added. See [MapPanes documentation](https://developers.google.com/maps/documentation/javascript/reference/map#MapPanes) for available pane names. |
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| position | `LatLngInput \| null` | | Point the content's top-left corner is placed at. |
+| bounds | `google.maps.LatLngBoundsLiteral \| google.maps.LatLngBounds \| null` | | Area the content is stretched over. Takes precedence over `position`. |
+| pane | `keyof google.maps.MapPanes` | `'floatPane'` | Map pane to render into. Use `overlayMouseTarget` or `floatPane` for clickable content. |
+| offset | `[number, number]` | `[0, 0]` | Pixel offset applied to `position`, as `[x, y]`. |
+| zIndex | `number` | | CSS `z-index` of the content container. |
+| class | `string` | `''` | Class of the content container. |
+| overlayView | `google.maps.OverlayView \| null` | `null` | The instance. Bindable: read it with `bind:overlayView`. |
+| children | `Snippet` | | Overlay content. |
 
-## Pane constants
+### Event Props
 
-`FLOAT_PANE`, `MAP_PANE`, `MARKER_LAYER`, `OVERLAY_LAYER`, and `OVERLAY_MOUSE_TARGET` are exported from `svelte-google-maps-api` for convenient pane selection.
+| Prop | Type | Description |
+|------|------|-------------|
+| onLoad | `(overlayView: google.maps.OverlayView) => void` | Called once after the overlay is added to the map. |
 
-**Note:** You cannot specify both `position` and `bounds` simultaneously. Provide one or the other, or neither (in which case the overlay won't be displayed).
+## Usage
 
-## Events
+```svelte
+<script lang="ts">
+	import { APIProvider, GoogleMap, OverlayView } from 'svelte-google-maps-api';
+</script>
 
-| Event       | Type                                                      | Description                                                                                             |
-| :---------- | :-------------------------------------------------------- | :---------------------------------------------------------------------------------------------------- |
-| `onLoad`    | `((overlayView: google.maps.OverlayView) => void) \| undefined` | Fired when the overlay view is created and added to the map. Receives the instance.                   |
-| `onUnmount` | `((overlayView: google.maps.OverlayView) => void) \| undefined` | Fired when the component is destroyed and the overlay view is removed from the map. Receives the instance. |
+<div style="height: 400px;">
+	<APIProvider apiKey="YOUR_API_KEY">
+		<GoogleMap center={{ lat: 35.6812, lng: 139.7671 }} zoom={14}>
+			<OverlayView
+				position={{ lat: 35.6812, lng: 139.7671 }}
+				pane="overlayMouseTarget"
+				offset={[-60, -40]}
+			>
+				<div class="label">Tokyo Station</div>
+			</OverlayView>
+		</GoogleMap>
+	</APIProvider>
+</div>
 
-## Binding
+<style>
+	.label {
+		width: 120px;
+		padding: 6px;
+		text-align: center;
+		background: white;
+		border-radius: 6px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+	}
+</style>
+```
 
-This component does not support the `bind:` directive.
+## Notes
 
-## Slots
-
-*   **default:** Place the custom HTML elements or Svelte components to be displayed on the map. The styling of the slot content (specifically `position`, `left`, `top`, `width`, `height`) is managed internally by the `OverlayView` component based on the `position` or `bounds` prop. You can style the content itself (background, padding, etc.) as usual. When using `position`, it's common to adjust the styling for offset from the anchor point (e.g., `transform: translate(-50%, -100%);` to center the content above the tip like a marker). 
+- With `position`, the content's top-left corner sits on the point; use `offset` to center it.
+- The content is hidden until the overlay is first drawn, so it never flashes at the top-left of the page.
+- For simple markers with custom HTML, `AdvancedMarker` with children is usually easier and handles collisions and accessibility.
