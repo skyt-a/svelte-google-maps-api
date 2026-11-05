@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount, type Snippet } from 'svelte';
 	import { getAPIContext, MapContext, setMapContext } from './internal/context.svelte.js';
-	import { addListeners, latLngEquals, toLatLngLiteral } from './internal/utils.js';
+	import { addListeners, definedOnly, latLngEquals, toLatLngLiteral } from './internal/utils.js';
 	import type { MapCameraState } from './types.js';
 
 	type MapMouseHandler = (event: google.maps.MapMouseEvent) => void;
@@ -83,15 +83,11 @@
 
 	onMount(() => {
 		const { Map } = api.requireLibrary('maps');
+		// Pass only the props that are set. The Maps API rejects `null` for some options
+		// (e.g. `renderingType`), and unset props must not override values from `options`.
 		const instance = new Map(container, {
 			...options,
-			center: center ?? null,
-			zoom: zoom ?? null,
-			heading: heading ?? null,
-			tilt: tilt ?? null,
-			mapId: mapId ?? null,
-			colorScheme: colorScheme ?? undefined,
-			renderingType: renderingType ?? null
+			...definedOnly({ center, zoom, heading, tilt, mapId, colorScheme, renderingType })
 		});
 
 		context.map = instance;

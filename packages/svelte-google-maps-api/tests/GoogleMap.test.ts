@@ -1,6 +1,8 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { describe, expect, it, vi } from 'vitest';
 import CameraHarness from './fixtures/CameraHarness.svelte';
+import MapHarness from './fixtures/MapHarness.svelte';
+import Polyline from '../src/lib/Polyline.svelte';
 import { installGoogleMapsMock } from './googleMapsMock';
 
 describe('GoogleMap', () => {
@@ -14,6 +16,26 @@ describe('GoogleMap', () => {
 		expect(map.element).toHaveClass('test-map');
 		expect(map.options).toMatchObject({ mapId: 'DEMO_MAP_ID', zoom: 10 });
 		expect(map.getCenter()?.toJSON()).toEqual({ lat: 35, lng: 139 });
+	});
+
+	it('does not pass null for unset creation options', async () => {
+		// The real API throws "setRenderingType: null is not an accepted value".
+		const mock = installGoogleMapsMock();
+		render(MapHarness, {
+			props: {
+				component: Polyline,
+				mapProps: { options: { disableDefaultUI: true } }
+			}
+		});
+
+		await waitFor(() => expect(mock.classes.Map.instances).toHaveLength(1));
+		const { options } = mock.classes.Map.instances[0];
+
+		expect(Object.values(options)).not.toContain(null);
+		expect(options).toMatchObject({ disableDefaultUI: true, zoom: 3 });
+		for (const key of ['heading', 'tilt', 'mapId', 'colorScheme', 'renderingType']) {
+			expect(options).not.toHaveProperty(key);
+		}
 	});
 
 	it('pushes prop changes to the map', async () => {

@@ -354,6 +354,7 @@
 							strokeColor="#0f766e"
 							editable
 						/>
+						{@render statusControl(`${polygonPaths.length} vertices (drag to edit)`)}
 					{:else if componentName === 'Circle'}
 						<Circle
 							center={tokyo}
@@ -373,6 +374,10 @@
 							editable
 							draggable
 						/>
+						{@render statusControl(
+							`N ${rectangleBounds.north.toFixed(4)} · S ${rectangleBounds.south.toFixed(4)} · ` +
+								`E ${rectangleBounds.east.toFixed(4)} · W ${rectangleBounds.west.toFixed(4)}`
+						)}
 					{:else if componentName === 'GroundOverlay'}
 						<GroundOverlay url={groundOverlayUrl} bounds={overlayBounds} opacity={0.55} />
 					{:else if componentName === 'Data'}
